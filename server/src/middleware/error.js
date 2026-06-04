@@ -31,5 +31,7 @@ export const errorHandler = (err, req, res, next) => {
 
   if (statusCode >= 500) console.error(err);
 
+  console.log(payload.message);
+
   res.status(statusCode).json(payload);
 };

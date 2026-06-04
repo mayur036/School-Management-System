@@ -228,10 +228,11 @@ server/
 
 ### Phase 3 — Authentication
 
-- [ ] `auth.controller` + `auth.routes`: `POST /api/auth/login`, `GET /api/auth/me`
-- [ ] `middleware/auth.js` + `middleware/authorize.js`
-- [ ] `middleware/error.js` central handler
+- [x] `auth.controller` + `auth.routes`: `POST /api/auth/login`, `GET /api/auth/me`
+- [x] `middleware/auth.js` + `middleware/authorize.js`
+- [x] `middleware/error.js` central handler
 - **Done when:** super admin can log in and hit a protected route
+
 
 ### Phase 4 — Super Admin module
 

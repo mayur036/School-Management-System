@@ -4,6 +4,7 @@ import express from 'express';
 import morgan from 'morgan';
 
 import { isProduction } from './config/env.js';
+import { setupSwagger } from './config/swagger.js';
 import { errorHandler, notFound } from './middleware/error.js';
 import apiRoutes from './routes.js';
 
@@ -15,6 +16,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 if (!isProduction) app.use(morgan('dev'));
+
+// Setup Swagger API Documentation
+setupSwagger(app);
 
 // Health check
 app.get('/health', (req, res) => {
