@@ -208,20 +208,23 @@ server/
 - [x] Wire `index.js` → `src/app.js` with a `/health` route (+ `config/env.js`, `middleware/error.js`, `routes.js`)
 - **Done when:** `bun run dev` serves `GET /health → 200` ✓ (verified: `/health`, `/api`, and 404 handler all respond)
 
-### Phase 1 — Database (MySQL Workbench)
+### Phase 1 — Database (MySQL Workbench) ✅
 
-- [ ] Write `database/schema.sql` (roles, schools, departments, staff + FKs)
-- [ ] Write `database/procedures.sql` (all procs in §4.4)
-- [ ] Write `database/seed.sql` (seed 3 roles + 1 super admin with bcrypt hash)
-- [ ] Run all three in Workbench, verify tables + procs exist
-- **Done when:** `CALL sp_login_get_user('superadmin@...')` returns the seeded row
+- [x] Write `database/schema.sql` (roles, schools, departments, staff + FKs)
+- [x] Write `database/procedures.sql` (all 13 procs in §4.4)
+- [x] Write `database/seed.sql` (seed 3 roles + 1 super admin with bcrypt hash)
+- [x] Run all three, verify tables + procs exist (4 tables, 13 procs, idempotent re-runs)
+- **Done when:** `CALL sp_login_get_user('superadmin@...')` returns the seeded row ✓
+- **Seeded super admin:** `superadmin@sms.com` / `Admin@123` (change after first login)
 
-### Phase 2 — DB Connection & Models
+### Phase 2 — DB Connection & Models ✅
 
-- [ ] `config/db.js` — mysql2 connection pool
-- [ ] `models/` — wrappers calling each stored proc (`pool.query('CALL sp_...(?)')`)
-- [ ] `utils/` — `password.js` (bcrypt), `jwt.js`, `apiResponse.js`
-- **Done when:** a model can call a proc and return rows
+- [x] `config/db.js` — mysql2 connection pool + `verifyDbConnection()` (ping on startup)
+- [x] `utils/callProcedure.js` — **global** proc caller: builds `CALL name(?, ...)` from a params array (`callProcedure` for lists, `callProcedureOne` for single rows)
+- [x] `models/` — thin wrappers via the global caller (auth, school, department, staff)
+- [x] `utils/` — `password.js` (bcrypt), `jwt.js`, `apiResponse.js` (ok/created/asyncHandler)
+- [x] `index.js` — verifies DB before listening; closes pool on shutdown
+- **Done when:** a model can call a proc and return rows ✓ (verified: login lookup, password compare, list, jwt roundtrip)
 
 ### Phase 3 — Authentication
 
