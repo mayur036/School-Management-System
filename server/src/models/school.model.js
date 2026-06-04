@@ -1,7 +1,14 @@
 import { callProcedure, callProcedureOne } from '../utils/callProcedure.js';
 
 /** Create a school (super admin). Returns the created row. */
-export const createSchool = ({ name, code, email, phone, address, createdBy }) =>
+export const createSchool = ({
+  name,
+  code,
+  email,
+  phone,
+  address,
+  createdBy,
+}) =>
   callProcedureOne('sp_create_school', [
     name,
     code,
