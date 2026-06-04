@@ -41,7 +41,7 @@ export const LoginPage = () => {
     try {
       const response = await login(data).unwrap();
       toast.success(response.message || 'Login successful!!');
-      navigate('/profile');
+      navigate('/dashboard');
     } catch (err) {
       toast.error(err.data?.message || err.message || 'Login failed!!');
     }

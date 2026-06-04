@@ -1,5 +1,7 @@
 import { Navigate, Outlet } from 'react-router-dom';
 
+import { useGetMeQuery } from '@/features/auth/auth.api';
+import FullScreenLoader from '@/helper/FullScreenLoader';
 import { useAuth } from '@/hooks/useAuth';
 
 /**
@@ -8,9 +10,12 @@ import { useAuth } from '@/hooks/useAuth';
  * isAuthLoading is false; the check is kept as a safety net.
  */
 const ProtectedRoute = () => {
+  useGetMeQuery();
   const { isAuthenticated, isAuthLoading } = useAuth();
 
-  if (isAuthLoading) return null;
+  if (isAuthLoading) {
+    return <FullScreenLoader message="Loading your workspace..." />;
+  }
 
   return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
 };
