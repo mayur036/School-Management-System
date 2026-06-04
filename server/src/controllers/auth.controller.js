@@ -1,8 +1,22 @@
+import { isProduction } from '../config/env.js';
 import { ApiError } from '../middleware/error.js';
-import { findStaffById, findUserByEmail } from '../models/auth.model.js';
+import authModel from '../models/auth.model.js';
 import { asyncHandler, ok } from '../utils/apiResponse.js';
 import { signToken } from '../utils/jwt.js';
 import { comparePassword } from '../utils/password.js';
+
+const COOKIE_NAME = 'token';
+
+// Shared cookie attributes. clearCookie must match these (minus maxAge)
+// or the browser won't remove the cookie on logout.
+const cookieOptions = {
+  httpOnly: true,
+  secure: isProduction,
+  sameSite: 'strict',
+  path: '/',
+};
+
+const TOKEN_TTL_MS = 3 * 24 * 60 * 60 * 1000; // 3 days (matches JWT_EXPIRES_IN)
 
 /**
  * @desc    Authenticate user and login
@@ -13,9 +27,9 @@ const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
   // 1. Fetch user
-  const user = await findUserByEmail(email);
+  const user = await authModel.findUserByEmail(email);
   if (!user) {
-    throw new ApiError(401, 'Invalid email or password');
+    throw new ApiError(404, 'User not found');
   }
 
   // 2. Check active status
@@ -43,19 +57,13 @@ const login = asyncHandler(async (req, res) => {
     email: user.email,
   });
 
-  // 5. Send cookie
-  const cookieOptions = {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
-    maxAge: 24 * 60 * 60 * 1000, // 1 day
-  };
-  res.cookie('token', token, cookieOptions);
+  // 5. Set the httpOnly auth cookie (the token never leaves the cookie)
+  res.cookie(COOKIE_NAME, token, { ...cookieOptions, maxAge: TOKEN_TTL_MS });
 
   // Remove password hash from response
   delete user.password_hash;
 
-  return ok(res, { token, user }, 'Login successful');
+  return ok(res, { user }, 'Login successful');
 });
 
 /**
@@ -64,11 +72,7 @@ const login = asyncHandler(async (req, res) => {
  * @access  Public
  */
 const logout = asyncHandler(async (req, res) => {
-  res.clearCookie('token', {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
-  });
+  res.clearCookie(COOKIE_NAME, cookieOptions);
   return ok(res, null, 'Logged out successfully');
 });
 
@@ -78,7 +82,7 @@ const logout = asyncHandler(async (req, res) => {
  * @access  Private
  */
 const getMe = asyncHandler(async (req, res) => {
-  const user = await findStaffById(req.user.staff_id);
+  const user = await authModel.findStaffById(req.user.staff_id);
   if (!user) {
     throw new ApiError(404, 'User not found');
   }

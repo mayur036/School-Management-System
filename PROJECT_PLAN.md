@@ -233,7 +233,6 @@ server/
 - [x] `middleware/error.js` central handler
 - **Done when:** super admin can log in and hit a protected route
 
-
 ### Phase 4 — Super Admin module
 
 - [ ] Schools: `POST/GET /api/schools`, `PATCH /api/schools/:id/status`
