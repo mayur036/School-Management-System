@@ -201,12 +201,12 @@ server/
 
 ## 7. Build Phases
 
-### Phase 0 — Setup & Tooling
+### Phase 0 — Setup & Tooling ✅
 
-- [ ] Install backend deps: `bun add express mysql2 jsonwebtoken bcrypt dotenv cors cookie-parser zod`
-- [ ] Create `.env` (DB creds, `JWT_SECRET`, `PORT`) + update `.env.example`
-- [ ] Wire `index.js` → `src/app.js` with a `/health` route
-- **Done when:** `bun run dev` serves `GET /health → 200`
+- [x] Install backend deps: `bun add express mysql2 jsonwebtoken bcrypt dotenv cors cookie-parser zod morgan`
+- [x] Create `.env` (DB creds, `JWT_SECRET`, `PORT`) + update `.env.example`
+- [x] Wire `index.js` → `src/app.js` with a `/health` route (+ `config/env.js`, `middleware/error.js`, `routes.js`)
+- **Done when:** `bun run dev` serves `GET /health → 200` ✓ (verified: `/health`, `/api`, and 404 handler all respond)
 
 ### Phase 1 — Database (MySQL Workbench)
 
