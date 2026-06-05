@@ -41,6 +41,8 @@ A multi-tenant School Management System where:
 **Frontend (`/client`)** — _already installed_
 
 - React 19 + Vite + React Router v7
+- **Redux Toolkit + React-Redux + RTK Query** for all server state (data fetching, caching, invalidation) — a single `baseApi` with `injectEndpoints` per feature; `authSlice` holds the current user. No React Context for auth.
+- RTK Query uses a **custom axios `baseQuery`** (not `fetchBaseQuery`) so auth rides on the httpOnly cookie (`withCredentials`); no token header is attached client-side.
 - Tailwind v4 + shadcn/ui (radix-ui, lucide, sonner)
 - react-hook-form + zod, axios, recharts
 
@@ -254,14 +256,75 @@ server/
 - [x] `PATCH /api/staff/me/password` — change own password (verifies current password; new `sp_update_password` proc)
 - **Done when:** registered staff can log in and view their profile
 
-### Phase 7 — Frontend (React)
+### Phase 7 — Frontend (React + RTK Query)
 
-- [ ] Axios instance + auth context (token storage, refresh)
-- [ ] Login page → role-based redirect
-- [ ] **Super Admin panel:** schools list/create, create school admin
-- [ ] **School Admin panel:** departments, staff register page, staff list
-- [ ] Route guards by role; toasts via sonner; forms via react-hook-form + zod
-- **Done when:** full flow works in the browser end-to-end
+State management is **Redux Toolkit + RTK Query** (not React Context). All server
+data flows through one `baseApi` (`src/app/baseApi.js`) with a custom axios
+`baseQuery`; each feature adds endpoints via `baseApi.injectEndpoints(...)` in its
+own `feature.api.js`. Cache coherence is driven by `tagTypes` + `providesTags` /
+`invalidatesTags`. Local UI/auth state lives in slices (`authSlice`).
+
+**Conventions**
+
+- Feature folder layout: `src/features/<feature>/{<feature>.api.js, <feature>Slice.js?, pages/, components/}`
+- Every list endpoint `providesTags`; every mutation `invalidatesTags` the matching tag so lists refetch automatically.
+- Forms: `react-hook-form` + `zod` (`@hookform/resolvers`); submit calls the RTK Query mutation and `.unwrap()`s.
+- Feedback: `sonner` toast on mutation success/error; `Skeleton` while `isLoading`.
+- Routing: role-based guards (`ProtectedRoute`, `GuestRoute`) already exist; add per-role layouts + nested routes in `App.jsx`.
+
+#### Phase 7.0 — State & app foundation ✅
+
+- [x] `app/store.js` (configureStore: `baseApi.reducer` + `auth`), `app/baseApi.js` (axios baseQuery, `tagTypes: ['User']`)
+- [x] `providers/AppProviders.jsx` wires `<Provider store>` + theme; `authSlice` holds `{ user, isAuthenticated }`
+- [x] Add remaining `tagTypes` to `baseApi` as features land: `'School'`, `'Department'`, `'Staff'`
+
+#### Phase 7.1 — Auth & shell
+
+- [x] `features/auth/auth.api.js`: `login`, `getMe`, `logout` mutations/queries
+- [x] `LoginPage`, `ProtectedRoute` / `GuestRoute`, `useAuth` hook, super/school admin layouts
+- [ ] Bootstrap `getMe` on app load; **role-based redirect** after login (super_admin → `/dashboard`, school_admin → its panel, staff → profile)
+- [ ] Wire `logout` in the layout header; finalize per-role nav in layouts
+- **Done when:** logging in lands each role on its correct home; refresh keeps the session
+
+#### Phase 7.2 — Super Admin: Schools
+
+- [ ] `features/super_admin/schools.api.js`: `getSchools` (`providesTags: ['School']`), `getSchool`, `createSchool`, `updateSchoolStatus` (`invalidatesTags: ['School']`)
+- [ ] Schools list page (table, status badge, activate/deactivate toggle)
+- [ ] Create-school dialog (rhf + zod) → `POST /api/schools`
+- **Done when:** super admin lists, creates, and toggles a school's status from the UI
+
+#### Phase 7.3 — Super Admin: School Admins
+
+- [ ] Extend schools api (or `schoolAdmins.api.js`): `createSchoolAdmin` → `POST /api/schools/:id/admins`
+- [ ] "Add admin" form from a school's detail/row; surface the created credentials
+- **Done when:** super admin creates a school admin for a school via the UI
+
+#### Phase 7.4 — School Admin: Departments
+
+- [ ] `features/school_admin/departments.api.js`: `getDepartments` (`providesTags: ['Department']`), `createDepartment` (`invalidatesTags: ['Department']`)
+- [ ] Departments list + create dialog (tenant `school_id` comes from the cookie/token, never the form)
+- **Done when:** school admin lists and adds departments
+
+#### Phase 7.5 — School Admin: Staff
+
+- [ ] `features/school_admin/staff.api.js`: `getStaff` (`providesTags: ['Staff']`), `getStaffById`, `createStaff`, `updateStaffStatus` (`invalidatesTags: ['Staff']`)
+- [ ] Staff register page (rhf + zod, department `<Select>` fed by `getDepartments`) → `POST /api/staff`
+- [ ] Staff list (table + enable/disable) and staff detail
+- **Done when:** school admin registers staff into a department and toggles their status
+
+#### Phase 7.6 — Profile & password (all roles)
+
+- [ ] `features/profile/profile.api.js`: `getMyProfile` → `GET /api/staff/me`, `changePassword` → `PATCH /api/staff/me/password`
+- [ ] Profile page wired to live data; change-password form (rhf + zod)
+- **Done when:** any logged-in user views their profile and changes their password
+
+#### Phase 7.7 — Cross-cutting polish
+
+- [ ] Centralized RTK Query error → toast handling; consistent loading skeletons / empty states
+- [ ] Verify tag invalidation matrix end-to-end (mutations refresh the right lists)
+- [ ] Accessibility / responsive pass on the new pages
+
+- **Done when (Phase 7 overall):** full flow works in the browser end-to-end — super admin creates a school + admin; that admin logs in, adds a department, registers staff; staff logs in and views/edits their profile
 
 ### Phase 8 — Polish (optional)
 
@@ -304,7 +367,7 @@ PATCH  /api/staff/me/password          all        change own password
 2. **Backend plumbing** (db pool → auth → middleware)
 3. **Super Admin** APIs (schools + school admins)
 4. **School Admin** APIs (departments + staff)
-5. **Frontend** panels wired to the APIs
+5. **Frontend** (RTK Query) in sub-phases: state foundation → auth/shell → schools → school admins → departments → staff → profile/password → polish
 6. **Polish** (email, search, dashboards)
 
 > Principle: every DB read/write goes through a **stored procedure**; the Node layer only orchestrates, validates, and authorizes.
