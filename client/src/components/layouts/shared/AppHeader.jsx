@@ -1,3 +1,4 @@
+import { ChevronDown } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -80,15 +81,23 @@ const AppHeader = ({
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                size="icon"
                 aria-label="Open account menu"
-                className="rounded-full"
+                className="h-auto gap-2 rounded-full px-2 py-1.5"
               >
                 <Avatar className="size-8 border">
                   <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">
                     {initials}
                   </AvatarFallback>
                 </Avatar>
+                <div className="hidden flex-col items-start sm:flex">
+                  <span className="text-sm leading-tight font-medium">
+                    {user.first_name} {user.last_name}
+                  </span>
+                  <span className="text-muted-foreground text-[11px] capitalize leading-tight">
+                    {user.role_name?.replace('_', ' ')}
+                  </span>
+                </div>
+                <ChevronDown className="text-muted-foreground hidden size-4 sm:block" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end" forceMount>

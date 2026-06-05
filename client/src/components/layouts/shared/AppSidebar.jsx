@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
@@ -13,31 +13,48 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarSeparator,
+  useSidebar,
 } from '@/components/ui/sidebar';
 import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 
 // Active nav uses a quiet primary tint (per design system), never a full fill.
-const NavItem = ({ to, label, Icon }) => (
-  <SidebarMenuItem>
-    <SidebarMenuButton asChild tooltip={label}>
-      <NavLink
-        to={to}
-        end
-        className={({ isActive }) =>
-          cn(
+const NavItem = ({ to, label, Icon, end }) => {
+  const { pathname } = useLocation();
+  const { isMobile, setOpenMobile } = useSidebar();
+
+  // When `end` is true, only exact match highlights the item.
+  // Otherwise, prefix matching activates parent routes for child pages.
+  const isActive = end
+    ? pathname === to
+    : pathname === to || pathname.startsWith(to + '/');
+
+  const handleClick = () => {
+    // Close the mobile sidebar sheet on navigation
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
+
+  return (
+    <SidebarMenuItem>
+      <SidebarMenuButton asChild tooltip={label}>
+        <Link
+          to={to}
+          onClick={handleClick}
+          className={cn(
             'transition-colors',
             isActive &&
               'bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary font-medium'
-          )
-        }
-      >
-        <Icon className="size-4 shrink-0" />
-        <span>{label}</span>
-      </NavLink>
-    </SidebarMenuButton>
-  </SidebarMenuItem>
-);
+          )}
+        >
+          <Icon className="size-4 shrink-0" />
+          <span>{label}</span>
+        </Link>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
+  );
+};
 
 /**
  * Config-driven sidebar shared by every role layout.
@@ -62,7 +79,7 @@ const AppSidebar = ({ brand, groups, fallbackInitials = 'U' }) => {
             aria-hidden
             className="bg-primary text-primary-foreground flex size-8 items-center justify-center rounded-lg text-sm font-bold"
           >
-            E
+            SMS
           </div>
           <div className="flex flex-col">
             <span className="text-sm leading-none font-bold tracking-tight">

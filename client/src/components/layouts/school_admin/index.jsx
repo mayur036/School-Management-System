@@ -32,6 +32,7 @@ const config = {
           to: '/school/staff',
           label: 'Staff Directory',
           Icon: SCHOOL_ADMIN.STAFF_LIST,
+          end: true,
         },
         {
           to: '/school/staff/register',
