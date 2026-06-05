@@ -1,15 +1,17 @@
 import { Router } from 'express';
 
 import authRoutes from './routes/auth.routes.js';
+import departmentRoutes from './routes/department.routes.js';
 import schoolRoutes from './routes/school.routes.js';
+import staffRoutes from './routes/staff.routes.js';
 
 const router = Router();
 
 // Feature routers are mounted here as they are built (Phase 3+):
 router.use('/auth', authRoutes);
 router.use('/schools', schoolRoutes);
-//   router.use('/departments', departmentRoutes);
-//   router.use('/staff', staffRoutes);
+router.use('/departments', departmentRoutes);
+router.use('/staff', staffRoutes);
 
 router.get('/', (req, res) => {
   res.json({ success: true, message: 'School Management System API' });

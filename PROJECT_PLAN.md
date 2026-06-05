@@ -240,11 +240,11 @@ server/
 - [x] All guarded by `protect` + `authorize('super_admin')`; zod validation; ER_DUP_ENTRY → 409; Swagger docs
 - **Done when:** super admin creates a school + its admin via API
 
-### Phase 5 — School Admin module
+### Phase 5 — School Admin module ✅
 
-- [ ] Departments: `POST/GET /api/departments` (scoped to token's school_id)
-- [ ] Staff: `POST /api/staff` (register staff), `GET /api/staff`, `PATCH /api/staff/:id/status`
-- [ ] Guarded by `authorize('school_admin')` + tenant scoping
+- [x] Departments: `POST/GET /api/departments` (scoped to token's school_id)
+- [x] Staff: `POST /api/staff` (register staff), `GET /api/staff`, `GET /api/staff/:id`, `PATCH /api/staff/:id/status`
+- [x] Guarded by `protect` + `authorize('school_admin')` + tenant scoping (school_id from token only; cross-school staff → 404; department must belong to own school)
 - **Done when:** a school admin logs in, adds a department, registers staff
 
 ### Phase 6 — Staff & Profile
