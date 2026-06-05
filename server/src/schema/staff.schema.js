@@ -24,6 +24,16 @@ export const staffIdSchema = z.object({
   params: z.object({ id: idParam }),
 });
 
+export const changePasswordSchema = z.object({
+  body: z.object({
+    current_password: z.string().min(1, 'Current password is required'),
+    new_password: z
+      .string()
+      .min(8, 'New password must be at least 8 characters')
+      .max(72),
+  }),
+});
+
 export const updateStaffStatusSchema = z.object({
   params: z.object({ id: idParam }),
   body: z.object({

@@ -1,8 +1,9 @@
 import { ApiError } from '../middleware/error.js';
+import authModel from '../models/auth.model.js';
 import departmentModel from '../models/department.model.js';
 import staffModel from '../models/staff.model.js';
 import { asyncHandler, created, ok } from '../utils/apiResponse.js';
-import { hashPassword } from '../utils/password.js';
+import { comparePassword, hashPassword } from '../utils/password.js';
 
 /**
  * Fetch a staff member and assert it belongs to the caller's school.
@@ -15,6 +16,45 @@ const getOwnSchoolStaff = async (staffId, schoolId) => {
   }
   return staff;
 };
+
+/**
+ * @desc    Get the currently authenticated user's own profile
+ * @route   GET /api/staff/me
+ * @access  Private (any authenticated role)
+ */
+const getMyProfile = asyncHandler(async (req, res) => {
+  const staff = await staffModel.getStaff(req.user.staff_id);
+  if (!staff) {
+    throw new ApiError(404, 'Profile not found');
+  }
+  return ok(res, { staff }, 'Profile retrieved successfully');
+});
+
+/**
+ * @desc    Change the currently authenticated user's own password
+ * @route   PATCH /api/staff/me/password
+ * @access  Private (any authenticated role)
+ */
+const changeMyPassword = asyncHandler(async (req, res) => {
+  const { current_password, new_password } = req.body;
+
+  // Fetch the user's stored hash via the email in the token (sp_get_staff
+  // doesn't return the hash, but sp_login_get_user does).
+  const user = await authModel.findUserByEmail(req.user.email);
+  if (!user) {
+    throw new ApiError(404, 'Profile not found');
+  }
+
+  const isMatch = await comparePassword(current_password, user.password_hash);
+  if (!isMatch) {
+    throw new ApiError(401, 'Current password is incorrect');
+  }
+
+  const newHash = await hashPassword(new_password);
+  await staffModel.updatePassword(req.user.staff_id, newHash);
+
+  return ok(res, null, 'Password changed successfully');
+});
 
 /**
  * @desc    Register a staff member in the admin's own school
@@ -91,4 +131,11 @@ const updateStaffStatus = asyncHandler(async (req, res) => {
   );
 });
 
-export { createStaff, getStaff, listStaff, updateStaffStatus };
+export {
+  changeMyPassword,
+  createStaff,
+  getMyProfile,
+  getStaff,
+  listStaff,
+  updateStaffStatus,
+};

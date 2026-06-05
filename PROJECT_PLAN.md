@@ -148,6 +148,7 @@ staff (1) ────< (N) schools        created_by
 | `sp_list_staff(school_id)`                                      | Staff of a school                     | school admin |
 | `sp_get_staff(staff_id)`                                        | Staff detail / own profile            | all          |
 | `sp_update_staff_status(staff_id, status)`                      | Enable/disable staff                  | school admin |
+| `sp_update_password(staff_id, hash)`                            | Change own password                   | all          |
 
 > Each proc validates tenancy where relevant (e.g. staff must belong to the school_id passed in). App layer also re-checks via JWT claims.
 
@@ -247,10 +248,10 @@ server/
 - [x] Guarded by `protect` + `authorize('school_admin')` + tenant scoping (school_id from token only; cross-school staff → 404; department must belong to own school)
 - **Done when:** a school admin logs in, adds a department, registers staff
 
-### Phase 6 — Staff & Profile
+### Phase 6 — Staff & Profile ✅
 
-- [ ] `GET /api/staff/me` profile for any logged-in user
-- [ ] Optional: staff change password
+- [x] `GET /api/staff/me` profile for any logged-in user (declared before the school_admin guard + `/:id` route)
+- [x] `PATCH /api/staff/me/password` — change own password (verifies current password; new `sp_update_password` proc)
 - **Done when:** registered staff can log in and view their profile
 
 ### Phase 7 — Frontend (React)
@@ -292,6 +293,7 @@ GET    /api/staff                      school     list (own school)
 GET    /api/staff/:id                  school     staff detail
 PATCH  /api/staff/:id/status           school     enable/disable
 GET    /api/staff/me                   all        own profile
+PATCH  /api/staff/me/password          all        change own password
 ```
 
 ---

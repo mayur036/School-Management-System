@@ -32,6 +32,10 @@ const staffModel = {
   // Enable / disable a staff member. Returns the updated row.
   updateStaffStatus: (staffId, status) =>
     callProcedureOne('sp_update_staff_status', [staffId, status]),
+
+  // Update a user's own password hash.
+  updatePassword: (staffId, passwordHash) =>
+    callProcedure('sp_update_password', [staffId, passwordHash]),
 };
 
 export default staffModel;

@@ -73,6 +73,62 @@
 
 /**
  * @swagger
+ * /api/staff/me:
+ *   get:
+ *     summary: Get the currently authenticated user's own profile
+ *     description: Available to any authenticated role (staff, school_admin, super_admin).
+ *     tags: [Staff]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Profile retrieved successfully
+ *       401:
+ *         description: Not authorized
+ *       404:
+ *         description: Profile not found
+ */
+
+/**
+ * @swagger
+ * /api/staff/me/password:
+ *   patch:
+ *     summary: Change the currently authenticated user's own password
+ *     description: Available to any authenticated role. Verifies the current password before updating.
+ *     tags: [Staff]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - current_password
+ *               - new_password
+ *             properties:
+ *               current_password:
+ *                 type: string
+ *                 format: password
+ *                 example: Staff@123
+ *               new_password:
+ *                 type: string
+ *                 format: password
+ *                 example: NewStaff@456
+ *     responses:
+ *       200:
+ *         description: Password changed successfully
+ *       400:
+ *         description: Validation failed
+ *       401:
+ *         description: Not authorized, or current password is incorrect
+ *       404:
+ *         description: Profile not found
+ */
+
+/**
+ * @swagger
  * /api/staff/{id}:
  *   get:
  *     summary: Get a single staff member of the admin's own school

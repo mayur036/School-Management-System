@@ -225,4 +225,17 @@ BEGIN
   WHERE s.staff_id = p_staff_id;
 END $$
 
+-- sp_update_password : change a user's own password (hash computed in app layer)
+DROP PROCEDURE IF EXISTS sp_update_password $$
+CREATE PROCEDURE sp_update_password(
+  IN p_staff_id      INT,
+  IN p_password_hash VARCHAR(255)
+)
+BEGIN
+  UPDATE staff
+  SET password_hash = p_password_hash,
+      updated_at    = CURRENT_TIMESTAMP
+  WHERE staff_id = p_staff_id;
+END $$
+
 DELIMITER ;
