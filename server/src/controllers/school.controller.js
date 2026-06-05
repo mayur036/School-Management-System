@@ -1,0 +1,104 @@
+import { ApiError } from '../middleware/error.js';
+import schoolModel from '../models/school.model.js';
+import { asyncHandler, created, ok } from '../utils/apiResponse.js';
+import { hashPassword } from '../utils/password.js';
+
+/**
+ * @desc    Create a school
+ * @route   POST /api/schools
+ * @access  Private (super_admin)
+ */
+const createSchool = asyncHandler(async (req, res) => {
+  const { name, code, email, phone, address } = req.body;
+
+  const school = await schoolModel.createSchool({
+    name,
+    code: code ?? null,
+    email: email ?? null,
+    phone: phone ?? null,
+    address: address ?? null,
+    createdBy: req.user.staff_id,
+  });
+
+  return created(res, { school }, 'School created successfully');
+});
+
+/**
+ * @desc    List all schools
+ * @route   GET /api/schools
+ * @access  Private (super_admin)
+ */
+const listSchools = asyncHandler(async (req, res) => {
+  const schools = await schoolModel.listSchools();
+  return ok(res, { schools }, 'Schools retrieved successfully');
+});
+
+/**
+ * @desc    Get a single school by id
+ * @route   GET /api/schools/:id
+ * @access  Private (super_admin)
+ */
+const getSchool = asyncHandler(async (req, res) => {
+  const school = await schoolModel.getSchool(req.params.id);
+  if (!school) {
+    throw new ApiError(404, 'School not found');
+  }
+  return ok(res, { school }, 'School retrieved successfully');
+});
+
+/**
+ * @desc    Activate / deactivate a school
+ * @route   PATCH /api/schools/:id/status
+ * @access  Private (super_admin)
+ */
+const updateSchoolStatus = asyncHandler(async (req, res) => {
+  const { status } = req.body;
+
+  const existing = await schoolModel.getSchool(req.params.id);
+  if (!existing) {
+    throw new ApiError(404, 'School not found');
+  }
+
+  const school = await schoolModel.updateSchoolStatus(req.params.id, status);
+  return ok(
+    res,
+    { school },
+    `School ${status === 'active' ? 'activated' : 'deactivated'} successfully`
+  );
+});
+
+/**
+ * @desc    Create a school admin (school_admin staff row) for a school
+ * @route   POST /api/schools/:id/admins
+ * @access  Private (super_admin)
+ */
+const createSchoolAdmin = asyncHandler(async (req, res) => {
+  const { first_name, last_name, email, password, phone } = req.body;
+
+  const school = await schoolModel.getSchool(req.params.id);
+  if (!school) {
+    throw new ApiError(404, 'School not found');
+  }
+
+  const passwordHash = await hashPassword(password);
+
+  const admin = await schoolModel.createSchoolAdmin({
+    schoolId: req.params.id,
+    firstName: first_name,
+    lastName: last_name,
+    email,
+    passwordHash,
+    phone: phone ?? null,
+    createdBy: req.user.staff_id,
+  });
+
+  return created(res, { admin }, 'School admin created successfully');
+});
+
+export {
+  createSchool,
+  createSchoolAdmin,
+  getSchool,
+  listSchools,
+  updateSchoolStatus,
+};

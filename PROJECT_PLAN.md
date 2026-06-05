@@ -233,11 +233,11 @@ server/
 - [x] `middleware/error.js` central handler
 - **Done when:** super admin can log in and hit a protected route
 
-### Phase 4 — Super Admin module
+### Phase 4 — Super Admin module ✅
 
-- [ ] Schools: `POST/GET /api/schools`, `PATCH /api/schools/:id/status`
-- [ ] School Admins: `POST /api/schools/:id/admins` (creates `school_admin` in staff)
-- [ ] All guarded by `authorize('super_admin')`
+- [x] Schools: `POST/GET /api/schools`, `GET /api/schools/:id`, `PATCH /api/schools/:id/status`
+- [x] School Admins: `POST /api/schools/:id/admins` (creates `school_admin` in staff)
+- [x] All guarded by `protect` + `authorize('super_admin')`; zod validation; ER_DUP_ENTRY → 409; Swagger docs
 - **Done when:** super admin creates a school + its admin via API
 
 ### Phase 5 — School Admin module
