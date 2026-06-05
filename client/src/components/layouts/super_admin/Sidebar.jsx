@@ -1,42 +1,141 @@
 import { NavLink } from 'react-router-dom';
 
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarSeparator,
+} from '@/components/ui/sidebar';
+import { useAuth } from '@/hooks/useAuth';
 import { SUPER_ADMIN } from '@/lib/icons';
 import { cn } from '@/lib/utils';
 
-const NAV_ITEMS = [
+const MAIN_NAV = [
   { to: '/super/dashboard', label: 'Dashboard', Icon: SUPER_ADMIN.DASHBOARD },
+];
+
+const MANAGEMENT_NAV = [
+  { to: '/super/schools', label: 'Schools', Icon: SUPER_ADMIN.SCHOOLS },
+];
+
+const ACCOUNT_NAV = [
   { to: '/super/profile', label: 'Profile', Icon: SUPER_ADMIN.PROFILE },
 ];
 
-const linkClass = ({ isActive }) =>
-  cn(
-    'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-    isActive
-      ? 'bg-primary/10 text-primary'
-      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-  );
+const NavItem = ({ to, label, Icon }) => (
+  <SidebarMenuItem>
+    <SidebarMenuButton asChild tooltip={label}>
+      <NavLink
+        to={to}
+        className={({ isActive }) =>
+          cn(
+            isActive &&
+              'bg-sidebar-accent text-sidebar-accent-foreground font-medium'
+          )
+        }
+        end
+      >
+        <Icon className="h-4 w-4 shrink-0" />
+        <span>{label}</span>
+      </NavLink>
+    </SidebarMenuButton>
+  </SidebarMenuItem>
+);
 
-const SuperAdminSidebar = ({ className }) => {
+const SuperAdminSidebar = () => {
+  const { user } = useAuth();
+
+  const initials =
+    `${user?.first_name?.[0] ?? ''}${user?.last_name?.[0] ?? ''}`.toUpperCase() ||
+    'SA';
+
   return (
-    <aside
-      className={cn(
-        'bg-background flex w-60 flex-col gap-1 border-r p-4',
-        className
-      )}
-    >
-      <div className="mb-4 flex items-center gap-2 px-2">
-        <SUPER_ADMIN.SECURITY className="text-primary h-5 w-5" />
-        <span className="font-semibold tracking-tight">Super Admin</span>
-      </div>
-      <nav className="flex flex-col gap-1">
-        {NAV_ITEMS.map(({ to, label, Icon }) => (
-          <NavLink key={to} to={to} className={linkClass} end>
-            <Icon className="h-4 w-4" />
-            {label}
-          </NavLink>
-        ))}
-      </nav>
-    </aside>
+    <Sidebar collapsible="offcanvas" className="border-r">
+      {/* Brand */}
+      <SidebarHeader className="p-4 pb-2">
+        <div className="flex items-center gap-3">
+          <div className="bg-primary text-primary-foreground flex h-8 w-8 items-center justify-center rounded-lg text-sm font-bold">
+            E
+          </div>
+          <div className="flex flex-col">
+            <span className="text-sm leading-none font-bold tracking-tight">
+              EduManage
+            </span>
+            <span className="text-muted-foreground mt-1 text-[11px] leading-none">
+              Super Admin Panel
+            </span>
+          </div>
+        </div>
+      </SidebarHeader>
+
+      <SidebarSeparator />
+
+      {/* Navigation */}
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel>Overview</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {MAIN_NAV.map((item) => (
+                <NavItem key={item.to} {...item} />
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Management</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {MANAGEMENT_NAV.map((item) => (
+                <NavItem key={item.to} {...item} />
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Account</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {ACCOUNT_NAV.map((item) => (
+                <NavItem key={item.to} {...item} />
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+
+      {/* Footer with user info */}
+      <SidebarSeparator />
+      <SidebarFooter className="p-3">
+        {user && (
+          <div className="flex items-center gap-3 rounded-lg px-2 py-1.5">
+            <Avatar className="h-8 w-8 border">
+              <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex min-w-0 flex-col">
+              <span className="truncate text-sm leading-none font-medium">
+                {user.first_name} {user.last_name}
+              </span>
+              <span className="text-muted-foreground mt-1 truncate text-[11px] leading-none">
+                {user.email}
+              </span>
+            </div>
+          </div>
+        )}
+      </SidebarFooter>
+    </Sidebar>
   );
 };
 

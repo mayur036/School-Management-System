@@ -1,19 +1,21 @@
 import { Outlet } from 'react-router-dom';
 
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+
 import StaffHeader from './Header';
 import StaffSidebar from './Sidebar';
 
 const StaffLayout = () => {
   return (
-    <div className="flex min-h-screen">
-      <StaffSidebar className="hidden md:flex" />
-      <div className="flex min-w-0 flex-1 flex-col">
+    <SidebarProvider>
+      <StaffSidebar />
+      <SidebarInset className="flex min-w-0 flex-col">
         <StaffHeader />
-        <main className="bg-muted/20 flex-1 p-6">
+        <main className="bg-muted/10 flex-1 p-4 md:p-6">
           <Outlet />
         </main>
-      </div>
-    </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 };
 

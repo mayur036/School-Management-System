@@ -1,19 +1,21 @@
 import { Outlet } from 'react-router-dom';
 
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+
 import SchoolAdminHeader from './Header';
 import SchoolAdminSidebar from './Sidebar';
 
 const SchoolAdminLayout = () => {
   return (
-    <div className="flex min-h-screen">
-      <SchoolAdminSidebar className="hidden md:flex" />
-      <div className="flex min-w-0 flex-1 flex-col">
+    <SidebarProvider>
+      <SchoolAdminSidebar />
+      <SidebarInset className="flex min-w-0 flex-col">
         <SchoolAdminHeader />
-        <main className="bg-muted/20 flex-1 p-6">
+        <main className="bg-muted/10 flex-1 p-4 md:p-6">
           <Outlet />
         </main>
-      </div>
-    </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 };
 
