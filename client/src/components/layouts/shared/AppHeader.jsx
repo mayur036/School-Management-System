@@ -1,7 +1,7 @@
 import { ChevronDown } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -54,7 +54,7 @@ const AppHeader = ({
     fallbackInitials;
 
   return (
-    <header className="bg-background/95 supports-backdrop-filter:bg-background/60 sticky top-0 z-30 flex h-14 shrink-0 items-center gap-2 border-b px-4 backdrop-blur">
+    <header className="bg-background/80 supports-backdrop-filter:bg-background/60 border-border/60 sticky top-0 z-30 flex h-14 shrink-0 items-center gap-2 border-b px-4 backdrop-blur-md transition-colors duration-300">
       {/* Mobile-only sidebar toggle */}
       <SidebarTrigger className="md:hidden" />
       <Separator orientation="vertical" className="mr-1 h-4 md:hidden" />
@@ -63,18 +63,25 @@ const AppHeader = ({
         <BreadcrumbList>
           <BreadcrumbItem className="hidden sm:inline-flex">
             <BreadcrumbLink asChild>
-              <Link to={home}>{rootLabel}</Link>
+              <Link
+                to={home}
+                className="hover:text-primary transition-colors duration-200"
+              >
+                {rootLabel}
+              </Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator className="hidden sm:inline-flex" />
           <BreadcrumbItem>
-            <BreadcrumbPage className="font-semibold">{current}</BreadcrumbPage>
+            <BreadcrumbPage className="text-foreground/90 font-semibold transition-colors duration-200">
+              {current}
+            </BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
 
-      <div className="ml-auto flex items-center gap-1">
-        <ThemeToggler />
+      <div className="ml-auto flex items-center gap-1.5">
+        <ThemeToggler className="transition-transform duration-200 hover:rotate-12" />
 
         {user && (
           <DropdownMenu>
@@ -82,28 +89,32 @@ const AppHeader = ({
               <Button
                 variant="ghost"
                 aria-label="Open account menu"
-                className="h-auto gap-2 rounded-full px-2 py-1.5"
+                className="group hover:bg-accent/60 h-auto cursor-pointer gap-2.5 rounded-full px-2.5 py-1.5 transition-all duration-200"
               >
-                <Avatar className="size-8 border">
+                <Avatar className="size-8 border transition-transform duration-200 group-hover:scale-105">
+                  <AvatarImage
+                    src={user.avatar_url || undefined}
+                    alt={`${user.first_name} ${user.last_name}`}
+                  />
                   <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">
                     {initials}
                   </AvatarFallback>
                 </Avatar>
-                <div className="hidden flex-col items-start sm:flex">
-                  <span className="text-sm leading-tight font-medium">
+                <div className="hidden flex-col items-start text-left sm:flex">
+                  <span className="text-foreground group-hover:text-primary text-sm leading-none font-medium transition-colors">
                     {user.first_name} {user.last_name}
                   </span>
-                  <span className="text-muted-foreground text-[11px] capitalize leading-tight">
+                  <span className="text-muted-foreground mt-0.5 text-[11px] leading-none capitalize">
                     {user.role_name?.replace('_', ' ')}
                   </span>
                 </div>
-                <ChevronDown className="text-muted-foreground hidden size-4 sm:block" />
+                <ChevronDown className="text-muted-foreground/60 hidden size-4 transition-transform duration-200 group-hover:translate-y-0.5 sm:block" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end" forceMount>
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm leading-none font-medium">
+                  <p className="text-foreground text-sm leading-none font-medium">
                     {user.first_name} {user.last_name}
                   </p>
                   <p className="text-muted-foreground text-xs leading-none">
@@ -113,7 +124,10 @@ const AppHeader = ({
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link to={profilePath} className="w-full cursor-pointer">
+                <Link
+                  to={profilePath}
+                  className="focus:bg-accent/60 w-full cursor-pointer transition-colors"
+                >
                   Profile Settings
                 </Link>
               </DropdownMenuItem>
@@ -121,7 +135,7 @@ const AppHeader = ({
               <DropdownMenuItem
                 onClick={handleLogout}
                 disabled={isLoggingOut}
-                className="text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer"
+                className="text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer transition-colors"
               >
                 <LogoutIcon className="mr-2 size-4 shrink-0" />
                 <span>{isLoggingOut ? 'Signing out...' : 'Log out'}</span>

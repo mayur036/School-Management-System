@@ -3,7 +3,7 @@ import { SCHOOL_ADMIN } from '@/lib/icons';
 import RoleLayout from '../shared/RoleLayout';
 
 const config = {
-  brand: { name: 'EduManage', subtitle: 'School Administration' },
+  brand: { name: 'CampusCore', subtitle: 'School Administration' },
   rootLabel: 'School Admin',
   home: '/school/dashboard',
   profilePath: '/school/profile',

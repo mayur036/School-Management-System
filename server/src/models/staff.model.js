@@ -23,7 +23,7 @@ const staffModel = {
       createdBy,
     ]),
 
-  // List all staff of one school. 
+  // List all staff of one school.
   listStaff: (schoolId) => callProcedure('sp_list_staff', [schoolId]),
 
   // Get a single staff member by id.
@@ -36,6 +36,10 @@ const staffModel = {
   // Update a user's own password hash.
   updatePassword: (staffId, passwordHash) =>
     callProcedure('sp_update_password', [staffId, passwordHash]),
+
+  // Set a user's avatar URL + Cloudinary public_id. Returns the updated row.
+  updateAvatar: (staffId, avatarUrl, avatarPublicId) =>
+    callProcedureOne('sp_update_avatar', [staffId, avatarUrl, avatarPublicId]),
 };
 
 export default staffModel;

@@ -76,6 +76,8 @@ CREATE TABLE staff (
   email          VARCHAR(150) NOT NULL UNIQUE,
   password_hash  VARCHAR(255) NOT NULL,
   phone          VARCHAR(20),
+  avatar_url        VARCHAR(255) NULL,
+  avatar_public_id  VARCHAR(255) NULL,
   status         ENUM('active','inactive') NOT NULL DEFAULT 'active',
   created_by     INT NULL,
   created_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

@@ -12,7 +12,7 @@ export const Home = () => {
           <div className="flex items-center gap-2">
             <Building2 className="text-primary h-5 w-5" />
             <span className="text-foreground text-base font-bold tracking-tight">
-              EduManage
+              CampusCore
             </span>
           </div>
           <Button size="sm" asChild>
@@ -61,7 +61,7 @@ export const Home = () => {
 
       {/* Footer */}
       <footer className="border-border/40 text-muted-foreground border-t py-6 text-center text-xs">
-        &copy; {new Date().getFullYear()} EduManage. All rights reserved.
+        &copy; {new Date().getFullYear()} CampusCore. All rights reserved.
       </footer>
     </div>
   );

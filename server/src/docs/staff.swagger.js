@@ -129,6 +129,36 @@
 
 /**
  * @swagger
+ * /api/staff/me/avatar:
+ *   patch:
+ *     summary: Upload or replace the authenticated user's avatar
+ *     description: Available to any authenticated role. Accepts a single image (JPEG, PNG, or WEBP, max 2 MB) uploaded to Cloudinary. Replaces any previous avatar.
+ *     tags: [Staff]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - avatar
+ *             properties:
+ *               avatar:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Avatar updated successfully
+ *       400:
+ *         description: No image provided, unsupported type, or file too large
+ *       401:
+ *         description: Not authorized
+ */
+
+/**
+ * @swagger
  * /api/staff/{id}:
  *   get:
  *     summary: Get a single staff member of the admin's own school

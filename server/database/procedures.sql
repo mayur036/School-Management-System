@@ -28,7 +28,8 @@ CREATE PROCEDURE sp_login_get_user(IN p_email VARCHAR(150))
 BEGIN
   SELECT
     s.staff_id, s.role_id, r.role_name, s.school_id, s.department_id,
-    s.first_name, s.last_name, s.email, s.password_hash, s.phone, s.status
+    s.first_name, s.last_name, s.email, s.password_hash, s.phone,
+    s.avatar_url, s.status
   FROM staff s
   JOIN roles r ON r.role_id = s.role_id
   WHERE s.email = p_email
@@ -109,7 +110,8 @@ BEGIN
 
   SELECT
     s.staff_id, s.role_id, r.role_name, s.school_id, s.department_id,
-    s.first_name, s.last_name, s.email, s.phone, s.status, s.created_at
+    s.first_name, s.last_name, s.email, s.phone, s.avatar_url,
+    s.status, s.created_at
   FROM staff s JOIN roles r ON r.role_id = s.role_id
   WHERE s.staff_id = LAST_INSERT_ID();
 END $$
@@ -170,7 +172,7 @@ BEGIN
   SELECT
     s.staff_id, s.role_id, r.role_name, s.school_id, s.department_id,
     d.name AS department_name, s.first_name, s.last_name, s.email,
-    s.phone, s.status, s.created_at
+    s.phone, s.avatar_url, s.status, s.created_at
   FROM staff s
   JOIN roles r ON r.role_id = s.role_id
   LEFT JOIN departments d ON d.department_id = s.department_id
@@ -184,7 +186,7 @@ BEGIN
   SELECT
     s.staff_id, s.role_id, r.role_name, s.school_id, s.department_id,
     d.name AS department_name, s.first_name, s.last_name, s.email,
-    s.phone, s.status, s.created_at
+    s.phone, s.avatar_url, s.status, s.created_at
   FROM staff s
   JOIN roles r ON r.role_id = s.role_id
   LEFT JOIN departments d ON d.department_id = s.department_id
@@ -199,7 +201,8 @@ BEGIN
   SELECT
     s.staff_id, s.role_id, r.role_name, s.school_id, s.department_id,
     d.name AS department_name, s.first_name, s.last_name, s.email,
-    s.phone, s.status, s.created_at, s.updated_at
+    s.phone, s.avatar_url, s.avatar_public_id, s.status,
+    s.created_at, s.updated_at
   FROM staff s
   JOIN roles r ON r.role_id = s.role_id
   LEFT JOIN departments d ON d.department_id = s.department_id
@@ -218,7 +221,7 @@ BEGIN
   SELECT
     s.staff_id, s.role_id, r.role_name, s.school_id, s.department_id,
     d.name AS department_name, s.first_name, s.last_name, s.email,
-    s.phone, s.status, s.created_at, s.updated_at
+    s.phone, s.avatar_url, s.status, s.created_at, s.updated_at
   FROM staff s
   JOIN roles r ON r.role_id = s.role_id
   LEFT JOIN departments d ON d.department_id = s.department_id
@@ -236,6 +239,30 @@ BEGIN
   SET password_hash = p_password_hash,
       updated_at    = CURRENT_TIMESTAMP
   WHERE staff_id = p_staff_id;
+END $$
+
+-- sp_update_avatar : set a user's avatar URL + Cloudinary public_id, return the row
+DROP PROCEDURE IF EXISTS sp_update_avatar $$
+CREATE PROCEDURE sp_update_avatar(
+  IN p_staff_id         INT,
+  IN p_avatar_url       VARCHAR(255),
+  IN p_avatar_public_id VARCHAR(255)
+)
+BEGIN
+  UPDATE staff
+  SET avatar_url       = p_avatar_url,
+      avatar_public_id = p_avatar_public_id,
+      updated_at       = CURRENT_TIMESTAMP
+  WHERE staff_id = p_staff_id;
+
+  SELECT
+    s.staff_id, s.role_id, r.role_name, s.school_id, s.department_id,
+    d.name AS department_name, s.first_name, s.last_name, s.email,
+    s.phone, s.avatar_url, s.status, s.created_at, s.updated_at
+  FROM staff s
+  JOIN roles r ON r.role_id = s.role_id
+  LEFT JOIN departments d ON d.department_id = s.department_id
+  WHERE s.staff_id = p_staff_id;
 END $$
 
 DELIMITER ;

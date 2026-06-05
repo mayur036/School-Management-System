@@ -2,8 +2,9 @@ import { Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
-export const ThemeToggler = () => {
+export const ThemeToggler = ({ className }) => {
   const { theme, setTheme } = useTheme();
 
   return (
@@ -12,7 +13,10 @@ export const ThemeToggler = () => {
       size="icon"
       onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
       title="Toggle theme"
-      className="relative"
+      className={cn(
+        'relative cursor-pointer transition-transform duration-300 hover:rotate-12',
+        className
+      )}
     >
       {theme === 'light' ? (
         <Moon className="h-5 w-5 scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />

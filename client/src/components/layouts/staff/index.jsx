@@ -3,7 +3,7 @@ import { STAFF } from '@/lib/icons';
 import RoleLayout from '../shared/RoleLayout';
 
 const config = {
-  brand: { name: 'EduManage', subtitle: 'Staff Portal' },
+  brand: { name: 'CampusCore', subtitle: 'Staff Portal' },
   rootLabel: 'Staff',
   home: '/staff/dashboard',
   profilePath: '/staff/profile',

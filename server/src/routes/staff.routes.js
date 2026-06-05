@@ -6,10 +6,12 @@ import {
   getMyProfile,
   getStaff,
   listStaff,
+  updateMyAvatar,
   updateStaffStatus,
 } from '../controllers/staff.controller.js';
 import { protect } from '../middleware/auth.js';
 import { authorize } from '../middleware/authorize.js';
+import { uploadAvatar } from '../middleware/upload.js';
 import { validate } from '../middleware/validate.js';
 import {
   changePasswordSchema,
@@ -30,6 +32,7 @@ router.patch(
   validate(changePasswordSchema),
   changeMyPassword
 );
+router.patch('/me/avatar', protect, uploadAvatar, updateMyAvatar);
 
 // Everything below is school_admin only, scoped to their own school.
 router.use(protect, authorize('school_admin'));

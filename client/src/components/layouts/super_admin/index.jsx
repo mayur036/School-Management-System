@@ -3,7 +3,7 @@ import { SUPER_ADMIN } from '@/lib/icons';
 import RoleLayout from '../shared/RoleLayout';
 
 const config = {
-  brand: { name: 'EduManage', subtitle: 'Super Admin Panel' },
+  brand: { name: 'CampusCore', subtitle: 'Super Admin Panel' },
   rootLabel: 'Super Admin',
   home: '/super/dashboard',
   profilePath: '/super/profile',

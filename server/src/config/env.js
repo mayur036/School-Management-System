@@ -26,6 +26,12 @@ export const env = {
     secret: required('JWT_SECRET'),
     expiresIn: process.env.JWT_EXPIRES_IN ?? '1d',
   },
+
+  cloudinary: {
+    cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+    apiKey: process.env.CLOUDINARY_API_KEY,
+    apiSecret: process.env.CLOUDINARY_API_SECRET,
+  },
 };
 
 export const isProduction = env.nodeEnv === 'production';

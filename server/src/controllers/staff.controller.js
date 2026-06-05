@@ -3,6 +3,7 @@ import authModel from '../models/auth.model.js';
 import departmentModel from '../models/department.model.js';
 import staffModel from '../models/staff.model.js';
 import { asyncHandler, created, ok } from '../utils/apiResponse.js';
+import { destroyImage, uploadAvatar } from '../utils/cloudinary.js';
 import { comparePassword, hashPassword } from '../utils/password.js';
 
 /**
@@ -54,6 +55,34 @@ const changeMyPassword = asyncHandler(async (req, res) => {
   await staffModel.updatePassword(req.user.staff_id, newHash);
 
   return ok(res, null, 'Password changed successfully');
+});
+
+/**
+ * @desc    Upload / replace the authenticated user's avatar
+ * @route   PATCH /api/staff/me/avatar
+ * @access  Private (any authenticated role)
+ */
+const updateMyAvatar = asyncHandler(async (req, res) => {
+  if (!req.file) {
+    throw new ApiError(400, 'No image file provided');
+  }
+
+  const staffId = req.user.staff_id;
+
+  // Remember the old image so we can clean it up after a successful swap.
+  const existing = await staffModel.getStaff(staffId);
+  const oldPublicId = existing?.avatar_public_id ?? null;
+  console.log(oldPublicId);
+
+  const { url, publicId } = await uploadAvatar(req.file.buffer);
+  const staff = await staffModel.updateAvatar(staffId, url, publicId);
+
+  // Best-effort: delete the previous avatar so Cloudinary doesn't pile up.
+  if (oldPublicId && oldPublicId !== publicId) {
+    await destroyImage(oldPublicId);
+  }
+
+  return ok(res, { staff }, 'Avatar updated successfully');
 });
 
 /**
@@ -137,5 +166,6 @@ export {
   getMyProfile,
   getStaff,
   listStaff,
+  updateMyAvatar,
   updateStaffStatus,
 };

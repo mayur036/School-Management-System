@@ -40,6 +40,7 @@ const RoleLayout = ({ config }) => {
         brand={brand}
         groups={groups}
         home={home}
+        profilePath={profilePath}
         fallbackInitials={fallbackInitials}
       />
       <SidebarInset className="flex min-w-0 flex-col">
