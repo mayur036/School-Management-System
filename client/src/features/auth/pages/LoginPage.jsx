@@ -15,6 +15,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useLoginMutation } from '@/features/auth/auth.api';
+import { roleHome } from '@/lib/roles';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -41,9 +42,10 @@ export const LoginPage = () => {
     try {
       const response = await login(data).unwrap();
       toast.success(response.message || 'Login successful!!');
-      navigate('/dashboard');
+      // Land each role on its own home (super → dashboard, school → panel, staff → profile)
+      navigate(roleHome(response.data?.user?.role_name), { replace: true });
     } catch (err) {
-      toast.error(err.data?.message || err.message || 'Login failed!!');
+      toast.error(err.message || 'Login failed!!');
     }
   };
 

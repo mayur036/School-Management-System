@@ -1,14 +1,14 @@
 import { Outlet } from 'react-router-dom';
 
-import SuperAdminHeader from './Header';
-import SuperAdminSidebar from './Sidebar';
+import StaffHeader from './Header';
+import StaffSidebar from './Sidebar';
 
-const SuperAdminLayout = () => {
+const StaffLayout = () => {
   return (
     <div className="flex min-h-screen">
-      <SuperAdminSidebar className="hidden md:flex" />
+      <StaffSidebar className="hidden md:flex" />
       <div className="flex min-w-0 flex-1 flex-col">
-        <SuperAdminHeader />
+        <StaffHeader />
         <main className="bg-muted/20 flex-1 p-6">
           <Outlet />
         </main>
@@ -17,4 +17,4 @@ const SuperAdminLayout = () => {
   );
 };
 
-export default SuperAdminLayout;
+export default StaffLayout;

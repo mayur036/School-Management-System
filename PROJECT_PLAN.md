@@ -278,13 +278,16 @@ own `feature.api.js`. Cache coherence is driven by `tagTypes` + `providesTags` /
 - [x] `providers/AppProviders.jsx` wires `<Provider store>` + theme; `authSlice` holds `{ user, isAuthenticated }`
 - [x] Add remaining `tagTypes` to `baseApi` as features land: `'School'`, `'Department'`, `'Staff'`
 
-#### Phase 7.1 — Auth & shell
+#### Phase 7.1 — Auth & shell ✅
 
 - [x] `features/auth/auth.api.js`: `login`, `getMe`, `logout` mutations/queries
 - [x] `LoginPage`, `ProtectedRoute` / `GuestRoute`, `useAuth` hook, super/school admin layouts
-- [ ] Bootstrap `getMe` on app load; **role-based redirect** after login (super_admin → `/dashboard`, school_admin → its panel, staff → profile)
-- [ ] Wire `logout` in the layout header; finalize per-role nav in layouts
-- **Done when:** logging in lands each role on its correct home; refresh keeps the session
+- [x] Bootstrap `getMe` on app load (`SessionBootstrap` in `AppProviders`); **role-based redirect** via `lib/roles.js` `roleHome()` (super_admin → `/super/dashboard`, school_admin → `/school/dashboard`, staff → `/staff/profile`)
+- [x] `RoleRoute` guard branches in `App.jsx`; per-role `logout` wired in each role's own header
+- [x] Fixed `useAuth` field bug (`loading` → `isAuthLoading`) so guards wait for the first `/auth/me`
+- [x] **Separate layouts per role** — namespaced URLs (`/super/*`, `/school/*`, `/staff/*`); each role has its own `Sidebar` + `Header` (desktop sidebar + mobile `Sheet` drawer) under `components/layouts/<role>/`; shared `useLogout` hook
+- [x] Shared `features/profile/ProfileView` rendered inside each role's layout (its sidebar + header); old standalone `ProfilePage` + shared `AppHeader` removed
+- **Done when:** logging in lands each role on its correct home; refresh keeps the session ✓ (lint + build pass)
 
 #### Phase 7.2 — Super Admin: Schools
 
