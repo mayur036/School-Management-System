@@ -20,10 +20,7 @@ const router = Router();
 // Every staff route is school_admin only, scoped to their own school.
 router.use(protect, authorize('school_admin'));
 
-router
-  .route('/')
-  .post(validate(createStaffSchema), createStaff)
-  .get(listStaff);
+router.route('/').post(validate(createStaffSchema), createStaff).get(listStaff);
 
 router.get('/:id', validate(staffIdSchema), getStaff);
 
