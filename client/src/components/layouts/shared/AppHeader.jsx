@@ -1,6 +1,14 @@
 import { Link, useLocation } from 'react-router-dom';
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -15,57 +23,68 @@ import { SidebarTrigger } from '@/components/ui/sidebar';
 import ThemeToggler from '@/helper/ThemeToggler';
 import { useAuth } from '@/hooks/useAuth';
 import { useLogout } from '@/hooks/useLogout';
-import { SUPER_ADMIN } from '@/lib/icons';
 
-const PAGE_META = {
-  '/super/dashboard': {
-    title: 'Dashboard',
-    desc: 'System overview and analytics',
-  },
-  '/super/schools': {
-    title: 'Schools',
-    desc: 'Manage institutions and admins',
-  },
-  '/super/profile': {
-    title: 'Account Settings',
-    desc: 'Personal details and security',
-  },
-};
-
-const SuperAdminHeader = () => {
+/**
+ * Config-driven header shared by every role layout.
+ * Renders a breadcrumb (root → current page) plus theme + account menu.
+ *
+ * @param {string} rootLabel        breadcrumb root (e.g. 'Super Admin')
+ * @param {string} home             root link target
+ * @param {string} profilePath      account-menu profile link
+ * @param {Record<string,string>} pageLabels  pathname → page title
+ * @param {any}    LogoutIcon       lucide icon for the logout item
+ */
+const AppHeader = ({
+  rootLabel,
+  home,
+  profilePath,
+  pageLabels,
+  LogoutIcon,
+  fallbackInitials = 'U',
+}) => {
   const { user } = useAuth();
   const { handleLogout, isLoggingOut } = useLogout();
   const { pathname } = useLocation();
 
-  const meta = PAGE_META[pathname] || { title: 'Super Admin', desc: '' };
+  const current = pageLabels[pathname] ?? rootLabel;
 
   const initials =
     `${user?.first_name?.[0] ?? ''}${user?.last_name?.[0] ?? ''}`.toUpperCase() ||
-    'SA';
+    fallbackInitials;
 
   return (
-    <header className="bg-background/95 supports-backdrop-filter:bg-background/60 sticky top-0 z-10 flex h-14 shrink-0 items-center border-b px-4 backdrop-blur">
-      <div className="flex items-center gap-2">
-        {/* Mobile only trigger */}
-        <SidebarTrigger className="md:hidden" />
-        <Separator orientation="vertical" className="mr-2 h-4 md:hidden" />
+    <header className="bg-background/95 supports-backdrop-filter:bg-background/60 sticky top-0 z-30 flex h-14 shrink-0 items-center gap-2 border-b px-4 backdrop-blur">
+      {/* Mobile-only sidebar toggle */}
+      <SidebarTrigger className="md:hidden" />
+      <Separator orientation="vertical" className="mr-1 h-4 md:hidden" />
 
-        <div className="flex flex-col">
-          <h2 className="text-sm leading-none font-semibold">{meta.title}</h2>
-          <p className="text-muted-foreground mt-1 hidden text-[11px] leading-none sm:block">
-            {meta.desc}
-          </p>
-        </div>
-      </div>
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem className="hidden sm:inline-flex">
+            <BreadcrumbLink asChild>
+              <Link to={home}>{rootLabel}</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator className="hidden sm:inline-flex" />
+          <BreadcrumbItem>
+            <BreadcrumbPage className="font-semibold">{current}</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
 
-      <div className="ml-auto flex items-center gap-2">
+      <div className="ml-auto flex items-center gap-1">
         <ThemeToggler />
 
         {user && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                <Avatar className="h-8 w-8 border">
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="Open account menu"
+                className="rounded-full"
+              >
+                <Avatar className="size-8 border">
                   <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">
                     {initials}
                   </AvatarFallback>
@@ -85,7 +104,7 @@ const SuperAdminHeader = () => {
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link to="/super/profile" className="w-full cursor-pointer">
+                <Link to={profilePath} className="w-full cursor-pointer">
                   Profile Settings
                 </Link>
               </DropdownMenuItem>
@@ -95,7 +114,7 @@ const SuperAdminHeader = () => {
                 disabled={isLoggingOut}
                 className="text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer"
               >
-                <SUPER_ADMIN.LOGOUT className="mr-2 h-4 w-4 shrink-0" />
+                <LogoutIcon className="mr-2 size-4 shrink-0" />
                 <span>{isLoggingOut ? 'Signing out...' : 'Log out'}</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -106,4 +125,4 @@ const SuperAdminHeader = () => {
   );
 };
 
-export default SuperAdminHeader;
+export default AppHeader;

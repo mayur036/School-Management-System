@@ -1,22 +1,54 @@
-import { Outlet } from 'react-router-dom';
+import { SCHOOL_ADMIN } from '@/lib/icons';
 
-import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+import RoleLayout from '../shared/RoleLayout';
 
-import SchoolAdminHeader from './Header';
-import SchoolAdminSidebar from './Sidebar';
-
-const SchoolAdminLayout = () => {
-  return (
-    <SidebarProvider>
-      <SchoolAdminSidebar />
-      <SidebarInset className="flex min-w-0 flex-col">
-        <SchoolAdminHeader />
-        <main className="bg-muted/10 flex-1 p-4 md:p-6">
-          <Outlet />
-        </main>
-      </SidebarInset>
-    </SidebarProvider>
-  );
+const config = {
+  brand: { name: 'EduManage', subtitle: 'School Administration' },
+  rootLabel: 'School Admin',
+  home: '/school/dashboard',
+  profilePath: '/school/profile',
+  fallbackInitials: 'AD',
+  LogoutIcon: SCHOOL_ADMIN.LOGOUT,
+  groups: [
+    {
+      label: 'Overview',
+      items: [
+        {
+          to: '/school/dashboard',
+          label: 'Dashboard',
+          Icon: SCHOOL_ADMIN.DASHBOARD,
+        },
+      ],
+    },
+    {
+      label: 'Management',
+      items: [
+        {
+          to: '/school/departments',
+          label: 'Departments',
+          Icon: SCHOOL_ADMIN.DEPARTMENTS,
+        },
+        {
+          to: '/school/staff',
+          label: 'Staff Directory',
+          Icon: SCHOOL_ADMIN.STAFF_LIST,
+        },
+        {
+          to: '/school/staff/register',
+          label: 'Register Staff',
+          Icon: SCHOOL_ADMIN.REGISTER_STAFF,
+        },
+      ],
+    },
+    {
+      label: 'Account',
+      items: [
+        { to: '/school/profile', label: 'Profile', Icon: SCHOOL_ADMIN.PROFILE },
+      ],
+    },
+  ],
 };
+
+const SchoolAdminLayout = () => <RoleLayout config={config} />;
 
 export default SchoolAdminLayout;

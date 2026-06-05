@@ -58,6 +58,7 @@ Desktop.ini
 
 # Agent / tooling
 .claude/
+.agents/
 
 # Database dumps / local backups
 *.sqlite
@@ -65,3 +66,13 @@ Desktop.ini
 *.db
 *.dump
 *.bak
+
+# design
+design-system/
+
+# memory
+memory/
+
+# .mds
+CLAUDE.md
+PROJECT_PLAN.md

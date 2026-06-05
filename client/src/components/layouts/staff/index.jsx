@@ -1,22 +1,26 @@
-import { Outlet } from 'react-router-dom';
+import { STAFF } from '@/lib/icons';
 
-import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+import RoleLayout from '../shared/RoleLayout';
 
-import StaffHeader from './Header';
-import StaffSidebar from './Sidebar';
-
-const StaffLayout = () => {
-  return (
-    <SidebarProvider>
-      <StaffSidebar />
-      <SidebarInset className="flex min-w-0 flex-col">
-        <StaffHeader />
-        <main className="bg-muted/10 flex-1 p-4 md:p-6">
-          <Outlet />
-        </main>
-      </SidebarInset>
-    </SidebarProvider>
-  );
+const config = {
+  brand: { name: 'EduManage', subtitle: 'Staff Portal' },
+  rootLabel: 'Staff',
+  home: '/staff/dashboard',
+  profilePath: '/staff/profile',
+  fallbackInitials: 'ST',
+  LogoutIcon: STAFF.LOGOUT,
+  groups: [
+    {
+      label: 'Overview',
+      items: [{ to: '/staff/dashboard', label: 'Dashboard', Icon: STAFF.HOME }],
+    },
+    {
+      label: 'Account',
+      items: [{ to: '/staff/profile', label: 'Profile', Icon: STAFF.PROFILE }],
+    },
+  ],
 };
+
+const StaffLayout = () => <RoleLayout config={config} />;
 
 export default StaffLayout;

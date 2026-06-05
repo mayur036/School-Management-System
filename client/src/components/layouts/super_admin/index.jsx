@@ -1,22 +1,40 @@
-import { Outlet } from 'react-router-dom';
+import { SUPER_ADMIN } from '@/lib/icons';
 
-import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+import RoleLayout from '../shared/RoleLayout';
 
-import SuperAdminHeader from './Header';
-import SuperAdminSidebar from './Sidebar';
-
-const SuperAdminLayout = () => {
-  return (
-    <SidebarProvider>
-      <SuperAdminSidebar />
-      <SidebarInset className="flex min-w-0 flex-col">
-        <SuperAdminHeader />
-        <main className="bg-muted/10 flex-1 p-4 md:p-6">
-          <Outlet />
-        </main>
-      </SidebarInset>
-    </SidebarProvider>
-  );
+const config = {
+  brand: { name: 'EduManage', subtitle: 'Super Admin Panel' },
+  rootLabel: 'Super Admin',
+  home: '/super/dashboard',
+  profilePath: '/super/profile',
+  fallbackInitials: 'SA',
+  LogoutIcon: SUPER_ADMIN.LOGOUT,
+  groups: [
+    {
+      label: 'Overview',
+      items: [
+        {
+          to: '/super/dashboard',
+          label: 'Dashboard',
+          Icon: SUPER_ADMIN.DASHBOARD,
+        },
+      ],
+    },
+    {
+      label: 'Management',
+      items: [
+        { to: '/super/schools', label: 'Schools', Icon: SUPER_ADMIN.SCHOOLS },
+      ],
+    },
+    {
+      label: 'Account',
+      items: [
+        { to: '/super/profile', label: 'Profile', Icon: SUPER_ADMIN.PROFILE },
+      ],
+    },
+  ],
 };
+
+const SuperAdminLayout = () => <RoleLayout config={config} />;
 
 export default SuperAdminLayout;
