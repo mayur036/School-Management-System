@@ -265,4 +265,32 @@ BEGIN
   WHERE s.staff_id = p_staff_id;
 END $$
 
+-- ------------------------------------------------------------
+-- sp_update_profile : update first_name, last_name, and phone for a user
+-- ------------------------------------------------------------
+DROP PROCEDURE IF EXISTS sp_update_profile $$
+CREATE PROCEDURE sp_update_profile(
+  IN p_staff_id   INT,
+  IN p_first_name  VARCHAR(80),
+  IN p_last_name   VARCHAR(80),
+  IN p_phone       VARCHAR(20)
+)
+BEGIN
+  UPDATE staff
+  SET first_name = p_first_name,
+      last_name  = p_last_name,
+      phone      = p_phone,
+      updated_at = CURRENT_TIMESTAMP
+  WHERE staff_id = p_staff_id;
+
+  SELECT
+    s.staff_id, s.role_id, r.role_name, s.school_id, s.department_id,
+    d.name AS department_name, s.first_name, s.last_name, s.email,
+    s.phone, s.avatar_url, s.status, s.created_at, s.updated_at
+  FROM staff s
+  JOIN roles r ON r.role_id = s.role_id
+  LEFT JOIN departments d ON d.department_id = s.department_id
+  WHERE s.staff_id = p_staff_id;
+END $$
+
 DELIMITER ;

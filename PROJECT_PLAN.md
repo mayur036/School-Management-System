@@ -290,30 +290,30 @@ own `feature.api.js`. Cache coherence is driven by `tagTypes` + `providesTags` /
 - [x] Shared `features/profile/ProfileView` rendered inside each role's layout (its sidebar + header); old standalone `ProfilePage` + shared `AppHeader` removed
 - **Done when:** logging in lands each role on its correct home; refresh keeps the session ✓ (lint + build pass)
 
-#### Phase 7.2 — Super Admin: Schools
+#### Phase 7.2 — Super Admin: Schools ✅
 
-- [ ] `features/super_admin/schools.api.js`: `getSchools` (`providesTags: ['School']`), `getSchool`, `createSchool`, `updateSchoolStatus` (`invalidatesTags: ['School']`)
-- [ ] Schools list page (table, status badge, activate/deactivate toggle)
-- [ ] Create-school dialog (rhf + zod) → `POST /api/schools`
+- [x] `features/super_admin/schools.api.js`: `getSchools` (`providesTags: ['School']`), `getSchool`, `createSchool`, `updateSchoolStatus` (`invalidatesTags: ['School']`)
+- [x] Schools list page (table, status badge, activate/deactivate toggle)
+- [x] Create-school dialog (rhf + zod) → `POST /api/schools`
 - **Done when:** super admin lists, creates, and toggles a school's status from the UI
 
-#### Phase 7.3 — Super Admin: School Admins
+#### Phase 7.3 — Super Admin: School Admins ✅
 
-- [ ] Extend schools api (or `schoolAdmins.api.js`): `createSchoolAdmin` → `POST /api/schools/:id/admins`
-- [ ] "Add admin" form from a school's detail/row; surface the created credentials
+- [x] Extend schools api (or `schoolAdmins.api.js`): `createSchoolAdmin` → `POST /api/schools/:id/admins`
+- [x] "Add admin" form from a school's detail/row; surface the created credentials
 - **Done when:** super admin creates a school admin for a school via the UI
 
-#### Phase 7.4 — School Admin: Departments
+#### Phase 7.4 — School Admin: Departments ✅
 
-- [ ] `features/school_admin/departments.api.js`: `getDepartments` (`providesTags: ['Department']`), `createDepartment` (`invalidatesTags: ['Department']`)
-- [ ] Departments list + create dialog (tenant `school_id` comes from the cookie/token, never the form)
+- [x] `features/school_admin/departments.api.js`: `getDepartments` (`providesTags: ['Department']`), `createDepartment` (`invalidatesTags: ['Department']`)
+- [x] Departments list + create dialog (tenant `school_id` comes from the cookie/token, never the form)
 - **Done when:** school admin lists and adds departments
 
-#### Phase 7.5 — School Admin: Staff
+#### Phase 7.5 — School Admin: Staff ✅
 
-- [ ] `features/school_admin/staff.api.js`: `getStaff` (`providesTags: ['Staff']`), `getStaffById`, `createStaff`, `updateStaffStatus` (`invalidatesTags: ['Staff']`)
-- [ ] Staff register page (rhf + zod, department `<Select>` fed by `getDepartments`) → `POST /api/staff`
-- [ ] Staff list (table + enable/disable) and staff detail
+- [x] `features/school_admin/staff.api.js`: `getStaff` (`providesTags: ['Staff']`), `getStaffById`, `createStaff`, `updateStaffStatus` (`invalidatesTags: ['Staff']`)
+- [x] Staff register page (rhf + zod, department `<Select>` fed by `getDepartments`) → `POST /api/staff`
+- [x] Staff list (table + enable/disable) and staff detail
 - **Done when:** school admin registers staff into a department and toggles their status
 
 #### Phase 7.6 — Profile & password (all roles) [/]

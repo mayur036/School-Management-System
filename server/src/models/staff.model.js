@@ -40,6 +40,15 @@ const staffModel = {
   // Set a user's avatar URL + Cloudinary public_id. Returns the updated row.
   updateAvatar: (staffId, avatarUrl, avatarPublicId) =>
     callProcedureOne('sp_update_avatar', [staffId, avatarUrl, avatarPublicId]),
+
+  // Update a user's own profile info (first name, last name, phone). Returns the updated row.
+  updateProfile: (staffId, firstName, lastName, phone) =>
+    callProcedureOne('sp_update_profile', [
+      staffId,
+      firstName,
+      lastName,
+      phone,
+    ]),
 };
 
 export default staffModel;

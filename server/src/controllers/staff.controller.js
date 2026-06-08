@@ -160,6 +160,29 @@ const updateStaffStatus = asyncHandler(async (req, res) => {
   );
 });
 
+/**
+ * @desc    Update the currently authenticated user's own profile info
+ * @route   PATCH /api/staff/me
+ * @access  Private (any authenticated role)
+ */
+const updateMyProfile = asyncHandler(async (req, res) => {
+  const { first_name, last_name, phone } = req.body;
+  const staffId = req.user.staff_id;
+
+  const staff = await staffModel.updateProfile(
+    staffId,
+    first_name,
+    last_name,
+    phone ?? null
+  );
+
+  if (!staff) {
+    throw new ApiError(404, 'Profile not found');
+  }
+
+  return ok(res, { staff }, 'Profile updated successfully');
+});
+
 export {
   changeMyPassword,
   createStaff,
@@ -167,5 +190,6 @@ export {
   getStaff,
   listStaff,
   updateMyAvatar,
+  updateMyProfile,
   updateStaffStatus,
 };

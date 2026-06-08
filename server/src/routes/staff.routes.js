@@ -7,6 +7,7 @@ import {
   getStaff,
   listStaff,
   updateMyAvatar,
+  updateMyProfile,
   updateStaffStatus,
 } from '../controllers/staff.controller.js';
 import { protect } from '../middleware/auth.js';
@@ -17,6 +18,7 @@ import {
   changePasswordSchema,
   createStaffSchema,
   staffIdSchema,
+  updateProfileSchema,
   updateStaffStatusSchema,
 } from '../schema/staff.schema.js';
 
@@ -26,6 +28,7 @@ const router = Router();
 // before the school_admin guard (so staff aren't blocked) and before /:id
 // (so 'me' isn't captured as an id param).
 router.get('/me', protect, getMyProfile);
+router.patch('/me', protect, validate(updateProfileSchema), updateMyProfile);
 router.patch(
   '/me/password',
   protect,

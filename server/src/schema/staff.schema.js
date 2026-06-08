@@ -42,3 +42,11 @@ export const updateStaffStatusSchema = z.object({
     }),
   }),
 });
+
+export const updateProfileSchema = z.object({
+  body: z.object({
+    first_name: z.string().trim().min(1, 'First name is required').max(80),
+    last_name: z.string().trim().min(1, 'Last name is required').max(80),
+    phone: z.string().trim().max(20).optional().nullable(),
+  }),
+});

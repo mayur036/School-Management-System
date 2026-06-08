@@ -14,16 +14,41 @@ export const profileApi = baseApi.injectEndpoints({
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
-          // API returns { success, message, data: { staff } } — push the
-          // updated user into auth state so every avatar (header, sidebar,
-          // profile) refreshes immediately.
           dispatch(setUser(data.data.staff));
         } catch {
           // surfaced to the caller via unwrap()
         }
       },
     }),
+    // Update personal details.
+    updateProfile: builder.mutation({
+      query: (profileData) => ({
+        url: '/staff/me',
+        method: 'PATCH',
+        data: profileData,
+      }),
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(setUser(data.data.staff));
+        } catch {
+          // Handled by client mutation
+        }
+      },
+    }),
+    // Change own password.
+    changePassword: builder.mutation({
+      query: (passwordData) => ({
+        url: '/staff/me/password',
+        method: 'PATCH',
+        data: passwordData,
+      }),
+    }),
   }),
 });
 
-export const { useUploadAvatarMutation } = profileApi;
+export const {
+  useUploadAvatarMutation,
+  useUpdateProfileMutation,
+  useChangePasswordMutation,
+} = profileApi;

@@ -1,7 +1,9 @@
 import {
   Building2,
+  EllipsisVertical,
   LayoutDashboard,
   LogOut,
+  Power,
   Settings,
   ShieldAlert,
   User,
@@ -18,5 +20,7 @@ export const SUPER_ADMIN = {
   SECURITY: ShieldAlert,
   USERS: Users,
   LOGOUT: LogOut,
+  ACTIONS: EllipsisVertical,
+  POWER: Power,
 };
 export default SUPER_ADMIN;

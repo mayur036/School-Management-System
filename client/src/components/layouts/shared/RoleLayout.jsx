@@ -5,15 +5,7 @@ import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import AppHeader from './AppHeader';
 import AppSidebar from './AppSidebar';
 
-/**
- * Generic role layout: persistent sidebar + sticky header + content outlet.
- * Every per-role layout is just a `config` passed to this component, so the
- * three roles stay visually identical and only differ in nav + branding.
- *
- * Breadcrumb page labels are derived from the nav config (pathname → label),
- * with an optional `pageLabels` override for routes not present in the nav.
- */
-const RoleLayout = ({ config }) => {
+const RoleLayoutContent = ({ config }) => {
   const {
     brand,
     rootLabel,
@@ -22,20 +14,11 @@ const RoleLayout = ({ config }) => {
     profilePath,
     LogoutIcon,
     fallbackInitials,
-    pageLabels: overrides,
+    pageLabels,
   } = config;
 
-  const pageLabels = {
-    ...Object.fromEntries(
-      groups.flatMap((group) =>
-        group.items.map((item) => [item.to, item.label])
-      )
-    ),
-    ...overrides,
-  };
-
   return (
-    <SidebarProvider>
+    <>
       <AppSidebar
         brand={brand}
         groups={groups}
@@ -46,7 +29,6 @@ const RoleLayout = ({ config }) => {
       <SidebarInset className="flex min-w-0 flex-col">
         <AppHeader
           rootLabel={rootLabel}
-          home={home}
           profilePath={profilePath}
           pageLabels={pageLabels}
           LogoutIcon={LogoutIcon}
@@ -56,6 +38,30 @@ const RoleLayout = ({ config }) => {
           <Outlet />
         </main>
       </SidebarInset>
+    </>
+  );
+};
+
+const RoleLayout = ({ config }) => {
+  const { groups, pageLabels: overrides } = config;
+
+  const pageLabels = {
+    ...Object.fromEntries(
+      groups.flatMap((group) =>
+        group.items.map((item) => [item.to, item.label])
+      )
+    ),
+    ...overrides,
+  };
+
+  const layoutConfig = {
+    ...config,
+    pageLabels,
+  };
+
+  return (
+    <SidebarProvider>
+      <RoleLayoutContent config={layoutConfig} />
     </SidebarProvider>
   );
 };
