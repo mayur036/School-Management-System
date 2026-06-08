@@ -1,4 +1,4 @@
-# School Management System — Build Plan
+# CampusCore — School Management System — Build Plan
 
 > Phase-by-phase blueprint for building the School Management System.
 > Stack: **MySQL (stored procedures)** + **Node/Express** backend + **React (Vite)** frontend.
@@ -254,7 +254,8 @@ server/
 
 - [x] `GET /api/staff/me` profile for any logged-in user (declared before the school_admin guard + `/:id` route)
 - [x] `PATCH /api/staff/me/password` — change own password (verifies current password; new `sp_update_password` proc)
-- **Done when:** registered staff can log in and view their profile
+- [x] `PATCH /api/staff/me/avatar` — upload/replace own avatar photo using Cloudinary (buffered upload, deletes old image)
+- **Done when:** registered staff can log in, view their profile, upload a profile photo, and change their password
 
 ### Phase 7 — Frontend (React + RTK Query)
 
@@ -315,11 +316,11 @@ own `feature.api.js`. Cache coherence is driven by `tagTypes` + `providesTags` /
 - [ ] Staff list (table + enable/disable) and staff detail
 - **Done when:** school admin registers staff into a department and toggles their status
 
-#### Phase 7.6 — Profile & password (all roles)
+#### Phase 7.6 — Profile & password (all roles) [/]
 
-- [ ] `features/profile/profile.api.js`: `getMyProfile` → `GET /api/staff/me`, `changePassword` → `PATCH /api/staff/me/password`
-- [ ] Profile page wired to live data; change-password form (rhf + zod)
-- **Done when:** any logged-in user views their profile and changes their password
+- [/] `features/profile/profile.api.js`: `uploadAvatar` (PATCH `/staff/me/avatar`) ✅, `getMyProfile` → `GET /api/staff/me`, `changePassword` → `PATCH /api/staff/me/password`
+- [/] Profile page wired to live data (avatar upload and details display ✅, change-password form pending)
+- **Done when:** any logged-in user views their profile, uploads an avatar, and changes their password
 
 #### Phase 7.7 — Cross-cutting polish
 
@@ -360,6 +361,7 @@ GET    /api/staff/:id                  school     staff detail
 PATCH  /api/staff/:id/status           school     enable/disable
 GET    /api/staff/me                   all        own profile
 PATCH  /api/staff/me/password          all        change own password
+PATCH  /api/staff/me/avatar            all        upload / replace avatar (Cloudinary)
 ```
 
 ---

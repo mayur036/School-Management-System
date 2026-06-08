@@ -1,4 +1,5 @@
 import { cloudinary } from '../config/cloudinary.js';
+import { ApiError } from '../middleware/error.js';
 
 const AVATAR_FOLDER = 'school-management/avatars';
 
@@ -21,8 +22,8 @@ export const uploadAvatar = (buffer) =>
         ],
       },
       (error, result) => {
-        if (error) return reject(error);
-        resolve({ url: result.secure_url, publicId: result.public_id });
+        if (error) reject(new ApiError(500, 'Avatar upload failed'));
+        else resolve({ url: result.secure_url, publicId: result.public_id });
       }
     );
     stream.end(buffer);

@@ -7,15 +7,15 @@ let server;
 const start = async () => {
   try {
     await verifyDbConnection();
-    console.log('Database connected ' + `${env.nodeEnv}`);
+    console.log('Database connected ' + `${env.server.nodeEnv}`);
   } catch (err) {
     console.error('Database connection failed:' + `${err.message}`);
     process.exit(1);
   }
 
-  server = app.listen(env.port, () => {
+  server = app.listen(env.server.port, () => {
     console.log(
-      `Server running on http://localhost:${env.port} [${env.nodeEnv}]`
+      `Server running on http://localhost:${env.server.port} [${env.server.nodeEnv}]`
     );
   });
 };

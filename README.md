@@ -1,6 +1,6 @@
-# School Management System
+# CampusCore — School Management System
 
-A multi-tenant **School Management System** where a Super Admin onboards schools and their admins, and each School Admin manages their own staff — organized by department.
+A multi-tenant **CampusCore** School Management System where a Super Admin onboards schools and their admins, and each School Admin manages their own staff — organized by department.
 
 > **Stack:** MySQL (stored procedures) · Node.js / Express · React (Vite) · Tailwind + shadcn/ui
 > **Author:** Mayur Kapadi
@@ -19,11 +19,11 @@ For the full architecture and phase-by-phase roadmap, see [PROJECT_PLAN.md](PROJ
 
 ## 🧱 Roles at a glance
 
-| Role           | Can do                                            |
-| -------------- | ------------------------------------------------- |
-| `super_admin`  | Create / list schools, create school admins       |
-| `school_admin` | Create departments, register & manage own staff   |
-| `staff`        | Log in, view own profile                          |
+| Role           | Can do                                          |
+| -------------- | ----------------------------------------------- |
+| `super_admin`  | Create / list schools, create school admins     |
+| `school_admin` | Create departments, register & manage own staff |
+| `staff`        | Log in, view own profile                        |
 
 ---
 

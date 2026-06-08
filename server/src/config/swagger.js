@@ -13,7 +13,7 @@ const options = {
     },
     servers: [
       {
-        url: `http://localhost:${env.port}`,
+        url: `http://localhost:${env.server.port}`,
         description: 'Development Server',
       },
     ],
@@ -41,6 +41,6 @@ const swaggerSpec = swaggerJsdoc(options);
 export const setupSwagger = (app) => {
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
   console.log(
-    `Swagger docs available at http://localhost:${env.port}/api-docs`
+    `Swagger docs available at http://localhost:${env.server.port}/api-docs`
   );
 };

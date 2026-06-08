@@ -11,8 +11,15 @@ const required = (key) => {
 };
 
 export const env = {
-  nodeEnv: process.env.NODE_ENV ?? 'development',
-  port: Number(process.env.PORT ?? 5000),
+  server: {
+    port: Number(process.env.PORT ?? 5000),
+    nodeEnv: process.env.NODE_ENV ?? 'development',
+    url: process.env.SERVER_URL,
+    isDev: process.env.NODE_ENV === 'development',
+    isProd: process.env.NODE_ENV === 'production',
+    additionalUrls: process.env.ADDITIONAL_SERVER_URLS,
+    ipAddress: process.env.IP_ADDRESS,
+  },
 
   db: {
     host: process.env.DATABASE_HOST ?? 'localhost',
@@ -28,10 +35,22 @@ export const env = {
   },
 
   cloudinary: {
-    cloudName: process.env.CLOUDINARY_CLOUD_NAME,
-    apiKey: process.env.CLOUDINARY_API_KEY,
-    apiSecret: process.env.CLOUDINARY_API_SECRET,
+    cloudName: required('CLOUDINARY_CLOUD_NAME'),
+    apiKey: required('CLOUDINARY_API_KEY'),
+    apiSecret: required('CLOUDINARY_API_SECRET'),
+  },
+
+  client: {
+    url: process.env.CLIENT_URL,
+  },
+
+  email: {
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT),
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+    from: process.env.MAIL_FROM,
   },
 };
 
-export const isProduction = env.nodeEnv === 'production';
+export const isProduction = env.server.isProd;
