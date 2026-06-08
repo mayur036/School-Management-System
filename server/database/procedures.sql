@@ -293,4 +293,54 @@ BEGIN
   WHERE s.staff_id = p_staff_id;
 END $$
 
+-- ------------------------------------------------------------
+-- sp_set_reset_token : save password reset token and expiry
+-- ------------------------------------------------------------
+DROP PROCEDURE IF EXISTS sp_set_reset_token $$
+CREATE PROCEDURE sp_set_reset_token(
+  IN p_email VARCHAR(150),
+  IN p_token VARCHAR(255),
+  IN p_expiry DATETIME
+)
+BEGIN
+  UPDATE staff
+  SET reset_token = p_token,
+      reset_token_expiry = p_expiry
+  WHERE email = p_email AND status = 'active';
+END $$
+
+-- ------------------------------------------------------------
+-- sp_get_user_by_reset_token : find active user by reset token
+-- ------------------------------------------------------------
+DROP PROCEDURE IF EXISTS sp_get_user_by_reset_token $$
+CREATE PROCEDURE sp_get_user_by_reset_token(
+  IN p_token VARCHAR(255)
+)
+BEGIN
+  SELECT
+    s.staff_id, s.role_id, r.role_name, s.school_id, s.department_id,
+    s.first_name, s.last_name, s.email, s.status, s.reset_token_expiry
+  FROM staff s
+  JOIN roles r ON r.role_id = s.role_id
+  WHERE s.reset_token = p_token AND s.status = 'active'
+  LIMIT 1;
+END $$
+
+-- ------------------------------------------------------------
+-- sp_reset_password_by_token : update password and clear reset token details
+-- ------------------------------------------------------------
+DROP PROCEDURE IF EXISTS sp_reset_password_by_token $$
+CREATE PROCEDURE sp_reset_password_by_token(
+  IN p_token VARCHAR(255),
+  IN p_password_hash VARCHAR(255)
+)
+BEGIN
+  UPDATE staff
+  SET password_hash = p_password_hash,
+      reset_token = NULL,
+      reset_token_expiry = NULL,
+      updated_at = CURRENT_TIMESTAMP
+  WHERE reset_token = p_token AND status = 'active';
+END $$
+
 DELIMITER ;

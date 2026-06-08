@@ -78,6 +78,8 @@ CREATE TABLE staff (
   phone          VARCHAR(20),
   avatar_url        VARCHAR(255) NULL,
   avatar_public_id  VARCHAR(255) NULL,
+  reset_token       VARCHAR(255) NULL,
+  reset_token_expiry DATETIME NULL,
   status         ENUM('active','inactive') NOT NULL DEFAULT 'active',
   created_by     INT NULL,
   created_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

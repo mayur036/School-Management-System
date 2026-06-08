@@ -70,7 +70,7 @@ bun run preview   # preview the production build
 
 ## 🧭 App flow
 
-1. **Login** → token stored, user redirected by role.
+1. **Login & Recovery** → log in or request a secure timed password reset link via email.
 2. **Super Admin panel** → manage schools, create school admins.
 3. **School Admin panel** → manage departments, register & list staff.
 

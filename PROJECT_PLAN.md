@@ -108,6 +108,10 @@ staff   -- unified login/user table for EVERYONE
 ├─ email          VARCHAR(150) UNIQUE NOT NULL
 ├─ password_hash  VARCHAR(255) NOT NULL
 ├─ phone          VARCHAR(20)
+├─ avatar_url     VARCHAR(255) NULL
+├─ avatar_public_id VARCHAR(255) NULL
+├─ reset_token    VARCHAR(255) NULL
+├─ reset_token_expiry DATETIME NULL
 ├─ status         ENUM('active','inactive') DEFAULT 'active'
 ├─ created_by     INT NULL -- FK -> staff.staff_id (who registered this user)
 ├─ created_at     TIMESTAMP
@@ -151,6 +155,9 @@ staff (1) ────< (N) schools        created_by
 | `sp_get_staff(staff_id)`                                        | Staff detail / own profile            | all          |
 | `sp_update_staff_status(staff_id, status)`                      | Enable/disable staff                  | school admin |
 | `sp_update_password(staff_id, hash)`                            | Change own password                   | all          |
+| `sp_set_reset_token(email, token, expiry)`                      | Set reset token and expiry date       | auth         |
+| `sp_get_user_by_reset_token(token)`                             | Get user details by active token      | auth         |
+| `sp_reset_password_by_token(token, hash)`                       | Reset password and clear token fields  | auth         |
 
 > Each proc validates tenancy where relevant (e.g. staff must belong to the school_id passed in). App layer also re-checks via JWT claims.
 
@@ -316,11 +323,12 @@ own `feature.api.js`. Cache coherence is driven by `tagTypes` + `providesTags` /
 - [x] Staff list (table + enable/disable) and staff detail
 - **Done when:** school admin registers staff into a department and toggles their status
 
-#### Phase 7.6 — Profile & password (all roles) [/]
+#### Phase 7.6 — Profile & password (all roles) ✅
 
-- [/] `features/profile/profile.api.js`: `uploadAvatar` (PATCH `/staff/me/avatar`) ✅, `getMyProfile` → `GET /api/staff/me`, `changePassword` → `PATCH /api/staff/me/password`
-- [/] Profile page wired to live data (avatar upload and details display ✅, change-password form pending)
-- **Done when:** any logged-in user views their profile, uploads an avatar, and changes their password
+- [x] `features/profile/profile.api.js`: `uploadAvatar` (PATCH `/staff/me/avatar`) ✅, `getMyProfile` → `GET /api/staff/me` ✅, `changePassword` → `PATCH /api/staff/me/password` ✅
+- [x] Profile page wired to live data (avatar upload, details display, and change-password form) ✅
+- [x] Forgot & Reset Password flow: global SMTP `mailer.js` setup, template `resetPasswordTemplate.js`, recovery API routers/controllers (`POST /api/auth/forgot-password`, `POST /api/auth/reset-password`), client-side forms and page triggers.
+- **Done when:** any logged-in user views/edits their profile, uploads an avatar, and changes their password, and guest users can trigger forgot password links and reset passwords securely.
 
 #### Phase 7.7 — Cross-cutting polish
 
@@ -344,6 +352,8 @@ own `feature.api.js`. Cache coherence is driven by `tagTypes` + `providesTags` /
 
 ```
 POST   /api/auth/login                 all        login
+POST   /api/auth/forgot-password       all        request reset email
+POST   /api/auth/reset-password        all        set new password using token
 GET    /api/auth/me                    all        current user
 
 POST   /api/schools                    super      create school

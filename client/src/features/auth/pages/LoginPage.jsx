@@ -58,12 +58,7 @@ export const LoginPage = () => {
   };
 
   const handleForgotPassword = () => {
-    toast.info(
-      'Please contact your school administrator to reset your password.',
-      {
-        duration: 3000,
-      }
-    );
+    navigate('/forgot-password');
   };
 
   const handleGoogleSignIn = () => {
@@ -96,9 +91,9 @@ export const LoginPage = () => {
       </div>
 
       {/* Left Sidebar (Desktop only) */}
-      <aside className="from-primary relative hidden flex-col justify-between overflow-hidden bg-gradient-to-br to-indigo-950 p-10 text-white lg:flex xl:p-12">
+      <aside className="from-primary relative hidden flex-col justify-between overflow-hidden bg-linear-to-br to-indigo-950 p-10 text-white lg:flex xl:p-12">
         {/* Dot pattern */}
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(#ffffff15_1px,transparent_1px)] [background-size:16px_16px]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-linear(#ffffff15_1px,transparent_1px)] bg-size-[16px_16px]" />
 
         {/* Logo */}
         <div className="flex items-center gap-3">
@@ -159,9 +154,9 @@ export const LoginPage = () => {
       {/* Form Area */}
       <main className="bg-background relative flex min-h-screen flex-col lg:justify-center">
         {/* Mobile Header Banner */}
-        <div className="from-primary relative flex flex-col gap-4 overflow-hidden rounded-b-[2.5rem] bg-gradient-to-br to-indigo-950 p-8 pb-10 text-white shadow-md lg:hidden">
+        <div className="from-primary relative flex flex-col gap-4 overflow-hidden rounded-b-[2.5rem] bg-linear-to-br to-indigo-950 p-8 pb-10 text-white shadow-md lg:hidden">
           {/* Dot pattern */}
-          <div className="pointer-events-none absolute top-0 right-0 h-32 w-32 bg-[radial-gradient(#ffffff15_1px,transparent_1px)] [background-size:16px_16px]" />
+          <div className="pointer-events-none absolute top-0 right-0 h-32 w-32 bg-[radial-linear(#ffffff15_1px,transparent_1px)] bg-size-[16px_16px]" />
 
           <div className="flex items-center gap-3">
             <div className="flex size-10 items-center justify-center rounded-xl border border-white/5 bg-white/10 text-white">
@@ -180,7 +175,7 @@ export const LoginPage = () => {
 
         {/* Form panel content */}
         <div className="flex flex-1 flex-col justify-center px-6 py-10 sm:px-12 lg:px-16 xl:px-24">
-          <div className="mx-auto w-full max-w-[380px] space-y-6">
+          <div className="mx-auto w-full max-w-95 space-y-6">
             <div className="space-y-2">
               <h2 className="text-foreground text-2xl font-bold tracking-tight sm:text-3xl">
                 Welcome back 👋

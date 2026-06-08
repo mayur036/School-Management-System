@@ -18,6 +18,12 @@ import GuestRoute from './components/routes/GuestRoute';
 // Pages
 const Home = lazy(() => import('./features/guest/pages/Home'));
 const LoginPage = lazy(() => import('./features/auth/pages/LoginPage'));
+const ForgotPasswordPage = lazy(
+  () => import('./features/auth/pages/ForgotPasswordPage')
+);
+const ResetPasswordPage = lazy(
+  () => import('./features/auth/pages/ResetPasswordPage')
+);
 const ProfileView = lazy(() => import('./features/profile/ProfileView'));
 const ErrorPage = lazy(() => import('./pages/ErrorPage'));
 
@@ -52,6 +58,8 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Home /> },
       { path: 'login', element: <LoginPage /> },
+      { path: 'forgot-password', element: <ForgotPasswordPage /> },
+      { path: 'reset-password', element: <ResetPasswordPage /> },
     ],
   },
   {

@@ -91,20 +91,22 @@ Health check: `GET http://localhost:5000/health`
 
 ## 📡 API overview
 
-| Method | Endpoint                  | Role   | Purpose                |
-| ------ | ------------------------- | ------ | ---------------------- |
-| POST   | `/api/auth/login`         | all    | Log in                 |
-| GET    | `/api/auth/me`            | all    | Current user           |
-| POST   | `/api/schools`            | super  | Create school          |
-| GET    | `/api/schools`            | super  | List schools           |
-| PATCH  | `/api/schools/:id/status` | super  | Activate / deactivate  |
-| POST   | `/api/schools/:id/admins` | super  | Create school admin    |
-| POST   | `/api/departments`        | school | Create department      |
-| GET    | `/api/departments`        | school | List own departments   |
-| POST   | `/api/staff`              | school | Register staff         |
-| GET    | `/api/staff`              | school | List own staff         |
-| PATCH  | `/api/staff/:id/status`   | school | Enable / disable staff |
-| GET    | `/api/staff/me`           | all    | Own profile            |
+| Method | Endpoint                    | Role   | Purpose                   |
+| ------ | --------------------------- | ------ | ------------------------- |
+| POST   | `/api/auth/login`           | all    | Log in                    |
+| POST   | `/api/auth/forgot-password` | all    | Request reset link email  |
+| POST   | `/api/auth/reset-password`  | all    | Reset password with token |
+| GET    | `/api/auth/me`              | all    | Current user              |
+| POST   | `/api/schools`              | super  | Create school             |
+| GET    | `/api/schools`              | super  | List schools              |
+| PATCH  | `/api/schools/:id/status`   | super  | Activate / deactivate     |
+| POST   | `/api/schools/:id/admins`   | super  | Create school admin       |
+| POST   | `/api/departments`          | school | Create department         |
+| GET    | `/api/departments`          | school | List own departments      |
+| POST   | `/api/staff`                | school | Register staff            |
+| GET    | `/api/staff`                | school | List own staff            |
+| PATCH  | `/api/staff/:id/status`     | school | Enable / disable staff    |
+| GET    | `/api/staff/me`             | all    | Own profile               |
 
 > `super` = `super_admin`, `school` = `school_admin`. School-scoped routes derive `school_id` from the JWT — never from the request body.
 

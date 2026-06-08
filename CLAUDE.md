@@ -87,4 +87,4 @@ All server state flows through **one** `baseApi` (`src/app/baseApi.js`) using a 
 
 ## API surface
 
-See PROJECT_PLAN.md §8 for the full endpoint map. Shape: `/api/auth/*` (all roles), `/api/schools/*` (super_admin, incl. `POST /:id/admins`), `/api/departments` (school_admin, tenant-scoped), `/api/staff/*` (school_admin, plus `/me`, `/me/password`, and `/me/avatar` for everyone).
+See PROJECT_PLAN.md §8 for the full endpoint map. Shape: `/api/auth/*` (all roles, including login, logout, forgot-password, reset-password), `/api/schools/*` (super_admin, incl. `POST /:id/admins`), `/api/departments` (school_admin, tenant-scoped), `/api/staff/*` (school_admin, plus `/me`, `/me/password`, and `/me/avatar` for everyone).
