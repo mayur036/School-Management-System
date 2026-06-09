@@ -49,7 +49,7 @@ All three are idempotent and safe to re-run.
 2. Add a thin wrapper in `server/src/models/<feature>.model.js` that calls it via `callProcedure` (returns rows) or `callProcedureOne` (returns one row / null) from `utils/callProcedure.js`.
 3. Models never contain logic — they only map named args to the procedure's positional params.
 
-Procedures also validate tenancy where relevant (e.g. staff must belong to the passed `school_id`); the app layer re-checks via JWT claims.
+Procedures also validate tenancy where relevant (e.g. staff must belong to the passed `school_id`, preventing cross-school staff registration while allowing multiple staff per department); the app layer re-checks via JWT claims.
 
 ### Server request flow
 
@@ -63,7 +63,12 @@ Procedures also validate tenancy where relevant (e.g. staff must belong to the p
 - **Validation**: `validate(zodSchema)` middleware runs zod schemas from `src/schema/*.schema.js`.
 - **Responses**: always use the envelope helpers in `utils/apiResponse.js` — `ok(res, data, message)`, `created(...)`, and wrap every async handler in `asyncHandler(...)` so throws reach the central handler. Throw `new ApiError(status, message)` for expected errors. `ER_DUP_ENTRY` is auto-mapped to 409 in `middleware/error.js`.
 - **Route ordering gotcha**: in `staff.routes.js`, `/me` and `/me/password` are declared _before_ the `router.use(protect, authorize('school_admin'))` guard and before `/:id`, so any authenticated user can hit them and `me` isn't captured as an `:id`. Preserve this ordering when editing.
-- Config comes from `src/config/env.js` (`env` object; `JWT_SECRET` is required, throws if missing). Swagger docs are wired via `src/config/swagger.js` from JSDoc in `src/docs/*.swagger.js`.
+- Config comes from `src/config/env.js` (`env` object). Several keys are **`required()`** and the server throws on boot if any is missing: `JWT_SECRET`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`. Swagger docs are wired via `src/config/swagger.js` from JSDoc in `src/docs/*.swagger.js`.
+
+### External integrations (email + image uploads)
+
+- **Email**: `config/mailer.js` exposes `sendEmail({ to, subject, html })` over a nodemailer SMTP transporter (`SMTP_HOST`/`SMTP_PORT`/`SMTP_USER`/`SMTP_PASS`, `MAIL_FROM`; port 465 ⇒ secure). HTML bodies are built from `src/templates/*.js` (e.g. `resetPasswordTemplate.js`). Used by the forgot/reset-password flow; reset links are built against `CLIENT_URL`.
+- **Avatar uploads**: multer `memoryStorage` → `utils/cloudinary.js` (`config/cloudinary.js`) streams the buffer to Cloudinary. Drives `PUT /api/staff/me/avatar`.
 
 ### Client state — Redux Toolkit + RTK Query (no React Context for data/auth)
 
@@ -74,7 +79,7 @@ All server state flows through **one** `baseApi` (`src/app/baseApi.js`) using a 
 - **Routing** (`App.jsx`): role-based, namespaced URLs `/super/*`, `/school/*`, `/staff/*`. Guards: `GuestRoute` (logged-out only) → `ProtectedRoute` (any auth) → `RoleRoute allow={[ROLES...]}` → per-role layout. `lib/roles.js` `roleHome(role)` is the single source for post-login redirect targets. `useAuth` must finish the first `/auth/me` before guards decide (`isAuthLoading`).
 - **Per-role layouts** live in `src/components/layouts/<role>/` (each with its own `Sidebar` + `Header`; mobile uses a `Sheet` drawer). Shared `useLogout` hook.
 - **Feature folders**: `src/features/<feature>/{<feature>.api.js, <feature>Slice.js?, pages/, components/}`. Pages are `lazy`-loaded in `App.jsx`.
-- **Forms**: `react-hook-form` + `zod` (`@hookform/resolvers`); submit calls the RTK Query mutation and `.unwrap()`s. Feedback via `sonner` toasts; `Skeleton` while `isLoading`.
+- **Forms**: `react-hook-form` + `zod` (`@hookform/resolvers`) with schemas separated in `src/schemas/`. Submit calls the RTK Query mutation and `.unwrap()`s. Feedback via `sonner` toasts; `Skeleton` while `isLoading`.
 - **UI**: shadcn/ui (`src/components/ui/`, configured via `components.json`) + Tailwind v4 + lucide. React 19 with the React Compiler enabled (babel preset in `vite.config.js`).
 - **Import alias**: `@/` → `src/` (set in both `vite.config.js` and `jsconfig.json`).
 
@@ -83,7 +88,7 @@ All server state flows through **one** `baseApi` (`src/app/baseApi.js`) using a 
 - **ESM everywhere** (`"type": "module"` in both packages). Use `.js` extensions in server relative imports.
 - Imports are auto-sorted by `eslint-plugin-simple-import-sort` — run `lint:fix` rather than hand-ordering.
 - Prettier config is at the repo root (`.prettierrc`) and shared by both packages; `prettier-plugin-tailwindcss` orders Tailwind classes.
-- Secrets live in gitignored `.env` files. Server needs DB creds + `JWT_SECRET` (+ optional `PORT`, `JWT_EXPIRES_IN`); client needs `VITE_API_URL`. In dev the client proxies `/api`; in prod it calls `${VITE_API_URL}/api` directly.
+- Secrets live in gitignored `.env` files. Server needs DB creds, the required keys above (`JWT_SECRET` + the three `CLOUDINARY_*`), SMTP creds for email, and `CLIENT_URL` (used in reset links) (+ optional `PORT`, `JWT_EXPIRES_IN`, `NODE_ENV`); client needs `VITE_API_URL`. In dev the client proxies `/api`; in prod it calls `${VITE_API_URL}/api` directly.
 
 ## API surface
 

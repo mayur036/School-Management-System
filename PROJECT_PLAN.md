@@ -321,12 +321,14 @@ own `feature.api.js`. Cache coherence is driven by `tagTypes` + `providesTags` /
 - [x] `features/school_admin/staff.api.js`: `getStaff` (`providesTags: ['Staff']`), `getStaffById`, `createStaff`, `updateStaffStatus` (`invalidatesTags: ['Staff']`)
 - [x] Staff register page (rhf + zod, department `<Select>` fed by `getDepartments`) → `POST /api/staff`
 - [x] Staff list (table + enable/disable) and staff detail
+- [x] Allowed multiple staff registration in the same department but implemented DB validations to prevent cross-school registrations.
 - **Done when:** school admin registers staff into a department and toggles their status
 
 #### Phase 7.6 — Profile & password (all roles) ✅
 
 - [x] `features/profile/profile.api.js`: `uploadAvatar` (PATCH `/staff/me/avatar`) ✅, `getMyProfile` → `GET /api/staff/me` ✅, `changePassword` → `PATCH /api/staff/me/password` ✅
 - [x] Profile page wired to live data (avatar upload, details display, and change-password form) ✅
+- [x] Profile Edit Dialog fields integrated with react-hook-form and schema validations extracted to a separate file.
 - [x] Forgot & Reset Password flow: global SMTP `mailer.js` setup, template `resetPasswordTemplate.js`, recovery API routers/controllers (`POST /api/auth/forgot-password`, `POST /api/auth/reset-password`), client-side forms and page triggers.
 - **Done when:** any logged-in user views/edits their profile, uploads an avatar, and changes their password, and guest users can trigger forgot password links and reset passwords securely.
 
@@ -334,7 +336,7 @@ own `feature.api.js`. Cache coherence is driven by `tagTypes` + `providesTags` /
 
 - [ ] Centralized RTK Query error → toast handling; consistent loading skeletons / empty states
 - [ ] Verify tag invalidation matrix end-to-end (mutations refresh the right lists)
-- [ ] Accessibility / responsive pass on the new pages
+- [x] Accessibility / responsive pass on the new pages (stats cards made mobile-friendly with shadcn components)
 
 - **Done when (Phase 7 overall):** full flow works in the browser end-to-end — super admin creates a school + admin; that admin logs in, adds a department, registers staff; staff logs in and views/edits their profile
 

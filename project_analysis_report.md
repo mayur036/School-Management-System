@@ -68,21 +68,23 @@ Below is the state of progress across all phases outlined in [PROJECT_PLAN.md](f
 
 ### 🟢 Completed Phases
 *   **Phase 0 - 2 (Setup, DB, & Connection Models)**: DB tables seeded, connection pool configured, and global stored-procedure query execution utility finalized.
-*   **Phase 3 - 5 (Backend Features)**: Auth, Schools management, School Admins creation, Departments, and Staff registration backend endpoints completed and validated.
-*   **Phase 6 (Staff Profile & Avatar upload)**: Live profile fetching and Cloudinary-buffered avatar image uploads are fully functional.
+*   **Phase 3 - 5 (Backend Features)**: Auth, Schools management, School Admins creation, Departments, and Staff registration backend endpoints completed and validated. (Staff registration includes logic to allow multiple staff in the same department but prevents cross-school registration).
+*   **Phase 6 (Staff Profile & Avatar upload)**: Live profile fetching, Cloudinary-buffered avatar image uploads, and schema-validated Edit Profile Dialog are fully functional.
 *   **Phase 7.0 - 7.1 (State & Auth shell)**: Redux store initialized, custom base-query configured, layouts built with responsive navigation sidebars, session bootstrapped on page reload, and login/logout route redirection completed.
 *   **Phase 7.2 (Super Admin: Schools)**: Listing schools, status toggles, and "Add School" modal form.
 *   **Phase 7.3 (Super Admin: School Admins)**: Form to assign a school admin to an active school, generating temporary credentials.
-*   **Phase 7.4 (School Admin: Departments)**: Interface to list and add department names.
-*   **Phase 7.5 (School Admin: Staff)**: Register Staff registration form, staff members list table, and toggling staff status.
-*   **Phase 7.6 (Profile & Password UI)**: Avatar upload, profile identity layout, and Change Password form.
+*   **Phase 7.4 (School Admin: Departments)**: Interface to list and add department names. Mobile-responsive status cards completed.
+*   **Phase 7.5 (School Admin: Staff)**: Register Staff registration form, staff members list table, and toggling staff status. Mobile-responsive status cards completed.
+*   **Phase 7.6 (Profile & Password UI)**: Avatar upload, profile identity layout, schema-validated Edit Profile dialog with react-hook-form, and Change Password form.
 *   **Forgot & Reset Password Flow**: SMTP email configuration with `nodemailer`, HTML reset templates, validation schemas, recovery token controllers, and client-side forgot/reset pages.
+*   **Phase 7.7 (Cross-cutting Polish)**: UI polish (shadcn components, mobile responsiveness for stats/status cards, schema extraction for forms).
 
 ### 🟡 In-Progress (Current State)
-*   **Phase 7.7 (Cross-cutting Polish)**: RTK Query global error handling, loading skeleton loaders, and UI polish.
+*   **Phase 8 (Advanced Additions)**: Pagination/Search filters, credential emails, and Recharts statistics.
 
 ### 🔴 Pending Implementations (To-Be-Built UI Pages)
-*   **Phase 8 (Advanced Additions)**: Pagination/Search filters, credential emails, and Recharts statistics.
+*   **Audit fields / soft delete**
+*   **API docs (docs/)**
 
 ---
 

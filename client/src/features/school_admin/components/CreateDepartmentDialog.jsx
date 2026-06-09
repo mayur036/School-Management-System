@@ -23,6 +23,7 @@ import { useCreateDepartmentMutation } from '../departments.api';
 const CreateDepartmentDialog = ({
   externalOpen = false,
   onExternalOpenChange,
+  hideTrigger = false,
 }) => {
   const [internalOpen, setInternalOpen] = useState(false);
   const open = externalOpen || internalOpen;
@@ -59,12 +60,14 @@ const CreateDepartmentDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>
-        <Button className="cursor-pointer gap-2">
-          <COMMON.PLUS data-icon="inline-start" />
-          Add Department
-        </Button>
-      </DialogTrigger>
+      {!hideTrigger && (
+        <DialogTrigger asChild>
+          <Button className="cursor-pointer gap-2">
+            <COMMON.PLUS data-icon="inline-start" />
+            Add Department
+          </Button>
+        </DialogTrigger>
+      )}
 
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
