@@ -113,5 +113,11 @@ export const computeDepartmentMetrics = (departments = [], staff = []) => {
     latestDeptDateStr = formatDate(latest.created_at, 'short');
   }
 
-  return { totalDepts, totalStaff, avgStaff, latestDeptName, latestDeptDateStr };
+  return {
+    totalDepts,
+    totalStaff,
+    avgStaff,
+    latestDeptName,
+    latestDeptDateStr,
+  };
 };

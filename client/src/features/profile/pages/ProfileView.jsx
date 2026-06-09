@@ -264,27 +264,27 @@ export const ProfileView = () => {
       {metrics.length > 0 && (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
           {metrics.map((metric) => (
-          <Card
-            key={metric.label}
-            className={`border-border bg-card border border-l-4 ${metric.color}`}
-          >
-            <CardContent className="flex flex-row items-center gap-2.5 p-2.5 sm:gap-3.5 sm:p-4">
-              <div className="bg-background flex size-8 shrink-0 items-center justify-center rounded-xl text-inherit shadow-xs sm:size-10">
-                <metric.icon className="size-4 sm:size-5" />
-              </div>
-              <div className="flex min-w-0 flex-col">
-                <span className="text-muted-foreground truncate text-[9px] font-semibold tracking-normal uppercase sm:text-xs sm:tracking-wider">
-                  {metric.label}
-                </span>
-                <span className="text-foreground mt-0.5 truncate text-base leading-none font-bold sm:text-2xl">
-                  {metric.value}
-                </span>
-                <span className="text-muted-foreground mt-0.5 hidden truncate text-[9px] sm:block sm:text-[10px]">
-                  {metric.trend}
-                </span>
-              </div>
-            </CardContent>
-          </Card>
+            <Card
+              key={metric.label}
+              className={`border-border bg-card border border-l-4 ${metric.color}`}
+            >
+              <CardContent className="flex flex-row items-center gap-2.5 p-2.5 sm:gap-3.5 sm:p-4">
+                <div className="bg-background flex size-8 shrink-0 items-center justify-center rounded-xl text-inherit shadow-xs sm:size-10">
+                  <metric.icon className="size-4 sm:size-5" />
+                </div>
+                <div className="flex min-w-0 flex-col">
+                  <span className="text-muted-foreground truncate text-[9px] font-semibold tracking-normal uppercase sm:text-xs sm:tracking-wider">
+                    {metric.label}
+                  </span>
+                  <span className="text-foreground mt-0.5 truncate text-base leading-none font-bold sm:text-2xl">
+                    {metric.value}
+                  </span>
+                  <span className="text-muted-foreground mt-0.5 hidden truncate text-[9px] sm:block sm:text-[10px]">
+                    {metric.trend}
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
       )}

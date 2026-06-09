@@ -267,8 +267,7 @@ const StaffTable = ({
           </TableHeader>
           <TableBody>
             {staff.map((member) => {
-              const initials =
-                getInitials(member);
+              const initials = getInitials(member);
               return (
                 <TableRow key={member.staff_id}>
                   <TableCell className="flex items-center gap-3">

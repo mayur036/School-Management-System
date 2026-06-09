@@ -48,7 +48,7 @@ const RecentStaff = ({ staff = [], isLoading }) => (
           No staff registered yet
         </div>
       ) : (
-        <ul className="flex flex-col divide-y divide-border/60">
+        <ul className="divide-border/60 flex flex-col divide-y">
           {staff.map((member) => {
             const initials = getInitials(member);
             return (
