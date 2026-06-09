@@ -3,8 +3,8 @@ import { toast } from 'sonner';
 
 import AppBreadcrumb from '@/components/shared/AppBreadcrumb';
 import AppPagination from '@/components/shared/AppPagination';
+import StatCard from '@/components/shared/StatCard';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -15,12 +15,18 @@ import {
 } from '@/components/ui/select';
 import { useGetStaffQuery } from '@/features/school_admin/staff.api';
 import { COMMON } from '@/lib/icons';
-import { cn, formatDate } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 
 import CreateDepartmentDialog from '../components/CreateDepartmentDialog';
 import DepartmentsGrid from '../components/DepartmentsGrid';
 import DepartmentsTable from '../components/DepartmentsTable';
+import {
+  DEPARTMENT_SORT_OPTIONS,
+  DEPARTMENT_STATUS_FILTERS,
+} from '../constants/departments.constants';
 import { useGetDepartmentsQuery } from '../departments.api';
+import { computeDepartmentMetrics } from '../utils/departments.utils';
+import { countStaffByDepartmentId } from '../utils/staff.utils';
 
 const DepartmentsPage = () => {
   // Queries
@@ -48,45 +54,14 @@ const DepartmentsPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  // 1. Calculate staff count per department
-  const staffCounts = useMemo(() => {
-    const counts = {};
-    staff.forEach((s) => {
-      if (s.department_id) {
-        counts[s.department_id] = (counts[s.department_id] || 0) + 1;
-      }
-    });
-    return counts;
-  }, [staff]);
+  // Staff count per department + page summary metrics
+  const staffCounts = useMemo(() => countStaffByDepartmentId(staff), [staff]);
+  const metrics = useMemo(
+    () => computeDepartmentMetrics(departments, staff),
+    [departments, staff]
+  );
 
-  // 2. Calculate Real-Time Page Summary Metrics
-  const metrics = useMemo(() => {
-    const totalDepts = departments.length;
-    const totalStaff = staff.length;
-    const avgStaff =
-      totalDepts > 0 ? (totalStaff / totalDepts).toFixed(1) : '0.0';
-
-    // Find latest added department
-    let latestDeptName = 'None';
-    let latestDeptDateStr = '—';
-    if (departments.length > 0) {
-      const sortedByDate = [...departments].sort(
-        (a, b) => new Date(b.created_at) - new Date(a.created_at)
-      );
-      latestDeptName = sortedByDate[0].name;
-      latestDeptDateStr = formatDate(sortedByDate[0].created_at, 'short');
-    }
-
-    return {
-      totalDepts,
-      totalStaff,
-      avgStaff,
-      latestDeptName,
-      latestDeptDateStr,
-    };
-  }, [departments, staff]);
-
-  // 3. Filter and Sort Logic
+  // Filter and Sort Logic
   const processedDepartments = useMemo(() => {
     let result = departments.filter((dept) => {
       const name = (dept.name ?? '').toLowerCase();
@@ -175,85 +150,43 @@ const DepartmentsPage = () => {
 
       {/* Metrics Summary Row */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {/* Total Departments */}
-        <Card className="border-border bg-card border border-l-4 border-l-purple-500 shadow-xs">
-          <CardContent className="flex flex-row items-center gap-2.5 p-2.5 sm:gap-3.5 sm:p-4">
-            <div className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-purple-500/10 text-purple-600 sm:size-10 dark:bg-purple-500/20">
-              <COMMON.BUILDING className="size-4 sm:size-5" />
-            </div>
-            <div className="flex min-w-0 flex-col leading-tight">
-              <span className="text-muted-foreground truncate text-[9px] font-semibold tracking-normal uppercase sm:text-xs sm:tracking-wider">
-                Total Departments
-              </span>
-              <span className="text-foreground mt-0.5 truncate text-base font-bold sm:text-2xl">
-                {metrics.totalDepts}
-              </span>
-              <span className="text-muted-foreground mt-0.5 hidden text-[9px] sm:block sm:text-[10px]">
-                All active departments
-              </span>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Total Staff */}
-        <Card className="border-border bg-card border border-l-4 border-l-emerald-500 shadow-xs">
-          <CardContent className="flex flex-row items-center gap-2.5 p-2.5 sm:gap-3.5 sm:p-4">
-            <div className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 sm:size-10 dark:bg-emerald-500/20">
-              <COMMON.USERS_GROUP className="size-4 sm:size-5" />
-            </div>
-            <div className="flex min-w-0 flex-col leading-tight">
-              <span className="text-muted-foreground truncate text-[9px] font-semibold tracking-normal uppercase sm:text-xs sm:tracking-wider">
-                Total Staff
-              </span>
-              <span className="text-foreground mt-0.5 truncate text-base font-bold sm:text-2xl">
-                {metrics.totalStaff}
-              </span>
-              <span className="text-muted-foreground mt-0.5 hidden text-[9px] sm:block sm:text-[10px]">
-                Across all departments
-              </span>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Average Staff */}
-        <Card className="border-border bg-card border border-l-4 border-l-orange-500 shadow-xs">
-          <CardContent className="flex flex-row items-center gap-2.5 p-2.5 sm:gap-3.5 sm:p-4">
-            <div className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-orange-500/10 text-orange-600 sm:size-10 dark:bg-orange-500/20">
-              <COMMON.FILE_TEXT className="size-4 sm:size-5" />
-            </div>
-            <div className="flex min-w-0 flex-col leading-tight">
-              <span className="text-muted-foreground truncate text-[9px] font-semibold tracking-normal uppercase sm:text-xs sm:tracking-wider">
-                Average Staff
-              </span>
-              <span className="text-foreground mt-0.5 truncate text-base font-bold sm:text-2xl">
-                {metrics.avgStaff}
-              </span>
-              <span className="text-muted-foreground mt-0.5 hidden text-[9px] sm:block sm:text-[10px]">
-                Per department
-              </span>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Latest Added */}
-        <Card className="border-border bg-card border border-l-4 border-l-blue-500 shadow-xs">
-          <CardContent className="flex flex-row items-center gap-2.5 p-2.5 sm:gap-3.5 sm:p-4">
-            <div className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600 sm:size-10 dark:bg-blue-500/20">
-              <COMMON.CALENDAR className="size-4 sm:size-5" />
-            </div>
-            <div className="flex min-w-0 flex-col leading-tight">
-              <span className="text-muted-foreground truncate text-[9px] font-semibold tracking-normal uppercase sm:text-xs sm:tracking-wider">
-                Latest Added
-              </span>
-              <span className="text-foreground mt-0.5 truncate text-xs font-bold sm:text-lg">
-                {metrics.latestDeptName}
-              </span>
-              <span className="text-muted-foreground mt-0.5 hidden text-[9px] sm:block sm:text-[10px]">
-                {metrics.latestDeptDateStr}
-              </span>
-            </div>
-          </CardContent>
-        </Card>
+        <StatCard
+          Icon={COMMON.BUILDING}
+          label="Total Departments"
+          value={metrics.totalDepts}
+          subtext="All active departments"
+          accentClassName="border-l-purple-500"
+          iconChipClassName="bg-purple-500/10 text-purple-600 dark:bg-purple-500/20"
+          className="shadow-xs"
+        />
+        <StatCard
+          Icon={COMMON.USERS_GROUP}
+          label="Total Staff"
+          value={metrics.totalStaff}
+          subtext="Across all departments"
+          accentClassName="border-l-emerald-500"
+          iconChipClassName="bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20"
+          className="shadow-xs"
+        />
+        <StatCard
+          Icon={COMMON.FILE_TEXT}
+          label="Average Staff"
+          value={metrics.avgStaff}
+          subtext="Per department"
+          accentClassName="border-l-orange-500"
+          iconChipClassName="bg-orange-500/10 text-orange-600 dark:bg-orange-500/20"
+          className="shadow-xs"
+        />
+        <StatCard
+          Icon={COMMON.CALENDAR}
+          label="Latest Added"
+          value={metrics.latestDeptName}
+          valueClassName="text-xs sm:text-lg"
+          subtext={metrics.latestDeptDateStr}
+          accentClassName="border-l-blue-500"
+          iconChipClassName="bg-blue-500/10 text-blue-600 dark:bg-blue-500/20"
+          className="shadow-xs"
+        />
       </div>
 
       {/* Error state */}
@@ -293,9 +226,11 @@ const DepartmentsPage = () => {
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="inactive">Inactive</SelectItem>
+              {DEPARTMENT_STATUS_FILTERS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
 
@@ -311,10 +246,11 @@ const DepartmentsPage = () => {
               <SelectValue placeholder="Sort" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="newest">Sort: Newest</SelectItem>
-              <SelectItem value="oldest">Sort: Oldest</SelectItem>
-              <SelectItem value="alphabetical-asc">Sort: Name A-Z</SelectItem>
-              <SelectItem value="alphabetical-desc">Sort: Name Z-A</SelectItem>
+              {DEPARTMENT_SORT_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
 

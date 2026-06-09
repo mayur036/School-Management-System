@@ -32,9 +32,9 @@ export const EditProfileDialog = ({
   open,
   onOpenChange,
   user,
-  dummyBio,
-  dummyTimezone,
-  dummyLanguage,
+  bio,
+  timezone,
+  language,
   onSuccess,
 }) => {
   const [updateProfile, { isLoading: isUpdatingProfile }] =
@@ -64,12 +64,12 @@ export const EditProfileDialog = ({
         first_name: user.first_name || '',
         last_name: user.last_name || '',
         phone: user.phone || '',
-        bio: dummyBio || '',
-        timezone: dummyTimezone || '',
-        language: dummyLanguage || '',
+        bio: bio || '',
+        timezone: timezone || '',
+        language: language || '',
       });
     }
-  }, [open, user, dummyBio, dummyTimezone, dummyLanguage, reset]);
+  }, [open, user, bio, timezone, language, reset]);
 
   const onSubmit = async (data) => {
     try {
@@ -161,7 +161,7 @@ export const EditProfileDialog = ({
             )}
           </div>
 
-          {/* Dummy fields editing triggers */}
+          {/* Local-only preference fields (not yet persisted server-side) */}
           <div className="space-y-1">
             <Label htmlFor="bio" className="text-xs font-semibold">
               About / Bio

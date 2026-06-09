@@ -45,8 +45,6 @@ export const ProfileView = () => {
   const { user } = useAuth();
   const fileInputRef = useRef(null);
 
-  console.log(user);
-
   // Queries for dynamic metrics (skipped if not school_admin)
   const { data: deptData } = useGetDepartmentsQuery(undefined, {
     skip: user?.role_name !== 'school_admin',
@@ -67,14 +65,10 @@ export const ProfileView = () => {
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
 
-  // Dummy states for bio, timezone, language (as requested: do not use local storage)
-  const [dummyBio, setDummyBio] = useState(
-    'I manage all system operations, school onboarding, and platform administration.'
-  );
-  const [dummyTimezone, setDummyTimezone] = useState(
-    '(GMT+05:30) Asia/Kolkata'
-  );
-  const [dummyLanguage, setDummyLanguage] = useState('English');
+  // Local-only profile preferences (no backend persistence yet).
+  const [bio, setBio] = useState('');
+  const [timezone, setTimezone] = useState('');
+  const [language, setLanguage] = useState('');
 
   const schoolAdminMetrics = useMemo(() => {
     if (user?.role_name !== 'school_admin') return {};
@@ -106,10 +100,9 @@ export const ProfileView = () => {
     },
     { label: 'Profile Photo', completed: !!user.avatar_url },
     { label: 'Contact Details', completed: !!user.phone },
-    { label: 'Security Setup', completed: true },
     {
       label: 'Preferences Details',
-      completed: !!dummyBio && !!dummyTimezone && !!dummyLanguage,
+      completed: !!bio && !!timezone && !!language,
     },
   ];
   const completedCount = completionItems.filter(
@@ -267,9 +260,10 @@ export const ProfileView = () => {
         </div>
       </div>
 
-      {/* ── Desktop & Mobile Dynamic Metrics Row ───────────────── */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-        {metrics.map((metric) => (
+      {/* ── Dynamic Metrics Row (real data only) ──────────────── */}
+      {metrics.length > 0 && (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          {metrics.map((metric) => (
           <Card
             key={metric.label}
             className={`border-border bg-card border border-l-4 ${metric.color}`}
@@ -291,8 +285,9 @@ export const ProfileView = () => {
               </div>
             </CardContent>
           </Card>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* ── Main Container (Adaptive Viewports) ───────────────── */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
@@ -457,42 +452,47 @@ export const ProfileView = () => {
           {/* Account Security details card */}
           <Card className="border-border bg-card border">
             <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-base font-bold">
-                  Account Security
-                </CardTitle>
-                <Badge className="border-none bg-emerald-500/10 text-emerald-600 shadow-none">
-                  Strong
-                </Badge>
-              </div>
+              <CardTitle className="text-base font-bold">
+                Account Security
+              </CardTitle>
             </CardHeader>
             <div className="flex flex-col space-y-3.5 px-5 pb-4 text-xs">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex flex-col">
                   <span className="text-foreground font-semibold">
-                    Password
+                    Account Status
                   </span>
-                  <span className="text-muted-foreground mt-0.5 text-[10px]">
-                    Updated 5 days ago
+                  <span className="text-muted-foreground mt-0.5 text-[10px] capitalize">
+                    {user.status}
                   </span>
                 </div>
-                <COMMON.CHECK className="mt-0.5 size-4 text-emerald-500" />
+                <Badge
+                  className={`border-none shadow-none ${
+                    user.status === 'active'
+                      ? 'bg-emerald-500/10 text-emerald-600'
+                      : 'bg-red-500/10 text-red-600'
+                  }`}
+                >
+                  {user.status}
+                </Badge>
               </div>
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex flex-col">
-                  <span className="text-foreground font-semibold">
-                    Two-Factor Auth
-                  </span>
-                  <span className="text-muted-foreground mt-0.5 text-[10px]">
-                    Enabled via App
-                  </span>
-                </div>
-                <COMMON.CHECK className="mt-0.5 size-4 text-emerald-500" />
+              <div className="flex items-start justify-between gap-3 border-t pt-3">
+                <span className="text-foreground font-semibold">
+                  Last Login
+                </span>
+                <span className="text-muted-foreground text-[10px]">
+                  {user.last_login_at
+                    ? formatDate(user.last_login_at, 'medium-time')
+                    : 'Never'}
+                </span>
               </div>
               <div className="flex items-center justify-between border-t pt-3">
-                <span className="text-muted-foreground">Active Sessions</span>
-                <button className="text-primary font-semibold hover:underline">
-                  3 sessions
+                <span className="text-foreground font-semibold">Password</span>
+                <button
+                  onClick={() => setIsChangePasswordOpen(true)}
+                  className="text-primary cursor-pointer font-semibold hover:underline"
+                >
+                  Change
                 </button>
               </div>
             </div>
@@ -501,56 +501,16 @@ export const ProfileView = () => {
           {/* Recent activity timeline */}
           <Card className="border-border bg-card border">
             <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-base font-bold">
-                  Recent Activity
-                </CardTitle>
-                <button className="text-primary text-xs font-semibold hover:underline">
-                  View All
-                </button>
-              </div>
+              <CardTitle className="text-base font-bold">
+                Recent Activity
+              </CardTitle>
             </CardHeader>
-            <div className="flex flex-col space-y-4 px-5 pb-5">
-              <div className="flex gap-3">
-                <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600">
-                  <COMMON.USER className="size-3.5" />
-                </div>
-                <div className="flex flex-col text-xs">
-                  <span className="text-foreground font-semibold">
-                    Profile updated
-                  </span>
-                  <span className="text-muted-foreground mt-0.5 text-[10px]">
-                    Today, 09:12 AM
-                  </span>
-                </div>
+            <CardContent className="px-5 pb-5">
+              <div className="text-muted-foreground flex flex-col items-center justify-center gap-2 py-6 text-center text-xs">
+                <COMMON.ACTIVITY className="size-7 opacity-40" />
+                Activity tracking is coming soon.
               </div>
-              <div className="flex gap-3">
-                <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600">
-                  <COMMON.LOCK className="size-3.5" />
-                </div>
-                <div className="flex flex-col text-xs">
-                  <span className="text-foreground font-semibold">
-                    Password changed
-                  </span>
-                  <span className="text-muted-foreground mt-0.5 text-[10px]">
-                    07 Jun 2026, 04:35 PM
-                  </span>
-                </div>
-              </div>
-              <div className="flex gap-3">
-                <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600">
-                  <COMMON.SHIELD_CHECK className="size-3.5" />
-                </div>
-                <div className="flex flex-col text-xs">
-                  <span className="text-foreground font-semibold">
-                    Logged in successfully
-                  </span>
-                  <span className="text-muted-foreground mt-0.5 text-[10px]">
-                    07 Jun 2026, 09:15 AM
-                  </span>
-                </div>
-              </div>
-            </div>
+            </CardContent>
           </Card>
         </div>
       </div>
@@ -560,13 +520,13 @@ export const ProfileView = () => {
         open={isEditProfileOpen}
         onOpenChange={setIsEditProfileOpen}
         user={user}
-        dummyBio={dummyBio}
-        dummyTimezone={dummyTimezone}
-        dummyLanguage={dummyLanguage}
+        bio={bio}
+        timezone={timezone}
+        language={language}
         onSuccess={({ bio, timezone, language }) => {
-          setDummyBio(bio);
-          setDummyTimezone(timezone);
-          setDummyLanguage(language);
+          setBio(bio);
+          setTimezone(timezone);
+          setLanguage(language);
         }}
       />
 
@@ -626,14 +586,9 @@ export const ProfileView = () => {
                     <span className="text-muted-foreground font-semibold">
                       Email Address
                     </span>
-                    <div className="mt-1 flex items-center gap-1.5">
-                      <span className="text-foreground text-sm font-medium break-all">
-                        {user.email}
-                      </span>
-                      <Badge className="border-none bg-emerald-500/10 px-1 py-0 text-[8px] text-emerald-600 shadow-none">
-                        Verified
-                      </Badge>
-                    </div>
+                    <span className="text-foreground mt-1 text-sm font-medium break-all">
+                      {user.email}
+                    </span>
                   </div>
                   <div className="flex flex-col">
                     <span className="text-muted-foreground font-semibold">
@@ -656,7 +611,7 @@ export const ProfileView = () => {
                       Department
                     </span>
                     <Badge className="bg-muted text-muted-foreground mt-1 w-fit border-none text-[9px] shadow-none">
-                      {user.department_name || 'Administration'}
+                      {user.department_name || 'Not assigned'}
                     </Badge>
                   </div>
                   <div className="flex flex-col">
@@ -664,7 +619,7 @@ export const ProfileView = () => {
                       Time Zone
                     </span>
                     <span className="text-foreground mt-1 text-sm font-medium">
-                      {dummyTimezone}
+                      {timezone || 'Not set'}
                     </span>
                   </div>
                   <div className="flex flex-col">
@@ -672,7 +627,7 @@ export const ProfileView = () => {
                       Language
                     </span>
                     <span className="text-foreground mt-1 text-sm font-medium">
-                      {dummyLanguage}
+                      {language || 'Not set'}
                     </span>
                   </div>
                 </div>
@@ -695,8 +650,12 @@ export const ProfileView = () => {
                 </Button>
               </CardHeader>
               <CardContent className="px-5 pb-5">
-                <p className="text-foreground text-xs leading-relaxed">
-                  {dummyBio}
+                <p
+                  className={`text-xs leading-relaxed ${
+                    bio ? 'text-foreground' : 'text-muted-foreground italic'
+                  }`}
+                >
+                  {bio || 'No bio added yet.'}
                 </p>
               </CardContent>
             </Card>
@@ -743,8 +702,8 @@ export const ProfileView = () => {
                     Verification code required at login sessions.
                   </span>
                 </div>
-                <Badge className="border-none bg-emerald-500/10 text-xs text-emerald-600 shadow-none">
-                  Enabled
+                <Badge className="bg-muted text-muted-foreground border-none text-xs shadow-none">
+                  Not configured
                 </Badge>
               </div>
 
@@ -752,37 +711,9 @@ export const ProfileView = () => {
                 <h4 className="text-foreground text-xs font-bold tracking-wider uppercase">
                   Active Device Sessions
                 </h4>
-                <div className="space-y-2.5">
-                  <div className="bg-muted/10 flex items-center justify-between rounded-xl border p-3.5">
-                    <div className="flex items-center gap-3">
-                      <div className="bg-primary/10 text-primary flex size-9 items-center justify-center rounded-lg">
-                        <COMMON.USER className="size-4.5" />
-                      </div>
-                      <div className="flex flex-col text-xs">
-                        <span className="text-foreground font-semibold">
-                          Windows Chrome (Current Session)
-                        </span>
-                        <span className="text-muted-foreground mt-0.5 text-[10px]">
-                          IP: 103.54.21.90 · active now
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="bg-muted/10 flex items-center justify-between rounded-xl border p-3.5">
-                    <div className="flex items-center gap-3">
-                      <div className="bg-muted text-muted-foreground flex size-9 items-center justify-center rounded-lg">
-                        <COMMON.PHONE className="size-4.5" />
-                      </div>
-                      <div className="flex flex-col text-xs">
-                        <span className="text-foreground font-semibold">
-                          iPhone 14 Mobile App
-                        </span>
-                        <span className="text-muted-foreground mt-0.5 text-[10px]">
-                          IP: 182.12.33.109 · last active 2 hours ago
-                        </span>
-                      </div>
-                    </div>
-                  </div>
+                <div className="text-muted-foreground flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed py-6 text-center text-xs">
+                  <COMMON.SHIELD className="size-7 opacity-40" />
+                  Session tracking is coming soon.
                 </div>
               </div>
             </CardContent>
@@ -859,59 +790,9 @@ export const ProfileView = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="px-5 pb-5">
-              <div className="relative space-y-5 border-l py-2.5 pl-6">
-                <div className="relative">
-                  <span className="ring-background absolute top-0.5 -left-8.5 flex size-5 items-center justify-center rounded-full bg-blue-500 text-white ring-4">
-                    <COMMON.CHECK className="size-3" />
-                  </span>
-                  <div className="flex flex-col text-xs">
-                    <span className="text-foreground font-semibold">
-                      Profile updated
-                    </span>
-                    <span className="text-muted-foreground mt-0.5 text-[10px]">
-                      Today, 09:12 AM
-                    </span>
-                  </div>
-                </div>
-                <div className="relative">
-                  <span className="ring-background absolute top-0.5 -left-8.5 flex size-5 items-center justify-center rounded-full bg-amber-500 text-white ring-4">
-                    <COMMON.LOCK className="size-3" />
-                  </span>
-                  <div className="flex flex-col text-xs">
-                    <span className="text-foreground font-semibold">
-                      Password updated
-                    </span>
-                    <span className="text-muted-foreground mt-0.5 text-[10px]">
-                      07 Jun 2026, 04:35 PM
-                    </span>
-                  </div>
-                </div>
-                <div className="relative">
-                  <span className="ring-background absolute top-0.5 -left-8.5 flex size-5 items-center justify-center rounded-full bg-emerald-500 text-white ring-4">
-                    <COMMON.CHECK className="size-3" />
-                  </span>
-                  <div className="flex flex-col text-xs">
-                    <span className="text-foreground font-semibold">
-                      New device login detected (IP: 103.54.21.90)
-                    </span>
-                    <span className="text-muted-foreground mt-0.5 text-[10px]">
-                      07 Jun 2026, 09:15 AM
-                    </span>
-                  </div>
-                </div>
-                <div className="relative">
-                  <span className="ring-background absolute top-0.5 -left-8.5 flex size-5 items-center justify-center rounded-full bg-purple-500 text-white ring-4">
-                    <COMMON.CHECK className="size-3" />
-                  </span>
-                  <div className="flex flex-col text-xs">
-                    <span className="text-foreground font-semibold">
-                      Profile photo uploaded
-                    </span>
-                    <span className="text-muted-foreground mt-0.5 text-[10px]">
-                      06 Jun 2026, 11:20 AM
-                    </span>
-                  </div>
-                </div>
+              <div className="text-muted-foreground flex flex-col items-center justify-center gap-2 py-10 text-center text-xs">
+                <COMMON.ACTIVITY className="size-8 opacity-40" />
+                Activity audit logs are coming soon.
               </div>
             </CardContent>
           </Card>
@@ -932,7 +813,7 @@ export const ProfileView = () => {
                 <Label htmlFor="defaultTimezone" className="font-semibold">
                   Time Zone Preference
                 </Label>
-                <Select value={dummyTimezone} onValueChange={setDummyTimezone}>
+                <Select value={timezone} onValueChange={setTimezone}>
                   <SelectTrigger
                     id="defaultTimezone"
                     className="w-full text-xs"
@@ -953,7 +834,7 @@ export const ProfileView = () => {
                 <Label htmlFor="defaultLanguage" className="font-semibold">
                   Language Preference
                 </Label>
-                <Select value={dummyLanguage} onValueChange={setDummyLanguage}>
+                <Select value={language} onValueChange={setLanguage}>
                   <SelectTrigger
                     id="defaultLanguage"
                     className="w-full text-xs"

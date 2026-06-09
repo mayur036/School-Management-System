@@ -22,6 +22,7 @@ import {
   getDeptDescription,
   getDeptGradient,
   getDeptIcon,
+  getDeptStatusMeta,
 } from '../utils/departments.utils';
 
 // Skeleton rows (loading state)
@@ -51,9 +52,6 @@ const SkeletonRows = ({ count = 5 }) =>
       </TableCell>
     </TableRow>
   ));
-
-// Static threshold calculated at load time to ensure component rendering is pure
-const CUTOFF_DATE = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
 const DepartmentsTable = ({
   departments,
@@ -105,7 +103,7 @@ const DepartmentsTable = ({
             const IconComponent = getDeptIcon(dept.name);
             const description = getDeptDescription(dept.name);
             const staffCount = staffCounts[dept.department_id] || 0;
-            const isNew = new Date(dept.created_at) > CUTOFF_DATE;
+            const status = getDeptStatusMeta(dept);
 
             return (
               <TableRow
@@ -143,21 +141,10 @@ const DepartmentsTable = ({
                 <TableCell className="py-3.5 text-xs">
                   <div className="flex items-center gap-1.5">
                     <span
-                      className={cn(
-                        'size-1.5 rounded-full',
-                        dept.status === 'active'
-                          ? isNew
-                            ? 'bg-blue-500'
-                            : 'bg-green-500'
-                          : 'bg-red-500'
-                      )}
+                      className={cn('size-1.5 rounded-full', status.dotClass)}
                     />
                     <span className="text-foreground/80 text-[11px] font-semibold capitalize">
-                      {dept.status === 'active'
-                        ? isNew
-                          ? 'New'
-                          : 'active'
-                        : 'inactive'}
+                      {status.label}
                     </span>
                   </div>
                 </TableCell>

@@ -53,3 +53,19 @@ export const DEPARTMENT_ICONS = {
   student: Heart,
   default: Building2,
 };
+
+// A department created within this many days is flagged as "New".
+export const NEW_DEPT_CUTOFF_DAYS = 7;
+
+export const DEPARTMENT_STATUS_FILTERS = [
+  { value: 'all', label: 'All Status' },
+  { value: 'active', label: 'Active' },
+  { value: 'inactive', label: 'Inactive' },
+];
+
+export const DEPARTMENT_SORT_OPTIONS = [
+  { value: 'newest', label: 'Sort: Newest' },
+  { value: 'oldest', label: 'Sort: Oldest' },
+  { value: 'alphabetical-asc', label: 'Sort: Name A-Z' },
+  { value: 'alphabetical-desc', label: 'Sort: Name Z-A' },
+];

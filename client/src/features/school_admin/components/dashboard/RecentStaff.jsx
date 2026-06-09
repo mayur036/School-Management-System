@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 
+import StatusBadge from '@/components/shared/StatusBadge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import {
   Card,
   CardContent,
@@ -11,24 +11,7 @@ import {
 } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { COMMON, SCHOOL_ADMIN } from '@/lib/icons';
-import { formatDate } from '@/lib/utils';
-
-const StatusBadge = ({ status }) => {
-  const isActive = status === 'active';
-  return (
-    <Badge
-      variant="outline"
-      className={
-        isActive
-          ? 'bg-success/10 text-success border-success/20 font-medium'
-          : 'bg-destructive/10 text-destructive border-destructive/20 font-medium'
-      }
-    >
-      <span className="mr-1.5 inline-block size-1.5 rounded-full bg-current" />
-      {isActive ? 'Active' : 'Inactive'}
-    </Badge>
-  );
-};
+import { formatDate, getInitials } from '@/lib/utils';
 
 const RecentStaff = ({ staff = [], isLoading }) => (
   <Card className="border-border bg-card">
@@ -67,8 +50,7 @@ const RecentStaff = ({ staff = [], isLoading }) => (
       ) : (
         <ul className="flex flex-col divide-y divide-border/60">
           {staff.map((member) => {
-            const initials =
-              `${member.first_name?.[0] ?? ''}${member.last_name?.[0] ?? ''}`.toUpperCase();
+            const initials = getInitials(member);
             return (
               <li
                 key={member.staff_id}

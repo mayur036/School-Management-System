@@ -1,3 +1,4 @@
+import StatusBadge from '@/components/shared/StatusBadge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -21,53 +22,9 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { SCHOOL_ADMIN, SUPER_ADMIN } from '@/lib/icons';
-import { formatDate, formatStaffId } from '@/lib/utils';
+import { formatDate, formatStaffId, getInitials } from '@/lib/utils';
 
-// ── Status badge ──────────────────────────────────────────────
-
-const StatusBadge = ({ status }) => {
-  const isActive = status === 'active';
-  return (
-    <Badge
-      className={
-        isActive
-          ? 'bg-success/10 text-success border-success/20 hover:bg-success/20 font-medium'
-          : 'bg-destructive/10 text-destructive border-destructive/20 hover:bg-destructive/20 font-medium'
-      }
-      variant="outline"
-    >
-      <span className="mr-1.5 inline-block size-1.5 animate-pulse rounded-full bg-current" />
-      {isActive ? 'Active' : 'Inactive'}
-    </Badge>
-  );
-};
-
-// ── Department badge styling helper ────────────────────────────
-
-const getDeptBadgeClass = (deptName) => {
-  if (!deptName) return 'bg-muted/50 text-muted-foreground border-border';
-  const name = deptName.toLowerCase();
-  if (name.includes('math')) {
-    return 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20';
-  }
-  if (name.includes('science')) {
-    return 'bg-sky-500/10 text-sky-700 dark:text-sky-400 border-sky-500/20';
-  }
-  if (
-    name.includes('lang') ||
-    name.includes('literature') ||
-    name.includes('english')
-  ) {
-    return 'bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border-indigo-500/20';
-  }
-  if (name.includes('admin') || name.includes('office')) {
-    return 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20';
-  }
-  if (name.includes('account') || name.includes('finance')) {
-    return 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20';
-  }
-  return 'bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-500/20';
-};
+import { getDeptBadgeClass } from '../utils/departments.utils';
 
 // ── Skeleton rows (loading state) ─────────────────────────────
 
@@ -127,8 +84,7 @@ const SkeletonGrid = ({ count = 6 }) => (
 // ── Grid Card Item ─────────────────────────────────────────────
 
 const StaffCard = ({ member, onViewDetails, onToggleStatus }) => {
-  const initials =
-    `${member.first_name?.[0] ?? ''}${member.last_name?.[0] ?? ''}`.toUpperCase();
+  const initials = getInitials(member);
   return (
     <Card className="border-border bg-card relative flex flex-col gap-4 p-5 shadow-xs transition-shadow hover:shadow-md">
       <div className="flex items-start justify-between">
@@ -207,7 +163,7 @@ const StaffCard = ({ member, onViewDetails, onToggleStatus }) => {
       </div>
 
       <div className="border-border/60 mt-2 flex items-center justify-between border-t pt-3 text-xs">
-        <StatusBadge status={member.status} />
+        <StatusBadge status={member.status} pulse />
         <span className="text-muted-foreground font-mono">
           {formatDate(member.created_at, 'medium')}
         </span>
@@ -312,7 +268,7 @@ const StaffTable = ({
           <TableBody>
             {staff.map((member) => {
               const initials =
-                `${member.first_name?.[0] ?? ''}${member.last_name?.[0] ?? ''}`.toUpperCase();
+                getInitials(member);
               return (
                 <TableRow key={member.staff_id}>
                   <TableCell className="flex items-center gap-3">
@@ -349,7 +305,7 @@ const StaffTable = ({
                     {member.phone || '—'}
                   </TableCell>
                   <TableCell>
-                    <StatusBadge status={member.status} />
+                    <StatusBadge status={member.status} pulse />
                   </TableCell>
                   <TableCell className="text-muted-foreground hidden text-xs tabular-nums xl:table-cell">
                     {formatDate(member.created_at, 'medium')}

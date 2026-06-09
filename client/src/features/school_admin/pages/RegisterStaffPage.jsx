@@ -4,7 +4,6 @@ import { useMemo, useState } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { z } from 'zod';
 
 import AppBreadcrumb from '@/components/shared/AppBreadcrumb';
 import { Badge } from '@/components/ui/badge';
@@ -27,75 +26,11 @@ import {
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { COMMON } from '@/lib/icons';
+import { batchRegisterStaffSchema } from '@/schemas/staff.schema';
 
 import { useGetDepartmentsQuery } from '../departments.api';
 import { useCreateStaffMutation } from '../staff.api';
-
-// Helper to generate a secure random password
-const generateSecurePassword = () => {
-  const length = 12;
-  const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  const lowercase = 'abcdefghijklmnopqrstuvwxyz';
-  const numbers = '0123456789';
-  const symbols = '!@#$%^&*()_+~';
-  const allChars = uppercase + lowercase + numbers + symbols;
-
-  let password = '';
-  // Ensure at least one of each required type
-  password += uppercase[Math.floor(Math.random() * uppercase.length)];
-  password += lowercase[Math.floor(Math.random() * lowercase.length)];
-  password += numbers[Math.floor(Math.random() * numbers.length)];
-  password += symbols[Math.floor(Math.random() * symbols.length)];
-
-  for (let i = 4; i < length; i++) {
-    password += allChars[Math.floor(Math.random() * allChars.length)];
-  }
-
-  return password
-    .split('')
-    .sort(() => 0.5 - Math.random())
-    .join('');
-};
-
-// Zod Validation Schema for Batch Registration
-const memberFormSchema = z.object({
-  first_name: z
-    .string()
-    .trim()
-    .min(1, 'First name is required')
-    .max(80, 'First name must be 80 characters or fewer'),
-  last_name: z
-    .string()
-    .trim()
-    .min(1, 'Last name is required')
-    .max(80, 'Last name must be 80 characters or fewer'),
-  email: z
-    .string()
-    .trim()
-    .email('Please enter a valid email')
-    .max(150, 'Email must be 150 characters or fewer'),
-  phone: z
-    .string()
-    .trim()
-    .regex(/^\d{10}$/, 'Phone number must be exactly 10 digits')
-    .optional()
-    .or(z.literal('')),
-  password: z
-    .string()
-    .min(8, 'Password must be at least 8 characters')
-    .max(72, 'Password must be 72 characters or fewer'),
-  designation: z.string().trim().optional(),
-});
-
-const batchRegisterSchema = z.object({
-  department_id: z
-    .union([z.string(), z.number()])
-    .refine((val) => val !== '' && val !== undefined, {
-      message: 'Please select a department',
-    })
-    .transform((val) => Number(val)),
-  members: z.array(memberFormSchema).min(1, 'At least one member is required'),
-});
+import { generateSecurePassword } from '../utils/staff.utils';
 
 const RegisterStaffPage = () => {
   const navigate = useNavigate();
@@ -125,7 +60,7 @@ const RegisterStaffPage = () => {
     reset,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(batchRegisterSchema),
+    resolver: zodResolver(batchRegisterStaffSchema),
     defaultValues: {
       department_id: '',
       members: [

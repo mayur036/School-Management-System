@@ -5,6 +5,17 @@ export function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
 
+/**
+ * Build uppercase initials from a person-like object ({ first_name, last_name }).
+ * Falls back to 'U' when no name parts are present.
+ */
+export const getInitials = (person) => {
+  if (!person) return 'U';
+  const first = person.first_name?.[0] ?? '';
+  const last = person.last_name?.[0] ?? '';
+  return `${first}${last}`.toUpperCase() || 'U';
+};
+
 export const formatStaffId = (id) => `ST-${String(id).padStart(4, '0')}`;
 
 export const formatSchoolId = (id) => `sc-${String(id).padStart(4, '0')}`;

@@ -4,10 +4,11 @@ import { toast } from 'sonner';
 
 import AppBreadcrumb from '@/components/shared/AppBreadcrumb';
 import AppPagination from '@/components/shared/AppPagination';
+import StatCard from '@/components/shared/StatCard';
+import StatusBadge from '@/components/shared/StatusBadge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import {
   Drawer,
   DrawerClose,
@@ -27,12 +28,18 @@ import {
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { COMMON, SCHOOL_ADMIN } from '@/lib/icons';
-import { formatDate, formatPhoneNumber, formatStaffId } from '@/lib/utils';
+import {
+  formatDate,
+  formatPhoneNumber,
+  formatStaffId,
+  getInitials,
+} from '@/lib/utils';
 
 import StaffStatusToggle from '../components/StaffStatusToggle';
 import StaffTable from '../components/StaffTable';
 import { useGetDepartmentsQuery } from '../departments.api';
 import { useGetStaffQuery } from '../staff.api';
+import { computeStaffStats, exportStaffToCsv } from '../utils/staff.utils';
 
 const StaffPage = () => {
   // Queries
@@ -73,31 +80,11 @@ const StaffPage = () => {
   const [toggleMember, setToggleMember] = useState(null);
   const [detailMember, setDetailMember] = useState(null);
 
-  // 1. Calculate Real-Time Stats
-  const stats = useMemo(() => {
-    const total = staff.length;
-    const active = staff.filter((s) => s.status === 'active').length;
-    const activePct = total > 0 ? Math.round((active / total) * 100) : 0;
-    const deptsCount = departments.length;
-
-    const now = new Date();
-    const joinedThisMonth = staff.filter((s) => {
-      if (!s.created_at) return false;
-      const date = new Date(s.created_at);
-      return (
-        date.getMonth() === now.getMonth() &&
-        date.getFullYear() === now.getFullYear()
-      );
-    }).length;
-
-    return {
-      total,
-      active,
-      activePct,
-      deptsCount,
-      joinedThisMonth,
-    };
-  }, [staff, departments]);
+  // Real-time headline stats
+  const stats = useMemo(
+    () => computeStaffStats(staff, departments),
+    [staff, departments]
+  );
 
   // 2. Client-side Search and Filter logic
   const filteredStaff = useMemo(() => {
@@ -130,50 +117,13 @@ const StaffPage = () => {
     return filteredStaff.slice(startIndex, startIndex + itemsPerPage);
   }, [filteredStaff, currentPage, itemsPerPage]);
 
-  // 4. Exporter to CSV
   const handleExport = () => {
     if (!filteredStaff.length) {
       toast.error('No staff records found to export');
       return;
     }
     try {
-      const headers = [
-        'Staff ID',
-        'First Name',
-        'Last Name',
-        'Email',
-        'Phone',
-        'Department',
-        'Status',
-        'Registered Date',
-      ];
-      const rows = filteredStaff.map((s) => [
-        formatStaffId(s.staff_id),
-        s.first_name,
-        s.last_name,
-        s.email,
-        s.phone ? formatPhoneNumber(s.phone) : '',
-        s.department_name || 'Unassigned',
-        s.status,
-        s.created_at ? formatDate(s.created_at, 'short', 'sv-SE') : '',
-      ]);
-
-      const csvContent = [
-        headers.join(','),
-        ...rows.map((row) =>
-          row.map((val) => `"${val.replace(/"/g, '""')}"`).join(',')
-        ),
-      ].join('\n');
-
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.setAttribute('href', url);
-      link.setAttribute(
-        'download',
-        `staff_directory_${formatDate(new Date(), 'short', 'sv-SE').replace(/-/g, '')}.csv`
-      );
-      link.click();
+      exportStaffToCsv(filteredStaff);
       toast.success('Directory exported successfully');
     } catch {
       toast.error('Failed to export directory');
@@ -217,85 +167,39 @@ const StaffPage = () => {
 
       {/* ── Stats Summary Grid ────────────────────────────────── */}
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-        {/* Total Staff */}
-        <Card className="border-border bg-card border border-l-4 border-l-blue-500">
-          <CardContent className="flex flex-row items-center gap-2.5 p-2.5 sm:gap-4 sm:p-4">
-            <div className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600 sm:size-10 dark:bg-blue-500/20 dark:text-blue-400">
-              <SCHOOL_ADMIN.STAFF_LIST className="size-4 sm:size-5" />
-            </div>
-            <div className="flex min-w-0 flex-col leading-tight">
-              <span className="text-muted-foreground truncate text-[9px] font-semibold tracking-normal uppercase sm:text-xs sm:tracking-wider">
-                Total Staff
-              </span>
-              <span className="text-foreground mt-0.5 truncate text-base font-bold sm:text-2xl">
-                {stats.total}
-              </span>
-              <span className="text-muted-foreground mt-0.5 hidden truncate text-[9px] sm:block sm:text-[10px]">
-                All departments
-              </span>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Active Staff */}
-        <Card className="border-border bg-card border border-l-4 border-l-emerald-500">
-          <CardContent className="flex flex-row items-center gap-2.5 p-2.5 sm:gap-4 sm:p-4">
-            <div className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 sm:size-10 dark:bg-emerald-500/20 dark:text-emerald-400">
-              <COMMON.CHECK className="size-4 sm:size-5" />
-            </div>
-            <div className="flex min-w-0 flex-col leading-tight">
-              <span className="text-muted-foreground truncate text-[9px] font-semibold tracking-normal uppercase sm:text-xs sm:tracking-wider">
-                Active Staff
-              </span>
-              <span className="text-foreground mt-0.5 truncate text-base font-bold sm:text-2xl">
-                {stats.active}
-              </span>
-              <span className="mt-0.5 hidden truncate text-[9px] font-semibold text-emerald-600 sm:block sm:text-[10px] dark:text-emerald-400">
-                {stats.activePct}% of total
-              </span>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Departments Count */}
-        <Card className="border-border bg-card border border-l-4 border-l-amber-500">
-          <CardContent className="flex flex-row items-center gap-2.5 p-2.5 sm:gap-4 sm:p-4">
-            <div className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 sm:size-10 dark:bg-amber-500/20 dark:text-amber-400">
-              <SCHOOL_ADMIN.DEPARTMENTS className="size-4 sm:size-5" />
-            </div>
-            <div className="flex min-w-0 flex-col leading-tight">
-              <span className="text-muted-foreground truncate text-[9px] font-semibold tracking-normal uppercase sm:text-xs sm:tracking-wider">
-                Departments
-              </span>
-              <span className="text-foreground mt-0.5 truncate text-base font-bold sm:text-2xl">
-                {stats.deptsCount}
-              </span>
-              <span className="text-muted-foreground mt-0.5 hidden truncate text-[9px] sm:block sm:text-[10px]">
-                Academic & Admin
-              </span>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* New This Month */}
-        <Card className="border-border bg-card border border-l-4 border-l-purple-500">
-          <CardContent className="flex flex-row items-center gap-2.5 p-2.5 sm:gap-4 sm:p-4">
-            <div className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-purple-500/10 text-purple-600 sm:size-10 dark:bg-purple-500/20 dark:text-purple-400">
-              <SCHOOL_ADMIN.REGISTER_STAFF className="size-4 sm:size-5" />
-            </div>
-            <div className="flex min-w-0 flex-col leading-tight">
-              <span className="text-muted-foreground truncate text-[9px] font-semibold tracking-normal uppercase sm:text-xs sm:tracking-wider">
-                New This Month
-              </span>
-              <span className="text-foreground mt-0.5 truncate text-base font-bold sm:text-2xl">
-                {stats.joinedThisMonth}
-              </span>
-              <span className="text-muted-foreground mt-0.5 hidden truncate text-[9px] sm:block sm:text-[10px]">
-                Recently joined
-              </span>
-            </div>
-          </CardContent>
-        </Card>
+        <StatCard
+          Icon={SCHOOL_ADMIN.STAFF_LIST}
+          label="Total Staff"
+          value={stats.total}
+          subtext="All departments"
+          accentClassName="border-l-blue-500"
+          iconChipClassName="bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400"
+        />
+        <StatCard
+          Icon={COMMON.CHECK}
+          label="Active Staff"
+          value={stats.active}
+          subtext={`${stats.activePct}% of total`}
+          subtextClassName="font-semibold text-emerald-600 dark:text-emerald-400"
+          accentClassName="border-l-emerald-500"
+          iconChipClassName="bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400"
+        />
+        <StatCard
+          Icon={SCHOOL_ADMIN.DEPARTMENTS}
+          label="Departments"
+          value={stats.deptsCount}
+          subtext="Academic & Admin"
+          accentClassName="border-l-amber-500"
+          iconChipClassName="bg-amber-500/10 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400"
+        />
+        <StatCard
+          Icon={SCHOOL_ADMIN.REGISTER_STAFF}
+          label="New This Month"
+          value={stats.joinedThisMonth}
+          subtext="Recently joined"
+          accentClassName="border-l-purple-500"
+          iconChipClassName="bg-purple-500/10 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400"
+        />
       </div>
 
       {/* ── Controls & Actions Bar ────────────────────────────── */}
@@ -464,7 +368,7 @@ const StaffPage = () => {
                     alt={`${detailMember.first_name} ${detailMember.last_name}`}
                   />
                   <AvatarFallback className="bg-muted text-muted-foreground text-xl font-bold">
-                    {`${detailMember.first_name?.[0] ?? ''}${detailMember.last_name?.[0] ?? ''}`.toUpperCase()}
+                    {getInitials(detailMember)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col gap-1">
@@ -475,15 +379,7 @@ const StaffPage = () => {
                     <Badge variant="outline">
                       {detailMember.department_name || 'Unassigned'}
                     </Badge>
-                    <Badge
-                      className={
-                        detailMember.status === 'active'
-                          ? 'bg-success text-success-foreground'
-                          : 'bg-destructive text-destructive-foreground'
-                      }
-                    >
-                      {detailMember.status === 'active' ? 'Active' : 'Inactive'}
-                    </Badge>
+                    <StatusBadge status={detailMember.status} />
                   </div>
                   <p className="text-muted-foreground mt-1.5 font-mono text-xs">
                     Staff ID: {formatStaffId(detailMember.staff_id)}

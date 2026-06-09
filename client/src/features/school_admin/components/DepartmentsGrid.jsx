@@ -10,10 +10,11 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn, formatDate } from '@/lib/utils';
 
-import { getDeptGradient, getDeptIcon } from '../utils/departments.utils';
-
-// Static threshold calculated at load time to ensure component rendering is pure
-const CUTOFF_DATE = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+import {
+  getDeptGradient,
+  getDeptIcon,
+  getDeptStatusMeta,
+} from '../utils/departments.utils';
 
 export const DepartmentsGrid = ({
   departments,
@@ -27,7 +28,7 @@ export const DepartmentsGrid = ({
         const gradientClass = getDeptGradient(dept.name);
         const IconComponent = getDeptIcon(dept.name);
         const staffCount = staffCounts[dept.department_id] || 0;
-        const isNew = new Date(dept.created_at) > CUTOFF_DATE;
+        const status = getDeptStatusMeta(dept);
 
         return (
           <Card
@@ -59,21 +60,10 @@ export const DepartmentsGrid = ({
                   {/* Status indicator */}
                   <div className="mt-1.5 flex items-center gap-1.5">
                     <span
-                      className={cn(
-                        'size-1.5 rounded-full',
-                        dept.status === 'active'
-                          ? isNew
-                            ? 'bg-blue-500'
-                            : 'bg-green-500'
-                          : 'bg-red-500'
-                      )}
+                      className={cn('size-1.5 rounded-full', status.dotClass)}
                     />
                     <span className="text-muted-foreground text-[10px] font-medium capitalize">
-                      {dept.status === 'active'
-                        ? isNew
-                          ? 'New'
-                          : 'active'
-                        : 'inactive'}
+                      {status.label}
                     </span>
                   </div>
                 </div>
