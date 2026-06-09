@@ -24,7 +24,7 @@ const ForgotPasswordPage = lazy(
 const ResetPasswordPage = lazy(
   () => import('./features/auth/pages/ResetPasswordPage')
 );
-const ProfileView = lazy(() => import('./features/profile/ProfileView'));
+const ProfileView = lazy(() => import('./features/profile/pages/ProfileView'));
 const ErrorPage = lazy(() => import('./pages/ErrorPage'));
 
 // Super Admin

@@ -169,6 +169,16 @@ const updateMyProfile = asyncHandler(async (req, res) => {
   const { first_name, last_name, phone } = req.body;
   const staffId = req.user.staff_id;
 
+  const existingStaff = await staffModel.getStaff(staffId);
+
+  if (
+    existingStaff.first_name == first_name &&
+    existingStaff.last_name == last_name &&
+    existingStaff.phone == phone
+  ) {
+    throw new ApiError(400, 'No changes made');
+  }
+
   const staff = await staffModel.updateProfile(
     staffId,
     first_name,

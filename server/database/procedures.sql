@@ -27,11 +27,12 @@ DROP PROCEDURE IF EXISTS sp_login_get_user $$
 CREATE PROCEDURE sp_login_get_user(IN p_email VARCHAR(150))
 BEGIN
   SELECT
-    s.staff_id, s.role_id, r.role_name, s.school_id, s.department_id,
+    s.staff_id, s.role_id, r.role_name, s.school_id, sch.name AS school_name, s.department_id,
     s.first_name, s.last_name, s.email, s.password_hash, s.phone,
     s.avatar_url, s.status
   FROM staff s
   JOIN roles r ON r.role_id = s.role_id
+  LEFT JOIN schools sch ON sch.school_id = s.school_id
   WHERE s.email = p_email
   LIMIT 1;
 END $$
@@ -109,10 +110,12 @@ BEGIN
      p_email, p_password_hash, p_phone, p_created_by);
 
   SELECT
-    s.staff_id, s.role_id, r.role_name, s.school_id, s.department_id,
+    s.staff_id, s.role_id, r.role_name, s.school_id, sch.name AS school_name, s.department_id,
     s.first_name, s.last_name, s.email, s.phone, s.avatar_url,
     s.status, s.created_at
-  FROM staff s JOIN roles r ON r.role_id = s.role_id
+  FROM staff s
+  JOIN roles r ON r.role_id = s.role_id
+  LEFT JOIN schools sch ON sch.school_id = s.school_id
   WHERE s.staff_id = LAST_INSERT_ID();
 END $$
 
@@ -170,12 +173,13 @@ BEGIN
      p_email, p_password_hash, p_phone, p_created_by);
 
   SELECT
-    s.staff_id, s.role_id, r.role_name, s.school_id, s.department_id,
+    s.staff_id, s.role_id, r.role_name, s.school_id, sch.name AS school_name, s.department_id,
     d.name AS department_name, s.first_name, s.last_name, s.email,
     s.phone, s.avatar_url, s.status, s.created_at
   FROM staff s
   JOIN roles r ON r.role_id = s.role_id
   LEFT JOIN departments d ON d.department_id = s.department_id
+  LEFT JOIN schools sch ON sch.school_id = s.school_id
   WHERE s.staff_id = LAST_INSERT_ID();
 END $$
 
@@ -184,12 +188,13 @@ DROP PROCEDURE IF EXISTS sp_list_staff $$
 CREATE PROCEDURE sp_list_staff(IN p_school_id INT)
 BEGIN
   SELECT
-    s.staff_id, s.role_id, r.role_name, s.school_id, s.department_id,
+    s.staff_id, s.role_id, r.role_name, s.school_id, sch.name AS school_name, s.department_id,
     d.name AS department_name, s.first_name, s.last_name, s.email,
     s.phone, s.avatar_url, s.status, s.created_at
   FROM staff s
   JOIN roles r ON r.role_id = s.role_id
   LEFT JOIN departments d ON d.department_id = s.department_id
+  LEFT JOIN schools sch ON sch.school_id = s.school_id
   WHERE s.school_id = p_school_id
   ORDER BY s.created_at DESC;
 END $$
@@ -199,13 +204,14 @@ DROP PROCEDURE IF EXISTS sp_get_staff $$
 CREATE PROCEDURE sp_get_staff(IN p_staff_id INT)
 BEGIN
   SELECT
-    s.staff_id, s.role_id, r.role_name, s.school_id, s.department_id,
+    s.staff_id, s.role_id, r.role_name, s.school_id, sch.name AS school_name, s.department_id,
     d.name AS department_name, s.first_name, s.last_name, s.email,
     s.phone, s.avatar_url, s.avatar_public_id, s.status,
     s.created_at, s.updated_at
   FROM staff s
   JOIN roles r ON r.role_id = s.role_id
   LEFT JOIN departments d ON d.department_id = s.department_id
+  LEFT JOIN schools sch ON sch.school_id = s.school_id
   WHERE s.staff_id = p_staff_id;
 END $$
 
@@ -219,12 +225,13 @@ BEGIN
   UPDATE staff SET status = p_status WHERE staff_id = p_staff_id;
 
   SELECT
-    s.staff_id, s.role_id, r.role_name, s.school_id, s.department_id,
+    s.staff_id, s.role_id, r.role_name, s.school_id, sch.name AS school_name, s.department_id,
     d.name AS department_name, s.first_name, s.last_name, s.email,
     s.phone, s.avatar_url, s.status, s.created_at, s.updated_at
   FROM staff s
   JOIN roles r ON r.role_id = s.role_id
   LEFT JOIN departments d ON d.department_id = s.department_id
+  LEFT JOIN schools sch ON sch.school_id = s.school_id
   WHERE s.staff_id = p_staff_id;
 END $$
 
@@ -256,12 +263,13 @@ BEGIN
   WHERE staff_id = p_staff_id;
 
   SELECT
-    s.staff_id, s.role_id, r.role_name, s.school_id, s.department_id,
+    s.staff_id, s.role_id, r.role_name, s.school_id, sch.name AS school_name, s.department_id,
     d.name AS department_name, s.first_name, s.last_name, s.email,
     s.phone, s.avatar_url, s.status, s.created_at, s.updated_at
   FROM staff s
   JOIN roles r ON r.role_id = s.role_id
   LEFT JOIN departments d ON d.department_id = s.department_id
+  LEFT JOIN schools sch ON sch.school_id = s.school_id
   WHERE s.staff_id = p_staff_id;
 END $$
 
@@ -284,12 +292,13 @@ BEGIN
   WHERE staff_id = p_staff_id;
 
   SELECT
-    s.staff_id, s.role_id, r.role_name, s.school_id, s.department_id,
+    s.staff_id, s.role_id, r.role_name, s.school_id, sch.name AS school_name, s.department_id,
     d.name AS department_name, s.first_name, s.last_name, s.email,
     s.phone, s.avatar_url, s.status, s.created_at, s.updated_at
   FROM staff s
   JOIN roles r ON r.role_id = s.role_id
   LEFT JOIN departments d ON d.department_id = s.department_id
+  LEFT JOIN schools sch ON sch.school_id = s.school_id
   WHERE s.staff_id = p_staff_id;
 END $$
 

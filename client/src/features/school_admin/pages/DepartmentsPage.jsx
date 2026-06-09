@@ -9,6 +9,8 @@ const DepartmentsPage = () => {
   const departments = data?.data?.departments ?? [];
   const [createOpen, setCreateOpen] = useState(false);
 
+  console.log(departments);
+
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
       {/* Page Header */}

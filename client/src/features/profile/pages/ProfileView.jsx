@@ -12,15 +12,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -29,80 +20,34 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
 import { getMetrics } from '@/helper/getMatrics';
 import { useAuth } from '@/hooks/useAuth';
 import { COMMON } from '@/lib/icons';
+import { formatDate } from '@/lib/utils';
 
+import ChangePasswordDialog from '../components/ChangePasswordDialog';
+import EditProfileDialog from '../components/EditProfileDialog';
+import ProgressRing from '../components/ProgressRing';
 import {
-  useChangePasswordMutation,
-  useUpdateProfileMutation,
-  useUploadAvatarMutation,
-} from './profile.api';
-
-const MAX_SIZE = 2 * 1024 * 1024; // 2 MB
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-
-const ROLE_LABELS = {
-  super_admin: 'Super Administrator',
-  school_admin: 'School Administrator',
-  staff: 'Department Staff',
-};
-
-// Circular Progress Component
-const ProgressRing = ({ percentage }) => {
-  const radius = 45;
-  const stroke = 6;
-  const normalizedRadius = radius - stroke * 2;
-  const circumference = normalizedRadius * 2 * Math.PI;
-  const strokeDashoffset = circumference - (percentage / 100) * circumference;
-
-  return (
-    <div className="relative flex items-center justify-center">
-      <svg
-        height={radius * 2}
-        width={radius * 2}
-        className="-rotate-90 transform"
-      >
-        <circle
-          stroke="hsl(var(--muted)/0.4)"
-          fill="transparent"
-          strokeWidth={stroke}
-          r={normalizedRadius}
-          cx={radius}
-          cy={radius}
-        />
-        <circle
-          stroke="hsl(var(--primary))"
-          fill="transparent"
-          strokeWidth={stroke}
-          strokeDasharray={circumference + ' ' + circumference}
-          style={{ strokeDashoffset }}
-          strokeLinecap="round"
-          r={normalizedRadius}
-          cx={radius}
-          cy={radius}
-          className="transition-all duration-500 ease-in-out"
-        />
-      </svg>
-      <span className="text-foreground absolute text-sm font-bold">
-        {percentage}%
-      </span>
-    </div>
-  );
-};
+  ALLOWED_TYPES,
+  languagePreference,
+  MAX_SIZE,
+  ROLE_LABELS,
+  TABS_LIST,
+  timezonePreference,
+} from '../constants/profile.constants';
+import { useUploadAvatarMutation } from '../profile.api';
+import { getBreadcrumbRoleLabel, getInitials } from '../utils/profile.utils';
 
 export const ProfileView = () => {
   const { user } = useAuth();
   const fileInputRef = useRef(null);
 
+  console.log(user);
+
   // Mutations
   const [uploadAvatar, { isLoading: isUploadingAvatar }] =
     useUploadAvatarMutation();
-  const [updateProfile, { isLoading: isUpdatingProfile }] =
-    useUpdateProfileMutation();
-  const [changePassword, { isLoading: isChangingPassword }] =
-    useChangePasswordMutation();
 
   // Tab State
   const [activeTab, setActiveTab] = useState('profile');
@@ -111,18 +56,6 @@ export const ProfileView = () => {
   // Modals state
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
-
-  // Edit Profile Form States
-  const [editFirstName, setEditFirstName] = useState('');
-  const [editLastName, setEditLastName] = useState('');
-  const [editPhone, setEditPhone] = useState('');
-
-  // Change Password Form States
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
 
   // Dummy states for bio, timezone, language (as requested: do not use local storage)
   const [dummyBio, setDummyBio] = useState(
@@ -133,11 +66,6 @@ export const ProfileView = () => {
   );
   const [dummyLanguage, setDummyLanguage] = useState('English');
 
-  // Edit Profile Form state backups for Dialog input fields
-  const [dialogBio, setDialogBio] = useState('');
-  const [dialogTimezone, setDialogTimezone] = useState('');
-  const [dialogLanguage, setDialogLanguage] = useState('');
-
   if (!user) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
@@ -146,9 +74,7 @@ export const ProfileView = () => {
     );
   }
 
-  const initials =
-    `${user.first_name?.[0] ?? ''}${user.last_name?.[0] ?? ''}`.toUpperCase() ||
-    'U';
+  const initials = getInitials(user);
 
   // Dynamic Profile Completion
   const completionItems = [
@@ -198,95 +124,7 @@ export const ProfileView = () => {
     }
   };
 
-  // Open Edit Profile Dialog with current state
-  const handleOpenEditProfile = () => {
-    setEditFirstName(user.first_name || '');
-    setEditLastName(user.last_name || '');
-    setEditPhone(user.phone || '');
-    setDialogBio(dummyBio);
-    setDialogTimezone(dummyTimezone);
-    setDialogLanguage(dummyLanguage);
-    setIsEditProfileOpen(true);
-  };
-
-  // Submit Profile Edits
-  const handleSaveProfile = async (e) => {
-    e.preventDefault();
-    if (!editFirstName.trim() || !editLastName.trim()) {
-      toast.error('First and Last names are required');
-      return;
-    }
-
-    try {
-      await updateProfile({
-        first_name: editFirstName.trim(),
-        last_name: editLastName.trim(),
-        phone: editPhone.trim() || null,
-      }).unwrap();
-
-      // Save dummy fields to local state
-      setDummyBio(dialogBio);
-      setDummyTimezone(dialogTimezone);
-      setDummyLanguage(dialogLanguage);
-
-      setIsEditProfileOpen(false);
-      toast.success('Profile updated successfully');
-    } catch (err) {
-      toast.error(err?.message ?? 'Failed to update profile');
-    }
-  };
-
-  // Open Change Password Dialog
-  const handleOpenChangePassword = () => {
-    setCurrentPassword('');
-    setNewPassword('');
-    setConfirmPassword('');
-    setIsChangePasswordOpen(true);
-  };
-
-  // Submit Password Change
-  const handleSavePassword = async (e) => {
-    e.preventDefault();
-    if (!currentPassword) {
-      toast.error('Current password is required');
-      return;
-    }
-    if (newPassword.length < 8) {
-      toast.error('New password must be at least 8 characters long');
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      toast.error('Passwords do not match');
-      return;
-    }
-
-    try {
-      await changePassword({
-        current_password: currentPassword,
-        new_password: newPassword,
-      }).unwrap();
-      setIsChangePasswordOpen(false);
-      toast.success('Password updated successfully');
-    } catch (err) {
-      toast.error(err?.message ?? 'Failed to update password');
-    }
-  };
-
-  // Navigation tabs helper
-  const tabsList = [
-    { id: 'profile', label: 'Profile', icon: COMMON.USER },
-    { id: 'security', label: 'Security', icon: COMMON.SHIELD },
-    { id: 'notifications', label: 'Notifications', icon: COMMON.BELL },
-    { id: 'activity', label: 'Activity Logs', icon: COMMON.CLOCK },
-    { id: 'preferences', label: 'Preferences', icon: COMMON.SETTINGS },
-  ];
-
-  const breadcrumbRoleLabel =
-    user.role_name === 'super_admin'
-      ? 'Super Admin'
-      : user.role_name === 'school_admin'
-        ? 'School Admin'
-        : 'Staff';
+  const breadcrumbRoleLabel = getBreadcrumbRoleLabel(user.role_name);
 
   const userFullName = `${user.first_name} ${user.last_name}`;
 
@@ -354,8 +192,14 @@ export const ProfileView = () => {
                 <h2 className="text-foreground text-2xl font-bold tracking-tight">
                   {userFullName}
                 </h2>
-                <Badge className="border-none bg-green-500/10 text-green-600 capitalize shadow-none">
-                  Active
+                <Badge
+                  className={`border-none capitalize shadow-none ${
+                    user.status === 'active'
+                      ? 'bg-green-500/10 text-green-600'
+                      : 'bg-red-500/10 text-red-600'
+                  }`}
+                >
+                  {user.status}
                 </Badge>
               </div>
               <span className="text-muted-foreground mt-1 flex items-center justify-center gap-1.5 text-sm sm:justify-start">
@@ -367,11 +211,14 @@ export const ProfileView = () => {
               <div className="text-muted-foreground mt-3 flex flex-wrap justify-center gap-x-4 gap-y-1.5 text-xs sm:justify-start">
                 <span className="flex items-center gap-1">
                   <COMMON.CLOCK className="size-3.5" />
-                  Last Login: Today, 09:12 AM
+                  Last Login:{' '}
+                  {user.last_login_at
+                    ? formatDate(user.last_login_at, 'short-time')
+                    : 'Never'}
                 </span>
                 <span className="flex items-center gap-1">
                   <COMMON.CALENDAR className="size-3.5" />
-                  Joined: 08 Jun 2026
+                  Joined: {formatDate(user.created_at, 'long')}
                 </span>
               </div>
             </div>
@@ -381,14 +228,14 @@ export const ProfileView = () => {
           <div className="flex w-full flex-row gap-3 sm:mb-2 sm:w-auto">
             <Button
               variant="outline"
-              onClick={handleOpenEditProfile}
+              onClick={() => setIsEditProfileOpen(true)}
               className="flex-1 cursor-pointer gap-2 rounded-xl text-xs sm:flex-initial sm:text-sm"
             >
               <COMMON.USER className="size-4" />
               Edit Profile
             </Button>
             <Button
-              onClick={handleOpenChangePassword}
+              onClick={() => setIsChangePasswordOpen(true)}
               className="bg-primary text-primary-foreground hover:bg-primary/95 flex-1 cursor-pointer gap-2 rounded-xl text-xs sm:flex-initial sm:text-sm"
             >
               <COMMON.LOCK className="size-4" />
@@ -468,7 +315,7 @@ export const ProfileView = () => {
           {/* Desktop tab buttons list */}
           <Card className="border-border bg-card hidden border lg:block">
             <div className="flex flex-col space-y-0.5 p-1.5">
-              {tabsList.map((tab) => (
+              {TABS_LIST.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
@@ -492,7 +339,7 @@ export const ProfileView = () => {
             </CardHeader>
             <div className="flex flex-col space-y-1 px-2 pb-3">
               <button
-                onClick={handleOpenChangePassword}
+                onClick={() => setIsChangePasswordOpen(true)}
                 className="hover:bg-muted/50 text-foreground flex cursor-pointer items-center justify-between rounded-lg px-2.5 py-2 text-xs font-semibold"
               >
                 Change Password
@@ -521,7 +368,7 @@ export const ProfileView = () => {
             <div className="flex flex-col gap-3 lg:hidden">
               <Card className="border-border bg-card border p-2">
                 <div className="flex flex-col divide-y">
-                  {tabsList.map((tab) => (
+                  {TABS_LIST.map((tab) => (
                     <button
                       key={tab.id}
                       onClick={() => setMobileActiveSubView(tab.id)}
@@ -546,7 +393,7 @@ export const ProfileView = () => {
                 </CardHeader>
                 <div className="flex flex-col divide-y">
                   <button
-                    onClick={handleOpenChangePassword}
+                    onClick={() => setIsChangePasswordOpen(true)}
                     className="text-foreground/80 flex w-full cursor-pointer items-center justify-between px-2 py-3 text-xs font-semibold"
                   >
                     Change Password
@@ -687,222 +534,25 @@ export const ProfileView = () => {
       </div>
 
       {/* ── Edit Profile Modal Dialog ────────────────────────── */}
-      <Dialog open={isEditProfileOpen} onOpenChange={setIsEditProfileOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Edit Profile Information</DialogTitle>
-            <DialogDescription>
-              Update your account details. Click save when you are done.
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleSaveProfile} className="space-y-4 py-2">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <Label htmlFor="firstName" className="text-xs font-semibold">
-                  First Name
-                </Label>
-                <Input
-                  id="firstName"
-                  value={editFirstName}
-                  onChange={(e) => setEditFirstName(e.target.value)}
-                  className="rounded-lg text-xs"
-                />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="lastName" className="text-xs font-semibold">
-                  Last Name
-                </Label>
-                <Input
-                  id="lastName"
-                  value={editLastName}
-                  onChange={(e) => setEditLastName(e.target.value)}
-                  className="rounded-lg text-xs"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <Label htmlFor="phone" className="text-xs font-semibold">
-                Phone Number
-              </Label>
-              <Input
-                id="phone"
-                placeholder="+91 XXXXX XXXXX"
-                value={editPhone}
-                onChange={(e) => setEditPhone(e.target.value)}
-                className="rounded-lg text-xs"
-              />
-            </div>
-
-            {/* Dummy fields editing triggers */}
-            <div className="space-y-1">
-              <Label htmlFor="bio" className="text-xs font-semibold">
-                About / Bio
-              </Label>
-              <Textarea
-                id="bio"
-                placeholder="Tell us about yourself..."
-                value={dialogBio}
-                onChange={(e) => setDialogBio(e.target.value)}
-                className="min-h-16 rounded-lg text-xs"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label htmlFor="timezone" className="text-xs font-semibold">
-                  Time Zone
-                </Label>
-                <Select
-                  value={dialogTimezone}
-                  onValueChange={setDialogTimezone}
-                >
-                  <SelectTrigger id="timezone" className="w-full text-xs">
-                    <SelectValue placeholder="Select timezone" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="(GMT+05:30) Asia/Kolkata">
-                      (GMT+05:30) Kolkata
-                    </SelectItem>
-                    <SelectItem value="(GMT+00:00) UTC">
-                      (GMT+00:00) UTC
-                    </SelectItem>
-                    <SelectItem value="(GMT-05:00) EST">
-                      (GMT-05:00) EST
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-1.5">
-                <Label htmlFor="language" className="text-xs font-semibold">
-                  Language
-                </Label>
-                <Select
-                  value={dialogLanguage}
-                  onValueChange={setDialogLanguage}
-                >
-                  <SelectTrigger id="language" className="w-full text-xs">
-                    <SelectValue placeholder="Select language" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="English">English</SelectItem>
-                    <SelectItem value="Spanish">Spanish</SelectItem>
-                    <SelectItem value="French">French</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <DialogFooter className="pt-2">
-              <Button
-                type="submit"
-                disabled={isUpdatingProfile}
-                className="bg-primary text-primary-foreground hover:bg-primary/95 cursor-pointer rounded-xl text-xs sm:text-sm"
-              >
-                {isUpdatingProfile && (
-                  <COMMON.LOADER className="mr-2 size-3 animate-spin" />
-                )}
-                Save Changes
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <EditProfileDialog
+        open={isEditProfileOpen}
+        onOpenChange={setIsEditProfileOpen}
+        user={user}
+        dummyBio={dummyBio}
+        dummyTimezone={dummyTimezone}
+        dummyLanguage={dummyLanguage}
+        onSuccess={({ bio, timezone, language }) => {
+          setDummyBio(bio);
+          setDummyTimezone(timezone);
+          setDummyLanguage(language);
+        }}
+      />
 
       {/* ── Change Password Modal Dialog ──────────────────────── */}
-      <Dialog
+      <ChangePasswordDialog
         open={isChangePasswordOpen}
         onOpenChange={setIsChangePasswordOpen}
-      >
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Update Account Password</DialogTitle>
-            <DialogDescription>
-              Provide your current password to authorize this action.
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleSavePassword} className="space-y-4 py-2">
-            <div className="space-y-1.5">
-              <Label htmlFor="currentPass" className="text-xs font-semibold">
-                Current Password
-              </Label>
-              <div className="relative">
-                <Input
-                  id="currentPass"
-                  type={showCurrentPassword ? 'text' : 'password'}
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                  className="rounded-lg pr-10 text-xs"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                  className="text-muted-foreground/60 hover:text-foreground absolute inset-y-0 right-3 flex items-center"
-                >
-                  {showCurrentPassword ? (
-                    <COMMON.EYE_OFF className="size-4" />
-                  ) : (
-                    <COMMON.EYE className="size-4" />
-                  )}
-                </button>
-              </div>
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="newPass" className="text-xs font-semibold">
-                New Password
-              </Label>
-              <div className="relative">
-                <Input
-                  id="newPass"
-                  type={showNewPassword ? 'text' : 'password'}
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  className="rounded-lg pr-10 text-xs"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowNewPassword(!showNewPassword)}
-                  className="text-muted-foreground/60 hover:text-foreground absolute inset-y-0 right-3 flex items-center"
-                >
-                  {showNewPassword ? (
-                    <COMMON.EYE_OFF className="size-4" />
-                  ) : (
-                    <COMMON.EYE className="size-4" />
-                  )}
-                </button>
-              </div>
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="confirmPass" className="text-xs font-semibold">
-                Confirm New Password
-              </Label>
-              <Input
-                id="confirmPass"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="rounded-lg text-xs"
-              />
-            </div>
-
-            <DialogFooter className="pt-2">
-              <Button
-                type="submit"
-                disabled={isChangingPassword}
-                className="bg-primary text-primary-foreground hover:bg-primary/95 cursor-pointer rounded-xl text-xs sm:text-sm"
-              >
-                {isChangingPassword && (
-                  <COMMON.LOADER className="mr-2 size-3 animate-spin" />
-                )}
-                Update Password
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+      />
     </div>
   );
 
@@ -926,7 +576,7 @@ export const ProfileView = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={handleOpenEditProfile}
+                  onClick={() => setIsEditProfileOpen(true)}
                   className="cursor-pointer gap-1.5 text-xs"
                 >
                   Edit
@@ -1016,7 +666,7 @@ export const ProfileView = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={handleOpenEditProfile}
+                  onClick={() => setIsEditProfileOpen(true)}
                   className="cursor-pointer gap-1.5 text-xs"
                 >
                   Edit
@@ -1055,7 +705,7 @@ export const ProfileView = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={handleOpenChangePassword}
+                  onClick={() => setIsChangePasswordOpen(true)}
                   className="cursor-pointer text-xs"
                 >
                   Change Password
@@ -1268,15 +918,11 @@ export const ProfileView = () => {
                     <SelectValue placeholder="Select timezone" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="(GMT+05:30) Asia/Kolkata">
-                      (GMT+05:30) Kolkata
-                    </SelectItem>
-                    <SelectItem value="(GMT+00:00) UTC">
-                      (GMT+00:00) UTC
-                    </SelectItem>
-                    <SelectItem value="(GMT-05:00) EST">
-                      (GMT-05:00) EST
-                    </SelectItem>
+                    {timezonePreference.map((timezone) => (
+                      <SelectItem key={timezone.value} value={timezone.value}>
+                        {timezone.label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -1293,9 +939,11 @@ export const ProfileView = () => {
                     <SelectValue placeholder="Select language" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="English">English</SelectItem>
-                    <SelectItem value="Spanish">Spanish</SelectItem>
-                    <SelectItem value="French">French</SelectItem>
+                    {languagePreference.map((lang) => (
+                      <SelectItem key={lang.value} value={lang.value}>
+                        {lang.label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
