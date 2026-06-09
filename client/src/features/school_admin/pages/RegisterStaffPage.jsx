@@ -61,6 +61,7 @@ const RegisterStaffPage = () => {
     formState: { errors },
   } = useForm({
     resolver: zodResolver(batchRegisterStaffSchema),
+    mode: 'onChange',
     defaultValues: {
       department_id: '',
       members: [
@@ -154,7 +155,6 @@ const RegisterStaffPage = () => {
         });
         const isValid = await trigger(fieldsToValidate);
         if (!isValid) {
-          toast.error('Please resolve errors on Step 1 first');
           return;
         }
         if (stepId === 3) {
@@ -162,7 +162,6 @@ const RegisterStaffPage = () => {
           const passFields = fields.map((_, idx) => `members.${idx}.password`);
           const isPassValid = await trigger(passFields);
           if (!isPassValid) {
-            toast.error('Please configure valid passwords on Step 2 first');
             return;
           }
         }
@@ -171,7 +170,6 @@ const RegisterStaffPage = () => {
         const passFields = fields.map((_, idx) => `members.${idx}.password`);
         const isPassValid = await trigger(passFields);
         if (!isPassValid) {
-          toast.error('Please configure valid passwords on Step 2 first');
           return;
         }
       }
@@ -756,7 +754,7 @@ const RegisterStaffPage = () => {
                           </div>
 
                           {/* Designation */}
-                          <div className="col-span-2 flex flex-col gap-1">
+                          <div className="flex flex-col gap-1 sm:col-span-2">
                             <Label
                               htmlFor={`designation-${idx}`}
                               className="text-xs"

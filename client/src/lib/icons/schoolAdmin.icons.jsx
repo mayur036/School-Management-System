@@ -14,11 +14,11 @@ export const SCHOOL_ADMIN = {
   DASHBOARD: LayoutDashboard,
   DEPARTMENTS: FolderTree,
   DEPARTMENT_LIST: Briefcase,
+  LOGOUT: LogOut,
+  PROFILE: User,
   REGISTER_STAFF: UserPlus,
+  SETTINGS: Settings,
   STAFF_LIST: Users,
   STAFF_MANAGE: UserCheck,
-  SETTINGS: Settings,
-  PROFILE: User,
-  LOGOUT: LogOut,
 };
 export default SCHOOL_ADMIN;

@@ -12,15 +12,15 @@ import {
 } from 'lucide-react';
 
 export const SUPER_ADMIN = {
-  DASHBOARD: LayoutDashboard,
-  SCHOOLS: Building2,
-  CREATE_ADMIN: UserPlus,
-  SETTINGS: Settings,
-  PROFILE: User,
-  SECURITY: ShieldAlert,
-  USERS: Users,
-  LOGOUT: LogOut,
   ACTIONS: EllipsisVertical,
+  CREATE_ADMIN: UserPlus,
+  DASHBOARD: LayoutDashboard,
+  LOGOUT: LogOut,
   POWER: Power,
+  PROFILE: User,
+  SCHOOLS: Building2,
+  SECURITY: ShieldAlert,
+  SETTINGS: Settings,
+  USERS: Users,
 };
 export default SUPER_ADMIN;

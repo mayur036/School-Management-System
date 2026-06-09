@@ -9,12 +9,12 @@ import {
 } from 'lucide-react';
 
 export const STAFF = {
-  HOME: Home,
-  TASKS: ClipboardList,
   CALENDAR: Calendar,
+  HOME: Home,
+  LOGOUT: LogOut,
   NOTIFICATIONS: Bell,
   PROFILE: User,
   SETTINGS: Settings,
-  LOGOUT: LogOut,
+  TASKS: ClipboardList,
 };
 export default STAFF;

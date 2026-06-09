@@ -56,8 +56,7 @@ export const staffMemberSchema = z.object({
     .string()
     .trim()
     .regex(/^\d{10}$/, 'Phone number must be exactly 10 digits')
-    .optional()
-    .or(z.literal('')),
+    .optional(),
   password: z
     .string()
     .min(8, 'Password must be at least 8 characters')
