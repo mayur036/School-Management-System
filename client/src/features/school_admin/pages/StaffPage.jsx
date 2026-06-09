@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 
 import AppBreadcrumb from '@/components/shared/AppBreadcrumb';
+import AppPagination from '@/components/shared/AppPagination';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -53,6 +54,20 @@ const StaffPage = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [deptFilter, setDeptFilter] = useState('all');
   const [viewMode, setViewMode] = useState('list'); // 'list' or 'grid'
+
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, statusFilter, deptFilter]);
+
+  const handleItemsPerPageChange = (size) => {
+    setItemsPerPage(size);
+    setCurrentPage(1);
+  };
 
   // Active item states for dialogs & drawer details
   const [toggleMember, setToggleMember] = useState(null);
@@ -108,6 +123,12 @@ const StaffPage = () => {
       return matchesSearch && matchesStatus && matchesDept;
     });
   }, [staff, searchQuery, statusFilter, deptFilter]);
+
+  // Paginated subset of filtered staff
+  const paginatedStaff = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredStaff.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredStaff, currentPage, itemsPerPage]);
 
   // 4. Exporter to CSV
   const handleExport = () => {
@@ -198,18 +219,18 @@ const StaffPage = () => {
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         {/* Total Staff */}
         <Card className="border-border bg-card border border-l-4 border-l-blue-500">
-          <CardContent className="flex items-center gap-3 p-3.5 sm:gap-4 sm:p-5">
-            <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600 sm:size-10 dark:bg-blue-500/20 dark:text-blue-400">
-              <SCHOOL_ADMIN.STAFF_LIST className="size-4.5 sm:size-5" />
+          <CardContent className="flex flex-row items-center gap-2.5 p-2.5 sm:gap-4 sm:p-4">
+            <div className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600 sm:size-10 dark:bg-blue-500/20 dark:text-blue-400">
+              <SCHOOL_ADMIN.STAFF_LIST className="size-4 sm:size-5" />
             </div>
-            <div className="flex min-w-0 flex-col">
-              <span className="text-muted-foreground truncate text-[10px] font-semibold tracking-wider uppercase sm:text-xs">
+            <div className="flex min-w-0 flex-col leading-tight">
+              <span className="text-muted-foreground truncate text-[9px] font-semibold tracking-normal uppercase sm:text-xs sm:tracking-wider">
                 Total Staff
               </span>
-              <span className="text-foreground mt-0.5 text-xl leading-none font-bold sm:text-2xl">
+              <span className="text-foreground mt-0.5 truncate text-base font-bold sm:text-2xl">
                 {stats.total}
               </span>
-              <span className="text-muted-foreground mt-1 truncate text-[9px] sm:text-[10px]">
+              <span className="text-muted-foreground mt-0.5 hidden truncate text-[9px] sm:block sm:text-[10px]">
                 All departments
               </span>
             </div>
@@ -218,18 +239,18 @@ const StaffPage = () => {
 
         {/* Active Staff */}
         <Card className="border-border bg-card border border-l-4 border-l-emerald-500">
-          <CardContent className="flex items-center gap-3 p-3.5 sm:gap-4 sm:p-5">
-            <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 sm:size-10 dark:bg-emerald-500/20 dark:text-emerald-400">
-              <COMMON.CHECK className="size-4.5 sm:size-5" />
+          <CardContent className="flex flex-row items-center gap-2.5 p-2.5 sm:gap-4 sm:p-4">
+            <div className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 sm:size-10 dark:bg-emerald-500/20 dark:text-emerald-400">
+              <COMMON.CHECK className="size-4 sm:size-5" />
             </div>
-            <div className="flex min-w-0 flex-col">
-              <span className="text-muted-foreground truncate text-[10px] font-semibold tracking-wider uppercase sm:text-xs">
+            <div className="flex min-w-0 flex-col leading-tight">
+              <span className="text-muted-foreground truncate text-[9px] font-semibold tracking-normal uppercase sm:text-xs sm:tracking-wider">
                 Active Staff
               </span>
-              <span className="text-foreground mt-0.5 text-xl leading-none font-bold sm:text-2xl">
+              <span className="text-foreground mt-0.5 truncate text-base font-bold sm:text-2xl">
                 {stats.active}
               </span>
-              <span className="mt-1 truncate text-[9px] font-semibold text-emerald-600 sm:text-[10px] dark:text-emerald-400">
+              <span className="mt-0.5 hidden truncate text-[9px] font-semibold text-emerald-600 sm:block sm:text-[10px] dark:text-emerald-400">
                 {stats.activePct}% of total
               </span>
             </div>
@@ -238,18 +259,18 @@ const StaffPage = () => {
 
         {/* Departments Count */}
         <Card className="border-border bg-card border border-l-4 border-l-amber-500">
-          <CardContent className="flex items-center gap-3 p-3.5 sm:gap-4 sm:p-5">
-            <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 sm:size-10 dark:bg-amber-500/20 dark:text-amber-400">
-              <SCHOOL_ADMIN.DEPARTMENTS className="size-4.5 sm:size-5" />
+          <CardContent className="flex flex-row items-center gap-2.5 p-2.5 sm:gap-4 sm:p-4">
+            <div className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 sm:size-10 dark:bg-amber-500/20 dark:text-amber-400">
+              <SCHOOL_ADMIN.DEPARTMENTS className="size-4 sm:size-5" />
             </div>
-            <div className="flex min-w-0 flex-col">
-              <span className="text-muted-foreground truncate text-[10px] font-semibold tracking-wider uppercase sm:text-xs">
+            <div className="flex min-w-0 flex-col leading-tight">
+              <span className="text-muted-foreground truncate text-[9px] font-semibold tracking-normal uppercase sm:text-xs sm:tracking-wider">
                 Departments
               </span>
-              <span className="text-foreground mt-0.5 text-xl leading-none font-bold sm:text-2xl">
+              <span className="text-foreground mt-0.5 truncate text-base font-bold sm:text-2xl">
                 {stats.deptsCount}
               </span>
-              <span className="text-muted-foreground mt-1 truncate text-[9px] sm:text-[10px]">
+              <span className="text-muted-foreground mt-0.5 hidden truncate text-[9px] sm:block sm:text-[10px]">
                 Academic & Admin
               </span>
             </div>
@@ -258,18 +279,18 @@ const StaffPage = () => {
 
         {/* New This Month */}
         <Card className="border-border bg-card border border-l-4 border-l-purple-500">
-          <CardContent className="flex items-center gap-3 p-3.5 sm:gap-4 sm:p-5">
-            <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-purple-500/10 text-purple-600 sm:size-10 dark:bg-purple-500/20 dark:text-purple-400">
-              <SCHOOL_ADMIN.REGISTER_STAFF className="size-4.5 sm:size-5" />
+          <CardContent className="flex flex-row items-center gap-2.5 p-2.5 sm:gap-4 sm:p-4">
+            <div className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-purple-500/10 text-purple-600 sm:size-10 dark:bg-purple-500/20 dark:text-purple-400">
+              <SCHOOL_ADMIN.REGISTER_STAFF className="size-4 sm:size-5" />
             </div>
-            <div className="flex min-w-0 flex-col">
-              <span className="text-muted-foreground truncate text-[10px] font-semibold tracking-wider uppercase sm:text-xs">
+            <div className="flex min-w-0 flex-col leading-tight">
+              <span className="text-muted-foreground truncate text-[9px] font-semibold tracking-normal uppercase sm:text-xs sm:tracking-wider">
                 New This Month
               </span>
-              <span className="text-foreground mt-0.5 text-xl leading-none font-bold sm:text-2xl">
+              <span className="text-foreground mt-0.5 truncate text-base font-bold sm:text-2xl">
                 {stats.joinedThisMonth}
               </span>
-              <span className="text-muted-foreground mt-1 truncate text-[9px] sm:text-[10px]">
+              <span className="text-muted-foreground mt-0.5 hidden truncate text-[9px] sm:block sm:text-[10px]">
                 Recently joined
               </span>
             </div>
@@ -393,12 +414,23 @@ const StaffPage = () => {
       {/* ── Main Data View (Table / Grid) ────────────────────── */}
       <div className="flex flex-col gap-4">
         <StaffTable
-          staff={filteredStaff}
+          staff={paginatedStaff}
           isLoading={staffLoading}
           viewMode={viewMode}
           onViewDetails={setDetailMember}
           onToggleStatus={setToggleMember}
         />
+
+        {!staffLoading && (
+          <AppPagination
+            currentPage={currentPage}
+            totalItems={filteredStaff.length}
+            itemsPerPage={itemsPerPage}
+            onPageChange={setCurrentPage}
+            onItemsPerPageChange={handleItemsPerPageChange}
+            itemsLabel="staff members"
+          />
+        )}
       </div>
 
       {/* Status Toggle AlertDialog */}

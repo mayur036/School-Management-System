@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 import AppBreadcrumb from '@/components/shared/AppBreadcrumb';
@@ -20,6 +20,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useGetDepartmentsQuery } from '@/features/school_admin/departments.api';
+import { useGetStaffQuery } from '@/features/school_admin/staff.api';
 import { getMetrics } from '@/helper/getMatrics';
 import { useAuth } from '@/hooks/useAuth';
 import { COMMON } from '@/lib/icons';
@@ -45,6 +47,14 @@ export const ProfileView = () => {
 
   console.log(user);
 
+  // Queries for dynamic metrics (skipped if not school_admin)
+  const { data: deptData } = useGetDepartmentsQuery(undefined, {
+    skip: user?.role_name !== 'school_admin',
+  });
+  const { data: staffData } = useGetStaffQuery(undefined, {
+    skip: user?.role_name !== 'school_admin',
+  });
+
   // Mutations
   const [uploadAvatar, { isLoading: isUploadingAvatar }] =
     useUploadAvatarMutation();
@@ -65,6 +75,18 @@ export const ProfileView = () => {
     '(GMT+05:30) Asia/Kolkata'
   );
   const [dummyLanguage, setDummyLanguage] = useState('English');
+
+  const schoolAdminMetrics = useMemo(() => {
+    if (user?.role_name !== 'school_admin') return {};
+    const departments = deptData?.data?.departments ?? [];
+    const staff = staffData?.data?.staff ?? [];
+    const activeStaffCount = staff.filter((s) => s.status === 'active').length;
+    return {
+      deptsCount: departments.length,
+      staffCount: staff.length,
+      activeStaffCount,
+    };
+  }, [user, deptData, staffData]);
 
   if (!user) {
     return (
@@ -97,7 +119,7 @@ export const ProfileView = () => {
     (completedCount / completionItems.length) * 100
   );
 
-  const metrics = getMetrics(user);
+  const metrics = getMetrics(user, schoolAdminMetrics);
 
   const handleAvatarChange = async (event) => {
     const file = event.target.files?.[0];
@@ -252,18 +274,18 @@ export const ProfileView = () => {
             key={metric.label}
             className={`border-border bg-card border border-l-4 ${metric.color}`}
           >
-            <CardContent className="flex items-center gap-3 p-3.5 sm:p-4">
-              <div className="bg-background flex size-9 shrink-0 items-center justify-center rounded-xl text-inherit shadow-xs">
-                <metric.icon className="size-4.5" />
+            <CardContent className="flex flex-row items-center gap-2.5 p-2.5 sm:gap-3.5 sm:p-4">
+              <div className="bg-background flex size-8 shrink-0 items-center justify-center rounded-xl text-inherit shadow-xs sm:size-10">
+                <metric.icon className="size-4 sm:size-5" />
               </div>
               <div className="flex min-w-0 flex-col">
-                <span className="text-muted-foreground truncate text-[10px] font-semibold tracking-wider uppercase sm:text-xs">
+                <span className="text-muted-foreground truncate text-[9px] font-semibold tracking-normal uppercase sm:text-xs sm:tracking-wider">
                   {metric.label}
                 </span>
-                <span className="text-foreground mt-0.5 text-xl leading-none font-bold sm:text-2xl">
+                <span className="text-foreground mt-0.5 truncate text-base leading-none font-bold sm:text-2xl">
                   {metric.value}
                 </span>
-                <span className="text-muted-foreground mt-1 truncate text-[9px] sm:text-[10px]">
+                <span className="text-muted-foreground mt-0.5 hidden truncate text-[9px] sm:block sm:text-[10px]">
                   {metric.trend}
                 </span>
               </div>

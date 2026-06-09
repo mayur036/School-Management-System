@@ -1,8 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { Trash2 } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { z } from 'zod';
 
 import AppBreadcrumb from '@/components/shared/AppBreadcrumb';
 import { Badge } from '@/components/ui/badge';
@@ -24,8 +26,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { COMMON, SCHOOL_ADMIN } from '@/lib/icons';
-import { createStaffSchema } from '@/schemas/staff.schema';
+import { COMMON } from '@/lib/icons';
 
 import { useGetDepartmentsQuery } from '../departments.api';
 import { useCreateStaffMutation } from '../staff.api';
@@ -56,21 +57,64 @@ const generateSecurePassword = () => {
     .join('');
 };
 
+// Zod Validation Schema for Batch Registration
+const memberFormSchema = z.object({
+  first_name: z
+    .string()
+    .trim()
+    .min(1, 'First name is required')
+    .max(80, 'First name must be 80 characters or fewer'),
+  last_name: z
+    .string()
+    .trim()
+    .min(1, 'Last name is required')
+    .max(80, 'Last name must be 80 characters or fewer'),
+  email: z
+    .string()
+    .trim()
+    .email('Please enter a valid email')
+    .max(150, 'Email must be 150 characters or fewer'),
+  phone: z
+    .string()
+    .trim()
+    .regex(/^\d{10}$/, 'Phone number must be exactly 10 digits')
+    .optional()
+    .or(z.literal('')),
+  password: z
+    .string()
+    .min(8, 'Password must be at least 8 characters')
+    .max(72, 'Password must be 72 characters or fewer'),
+  designation: z.string().trim().optional(),
+});
+
+const batchRegisterSchema = z.object({
+  department_id: z
+    .union([z.string(), z.number()])
+    .refine((val) => val !== '' && val !== undefined, {
+      message: 'Please select a department',
+    })
+    .transform((val) => Number(val)),
+  members: z.array(memberFormSchema).min(1, 'At least one member is required'),
+});
+
 const RegisterStaffPage = () => {
   const navigate = useNavigate();
 
   // Queries & Mutations
   const { data: deptData, isLoading: deptsLoading } = useGetDepartmentsQuery();
-  const departments = deptData?.data?.departments ?? [];
+  const departments = useMemo(
+    () => deptData?.data?.departments ?? [],
+    [deptData]
+  );
   const [createStaff, { isLoading: isSubmitting }] = useCreateStaffMutation();
 
-  // Multi-step State
-  const [activeStep, setActiveStep] = useState(1); // 1 = Personal, 2 = Contact, 3 = Account, 4 = Review
-  const [showPassword, setShowPassword] = useState(false);
+  // Stepper State
+  const [activeStep, setActiveStep] = useState(1); // 1 = Details, 2 = Credentials, 3 = Review
+  const [visiblePasswords, setVisiblePasswords] = useState({});
   const [createdCredentials, setCreatedCredentials] = useState(null);
   const [copied, setCopied] = useState(false);
 
-  // Form setup
+  // Form Setup
   const {
     register,
     handleSubmit,
@@ -81,51 +125,78 @@ const RegisterStaffPage = () => {
     reset,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(createStaffSchema),
+    resolver: zodResolver(batchRegisterSchema),
     defaultValues: {
       department_id: '',
-      first_name: '',
-      last_name: '',
-      email: '',
-      password: '',
-      phone: '',
-      designation: '', // Visual mock field (ignored by server schema)
+      members: [
+        {
+          first_name: '',
+          last_name: '',
+          email: '',
+          phone: '',
+          password: '',
+          designation: '',
+        },
+      ],
     },
   });
 
-  // Step names & descriptors
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'members',
+  });
+
+  // Step Wizard Meta
   const steps = [
     {
       id: 1,
-      title: 'Personal',
-      desc: 'Basic information',
-      fields: ['department_id', 'first_name', 'last_name'],
+      title: 'Staff Members',
+      desc: 'Enter names & contact details',
     },
     {
       id: 2,
-      title: 'Contact',
-      desc: 'Contact details',
-      fields: ['email', 'phone'],
+      title: 'Credentials',
+      desc: 'Set passwords',
     },
     {
       id: 3,
-      title: 'Account',
-      desc: 'Login credentials',
-      fields: ['password'],
+      title: 'Review & Confirm',
+      desc: 'Verify details & submit',
     },
-    { id: 4, title: 'Review', desc: 'Verify & submit', fields: [] },
   ];
 
-  // Navigation handlers within wizard
+  // Validate step transitions
   const handleNext = async () => {
-    const currentStepFields = steps[activeStep - 1].fields;
-    const isValid = await trigger(currentStepFields);
-    if (isValid) {
-      setActiveStep((prev) => Math.min(prev + 1, 4));
-    } else {
-      toast.error(
-        'Please resolve the errors on this step before moving forward'
-      );
+    if (activeStep === 1) {
+      // Validate department_id and member detail fields (excluding password)
+      const fieldsToValidate = ['department_id'];
+      fields.forEach((_, index) => {
+        fieldsToValidate.push(`members.${index}.first_name`);
+        fieldsToValidate.push(`members.${index}.last_name`);
+        fieldsToValidate.push(`members.${index}.email`);
+        fieldsToValidate.push(`members.${index}.phone`);
+        fieldsToValidate.push(`members.${index}.designation`);
+      });
+
+      const isValid = await trigger(fieldsToValidate);
+      if (isValid) {
+        setActiveStep(2);
+      } else {
+        toast.error('Please resolve errors on this step before moving forward');
+      }
+    } else if (activeStep === 2) {
+      // Validate passwords
+      const fieldsToValidate = [];
+      fields.forEach((_, index) => {
+        fieldsToValidate.push(`members.${index}.password`);
+      });
+
+      const isValid = await trigger(fieldsToValidate);
+      if (isValid) {
+        setActiveStep(3);
+      } else {
+        toast.error('Please configure valid passwords for all members');
+      }
     }
   };
 
@@ -134,73 +205,139 @@ const RegisterStaffPage = () => {
   };
 
   const handleStepClick = async (stepId) => {
-    // Prevent jumping ahead of completed steps
+    if (stepId === activeStep) return;
     if (stepId > activeStep) {
-      // Validate all previous steps
-      let allValid = true;
-      for (let i = 1; i < stepId; i++) {
-        const isValid = await trigger(steps[i - 1].fields);
+      if (activeStep === 1 && stepId >= 2) {
+        // Validate Step 1
+        const fieldsToValidate = ['department_id'];
+        fields.forEach((_, idx) => {
+          fieldsToValidate.push(`members.${idx}.first_name`);
+          fieldsToValidate.push(`members.${idx}.last_name`);
+          fieldsToValidate.push(`members.${idx}.email`);
+          fieldsToValidate.push(`members.${idx}.phone`);
+          fieldsToValidate.push(`members.${idx}.designation`);
+        });
+        const isValid = await trigger(fieldsToValidate);
         if (!isValid) {
-          allValid = false;
-          break;
+          toast.error('Please resolve errors on Step 1 first');
+          return;
+        }
+        if (stepId === 3) {
+          // If trying to skip to Step 3, must also validate Step 2 (passwords)
+          const passFields = fields.map((_, idx) => `members.${idx}.password`);
+          const isPassValid = await trigger(passFields);
+          if (!isPassValid) {
+            toast.error('Please configure valid passwords on Step 2 first');
+            return;
+          }
+        }
+      } else if (activeStep === 2 && stepId === 3) {
+        // Validate Step 2
+        const passFields = fields.map((_, idx) => `members.${idx}.password`);
+        const isPassValid = await trigger(passFields);
+        if (!isPassValid) {
+          toast.error('Please configure valid passwords on Step 2 first');
+          return;
         }
       }
-      if (allValid) setActiveStep(stepId);
+      setActiveStep(stepId);
     } else {
       setActiveStep(stepId);
     }
   };
 
+  // Bulk password actions
+  const handleGeneratePassword = (index) => {
+    const pwd = generateSecurePassword();
+    setValue(`members.${index}.password`, pwd, { shouldValidate: true });
+    toast.success(`Generated password for member #${index + 1}`);
+  };
+
+  const handleGenerateAllPasswords = () => {
+    fields.forEach((_, index) => {
+      const pwd = generateSecurePassword();
+      setValue(`members.${index}.password`, pwd, { shouldValidate: true });
+    });
+    toast.success('Generated secure passwords for all staff members');
+  };
+
+  const togglePasswordVisibility = (index) => {
+    setVisiblePasswords((prev) => ({
+      ...prev,
+      [index]: !prev[index],
+    }));
+  };
+
+  // Submit Handler
   const onSubmit = async (data) => {
-    // Strip designation since DB schema/stored procedure doesn't hold it
-    const { designation, ...cleanData } = data;
-    const payload = Object.fromEntries(
-      Object.entries(cleanData).filter(([, v]) => v !== '')
-    );
+    // Strip designation since database schema does not hold it
+    const cleanMembers = data.members.map(({ ...m }) => {
+      const cleanMember = Object.fromEntries(
+        Object.entries(m).filter(([, v]) => v !== '')
+      );
+      return cleanMember;
+    });
+
+    const payload = {
+      department_id: Number(data.department_id),
+      members: cleanMembers,
+    };
 
     try {
       await createStaff(payload).unwrap();
-      toast.success('Staff member registered successfully');
+      toast.success('Batch registration completed successfully');
 
       const selectedDept = departments.find(
         (d) => Number(d.department_id) === Number(data.department_id)
       );
 
-      setCreatedCredentials({
-        name: `${data.first_name} ${data.last_name}`,
+      const credentialDetails = data.members.map((m) => ({
+        name: `${m.first_name} ${m.last_name}`,
         department: selectedDept?.name ?? 'Assigned Department',
-        designation: designation || 'Staff Member',
-        email: data.email,
-        password: data.password,
-      });
+        designation: m.designation || 'Staff Member',
+        email: m.email,
+        password: m.password,
+      }));
+
+      setCreatedCredentials(credentialDetails);
     } catch (err) {
-      toast.error(err?.message ?? 'Failed to register staff');
+      toast.error(err?.message ?? 'Failed to register staff batch');
     }
   };
 
-  const handleGeneratePassword = () => {
-    const pwd = generateSecurePassword();
-    setValue('password', pwd, { shouldValidate: true });
-    toast.success('Generated a secure password');
-  };
-
-  const handleCopy = async () => {
+  // Clipboard Copiers
+  const handleCopyAll = async () => {
     if (!createdCredentials) return;
-    const text = `Name: ${createdCredentials.name}\nDepartment: ${createdCredentials.department}\nEmail: ${createdCredentials.email}\nPassword: ${createdCredentials.password}`;
+    const text = createdCredentials
+      .map(
+        (c, idx) =>
+          `Staff #${idx + 1}:\nName: ${c.name}\nDepartment: ${c.department}\nEmail: ${c.email}\nPassword: ${c.password}\n`
+      )
+      .join('\n---\n\n');
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
-      toast.success('Credentials copied to clipboard');
+      toast.success('All credentials copied to clipboard');
       setTimeout(() => setCopied(false), 2000);
     } catch {
       toast.error('Failed to copy — please copy manually');
     }
   };
 
-  const handleRegisterAnother = () => {
+  const handleCopySingle = async (member, idx) => {
+    const text = `Name: ${member.name}\nDepartment: ${member.department}\nEmail: ${member.email}\nPassword: ${member.password}`;
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success(`Copied credentials for Member #${idx + 1}`);
+    } catch {
+      toast.error('Failed to copy');
+    }
+  };
+
+  const handleRegisterAnotherBatch = () => {
     reset();
     setCreatedCredentials(null);
-    setShowPassword(false);
+    setVisiblePasswords({});
     setCopied(false);
     setActiveStep(1);
   };
@@ -251,10 +388,10 @@ const RegisterStaffPage = () => {
       <div className="flex flex-col gap-4 border-b pb-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h1 className="text-foreground text-3xl font-bold tracking-tight">
-            Register Staff
+            Register Staff Batch
           </h1>
           <p className="text-muted-foreground mt-1 text-sm">
-            Add a new department staff member and set their login credentials.
+            Register multiple staff members at once under the same department.
           </p>
         </div>
 
@@ -267,7 +404,7 @@ const RegisterStaffPage = () => {
             <div>
               <p className="text-foreground font-semibold">Secure & Private</p>
               <p className="text-muted-foreground mt-0.5">
-                Staff credentials are encrypted and stored securely.
+                All passwords are encrypted using industry standards.
               </p>
             </div>
           </CardContent>
@@ -276,96 +413,110 @@ const RegisterStaffPage = () => {
 
       {createdCredentials ? (
         /* ── Post-Creation Credential Display ──────────────── */
-        <Card className="border-success/30 bg-success/5 mx-auto w-full max-w-xl shadow-md">
+        <Card className="border-success/30 bg-success/5 mx-auto w-full max-w-2xl shadow-md">
           <CardHeader>
-            <div className="flex items-center gap-2">
-              <CardTitle className="text-lg">
-                Staff Registered Successfully
-              </CardTitle>
-              <Badge className="bg-success text-success-foreground">
-                Success
-              </Badge>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <CardTitle className="text-lg">
+                  Staff Registered Successfully
+                </CardTitle>
+                <Badge className="bg-success text-success-foreground">
+                  Success
+                </Badge>
+              </div>
+              <Button
+                size="sm"
+                variant="outline"
+                className="cursor-pointer gap-1.5"
+                onClick={handleCopyAll}
+              >
+                {copied ? (
+                  <COMMON.CHECK className="text-success size-3.5" />
+                ) : (
+                  <COMMON.COPY className="size-3.5" />
+                )}
+                {copied ? 'Copied All!' : 'Copy All Credentials'}
+              </Button>
             </div>
             <CardDescription>
-              Copy these details securely and share them with the new staff
-              member.
+              Copy these credentials and share them with the newly registered
+              staff members.
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
-            <dl className="grid gap-3 text-sm">
-              <div>
-                <dt className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
-                  Name
-                </dt>
-                <dd className="text-foreground mt-0.5 font-medium">
-                  {createdCredentials.name}
-                </dd>
-              </div>
-              <Separator />
-              <div>
-                <dt className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
-                  Department
-                </dt>
-                <dd className="text-foreground mt-0.5 font-medium">
-                  {createdCredentials.department}
-                </dd>
-              </div>
-              <Separator />
-              <div>
-                <dt className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
-                  Designation
-                </dt>
-                <dd className="text-foreground mt-0.5 font-medium">
-                  {createdCredentials.designation}
-                </dd>
-              </div>
-              <Separator />
-              <div>
-                <dt className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
-                  Email
-                </dt>
-                <dd className="text-foreground mt-0.5 font-mono font-medium break-all">
-                  {createdCredentials.email}
-                </dd>
-              </div>
-              <Separator />
-              <div>
-                <dt className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
-                  Password
-                </dt>
-                <dd className="text-foreground mt-0.5 font-mono font-medium">
-                  {createdCredentials.password}
-                </dd>
-              </div>
-            </dl>
+            <div className="flex max-h-96 flex-col gap-3 overflow-y-auto pr-1">
+              {createdCredentials.map((c, idx) => (
+                <div
+                  key={idx}
+                  className="bg-card border-border relative rounded-xl border p-4 text-sm shadow-xs"
+                >
+                  <div className="mb-2 flex items-center justify-between border-b pb-2">
+                    <span className="text-foreground font-bold">
+                      Member #{idx + 1}: {c.name}
+                    </span>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="size-7 cursor-pointer"
+                      title="Copy member details"
+                      onClick={() => handleCopySingle(c, idx)}
+                    >
+                      <COMMON.COPY className="size-3.5" />
+                    </Button>
+                  </div>
+                  <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
+                    <div>
+                      <dt className="text-muted-foreground font-semibold uppercase">
+                        Department
+                      </dt>
+                      <dd className="text-foreground mt-0.5">{c.department}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-muted-foreground font-semibold uppercase">
+                        Role/Designation
+                      </dt>
+                      <dd className="text-foreground mt-0.5">
+                        {c.designation}
+                      </dd>
+                    </div>
+                    <div className="col-span-2">
+                      <dt className="text-muted-foreground font-semibold uppercase">
+                        Email
+                      </dt>
+                      <dd className="text-foreground mt-0.5 font-mono break-all">
+                        {c.email}
+                      </dd>
+                    </div>
+                    <div className="col-span-2">
+                      <dt className="text-muted-foreground font-semibold uppercase">
+                        Password
+                      </dt>
+                      <dd className="text-foreground bg-muted/30 mt-0.5 w-fit rounded-md border px-2 py-1 font-mono font-bold">
+                        {c.password}
+                      </dd>
+                    </div>
+                  </dl>
+                </div>
+              ))}
+            </div>
 
-            <div className="mt-6 flex gap-3">
+            <Separator className="my-2" />
+
+            <div className="mt-2 flex gap-3">
               <Button
                 variant="outline"
-                className="flex-1 cursor-pointer gap-2"
-                onClick={handleCopy}
+                asChild
+                className="flex-1 cursor-pointer"
               >
-                {copied ? (
-                  <COMMON.CHECK data-icon="inline-start" />
-                ) : (
-                  <COMMON.COPY data-icon="inline-start" />
-                )}
-                {copied ? 'Copied!' : 'Copy Credentials'}
+                <Link to="/school/staff">Go to Directory</Link>
               </Button>
               <Button
                 className="bg-primary text-primary-foreground hover:bg-primary/95 flex-1 cursor-pointer"
-                onClick={handleRegisterAnother}
+                onClick={handleRegisterAnotherBatch}
               >
-                Register Another
+                Register Another Batch
               </Button>
             </div>
-            <Button
-              variant="ghost"
-              asChild
-              className="mt-1 w-full cursor-pointer"
-            >
-              <Link to="/school/staff">Go to Directory</Link>
-            </Button>
           </CardContent>
         </Card>
       ) : (
@@ -475,54 +626,53 @@ const RegisterStaffPage = () => {
 
           {/* Right Panel: Stepper-Accordion Container */}
           <div className="flex flex-col gap-4 lg:col-span-3">
-            {/* Step 1: Personal Details */}
+            {/* Step 1: Department Selection & Staff Details */}
             <Card
               className={`border-border border shadow-xs transition-all ${activeStep === 1 ? 'block' : 'hidden'}`}
             >
               <CardHeader className="pb-4">
-                <CardTitle className="text-lg font-semibold">
-                  Personal & Account Details
+                <CardTitle className="animate-fade-in text-lg font-semibold">
+                  Department & Member List
                 </CardTitle>
                 <CardDescription>
-                  Provide accurate information to create staff account.
+                  Select the department and add list details for all members.
                 </CardDescription>
               </CardHeader>
-              <CardContent className="flex flex-col gap-4">
-                {/* Department */}
+              <CardContent className="flex flex-col gap-5">
+                {/* Department Selection (Shared) */}
                 <div className="flex flex-col gap-1.5">
                   <Label htmlFor="staff-dept">
-                    Department <span className="text-destructive">*</span>
+                    Registration Department{' '}
+                    <span className="text-destructive">*</span>
                   </Label>
-                  <div className="relative">
-                    <Controller
-                      control={control}
-                      name="department_id"
-                      render={({ field }) => (
-                        <Select
-                          value={field.value ? String(field.value) : ''}
-                          onValueChange={field.onChange}
+                  <Controller
+                    control={control}
+                    name="department_id"
+                    render={({ field }) => (
+                      <Select
+                        value={field.value ? String(field.value) : ''}
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger
+                          id="staff-dept"
+                          aria-invalid={!!errors.department_id}
+                          className="bg-muted/30 border-border"
                         >
-                          <SelectTrigger
-                            id="staff-dept"
-                            aria-invalid={!!errors.department_id}
-                            className="bg-muted/30 border-border"
-                          >
-                            <SelectValue placeholder="Select department" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {departments.map((dept) => (
-                              <SelectItem
-                                key={dept.department_id}
-                                value={String(dept.department_id)}
-                              >
-                                {dept.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      )}
-                    />
-                  </div>
+                          <SelectValue placeholder="Select target department" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {departments.map((dept) => (
+                            <SelectItem
+                              key={dept.department_id}
+                              value={String(dept.department_id)}
+                            >
+                              {dept.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
                   {errors.department_id && (
                     <p className="text-destructive text-xs">
                       {errors.department_id.message}
@@ -530,66 +680,165 @@ const RegisterStaffPage = () => {
                   )}
                 </div>
 
-                {/* First + Last Name */}
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="flex flex-col gap-1.5">
-                    <Label htmlFor="staff-first-name">
-                      First Name <span className="text-destructive">*</span>
+                <Separator />
+
+                {/* Dynamic Member Rows List */}
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm font-bold">
+                      Staff Members List ({fields.length})
                     </Label>
-                    <div className="relative">
-                      <SCHOOL_ADMIN.PROFILE className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
-                      <Input
-                        id="staff-first-name"
-                        placeholder="Enter first name"
-                        className="bg-muted/30 border-border pl-9"
-                        aria-invalid={!!errors.first_name}
-                        {...register('first_name')}
-                      />
-                    </div>
-                    {errors.first_name && (
-                      <p className="text-destructive text-xs">
-                        {errors.first_name.message}
-                      </p>
-                    )}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="cursor-pointer gap-1"
+                      onClick={() =>
+                        append({
+                          first_name: '',
+                          last_name: '',
+                          email: '',
+                          phone: '',
+                          password: '',
+                          designation: '',
+                        })
+                      }
+                    >
+                      <COMMON.PLUS className="size-3.5" />
+                      Add Member
+                    </Button>
                   </div>
 
-                  <div className="flex flex-col gap-1.5">
-                    <Label htmlFor="staff-last-name">
-                      Last Name <span className="text-destructive">*</span>
-                    </Label>
-                    <div className="relative">
-                      <SCHOOL_ADMIN.PROFILE className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
-                      <Input
-                        id="staff-last-name"
-                        placeholder="Enter last name"
-                        className="bg-muted/30 border-border pl-9"
-                        aria-invalid={!!errors.last_name}
-                        {...register('last_name')}
-                      />
-                    </div>
-                    {errors.last_name && (
-                      <p className="text-destructive text-xs">
-                        {errors.last_name.message}
-                      </p>
-                    )}
-                  </div>
-                </div>
+                  <div className="max-h-120 space-y-4 overflow-y-auto pr-1">
+                    {fields.map((field, idx) => (
+                      <div
+                        key={field.id}
+                        className="bg-muted/10 border-border relative rounded-xl border p-4 shadow-2xs"
+                      >
+                        <div className="mb-3 flex items-center justify-between border-b pb-2">
+                          <span className="text-foreground text-xs font-bold">
+                            Member #{idx + 1}
+                          </span>
+                          {fields.length > 1 && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="text-destructive hover:bg-destructive/10 h-7 cursor-pointer gap-1 px-2 text-xs"
+                              onClick={() => remove(idx)}
+                            >
+                              <Trash2 className="size-3.5" />
+                              Remove
+                            </Button>
+                          )}
+                        </div>
 
-                {/* Designation / Role */}
-                <div className="flex flex-col gap-1.5">
-                  <Label htmlFor="staff-designation">Role / Designation</Label>
-                  <div className="relative">
-                    <SCHOOL_ADMIN.DEPARTMENT_LIST className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
-                    <Input
-                      id="staff-designation"
-                      placeholder="e.g. Teacher, Librarian, Lab Assistant"
-                      className="bg-muted/30 border-border pl-9"
-                      {...register('designation')}
-                    />
+                        <div className="grid gap-3 sm:grid-cols-2">
+                          {/* First Name */}
+                          <div className="flex flex-col gap-1">
+                            <Label
+                              htmlFor={`first-name-${idx}`}
+                              className="text-xs"
+                            >
+                              First Name{' '}
+                              <span className="text-destructive">*</span>
+                            </Label>
+                            <Input
+                              id={`first-name-${idx}`}
+                              placeholder="First name"
+                              className="bg-background h-8.5 text-xs"
+                              aria-invalid={!!errors.members?.[idx]?.first_name}
+                              {...register(`members.${idx}.first_name`)}
+                            />
+                            {errors.members?.[idx]?.first_name && (
+                              <p className="text-destructive text-[10px]">
+                                {errors.members[idx].first_name.message}
+                              </p>
+                            )}
+                          </div>
+
+                          {/* Last Name */}
+                          <div className="flex flex-col gap-1">
+                            <Label
+                              htmlFor={`last-name-${idx}`}
+                              className="text-xs"
+                            >
+                              Last Name{' '}
+                              <span className="text-destructive">*</span>
+                            </Label>
+                            <Input
+                              id={`last-name-${idx}`}
+                              placeholder="Last name"
+                              className="bg-background h-8.5 text-xs"
+                              aria-invalid={!!errors.members?.[idx]?.last_name}
+                              {...register(`members.${idx}.last_name`)}
+                            />
+                            {errors.members?.[idx]?.last_name && (
+                              <p className="text-destructive text-[10px]">
+                                {errors.members[idx].last_name.message}
+                              </p>
+                            )}
+                          </div>
+
+                          {/* Email */}
+                          <div className="flex flex-col gap-1">
+                            <Label htmlFor={`email-${idx}`} className="text-xs">
+                              Email Address{' '}
+                              <span className="text-destructive">*</span>
+                            </Label>
+                            <Input
+                              id={`email-${idx}`}
+                              type="email"
+                              placeholder="email@school.com"
+                              className="bg-background h-8.5 text-xs"
+                              aria-invalid={!!errors.members?.[idx]?.email}
+                              {...register(`members.${idx}.email`)}
+                            />
+                            {errors.members?.[idx]?.email && (
+                              <p className="text-destructive text-[10px]">
+                                {errors.members[idx].email.message}
+                              </p>
+                            )}
+                          </div>
+
+                          {/* Phone */}
+                          <div className="flex flex-col gap-1">
+                            <Label htmlFor={`phone-${idx}`} className="text-xs">
+                              Phone Number (10 digits)
+                            </Label>
+                            <Input
+                              id={`phone-${idx}`}
+                              placeholder="e.g. 9876543210"
+                              className="bg-background h-8.5 text-xs"
+                              aria-invalid={!!errors.members?.[idx]?.phone}
+                              {...register(`members.${idx}.phone`)}
+                            />
+                            {errors.members?.[idx]?.phone && (
+                              <p className="text-destructive text-[10px]">
+                                {errors.members[idx].phone.message}
+                              </p>
+                            )}
+                          </div>
+
+                          {/* Designation */}
+                          <div className="col-span-2 flex flex-col gap-1">
+                            <Label
+                              htmlFor={`designation-${idx}`}
+                              className="text-xs"
+                            >
+                              Designation / Role
+                            </Label>
+                            <Input
+                              id={`designation-${idx}`}
+                              placeholder="e.g. Science Teacher, Assistant Professor, Registrar"
+                              className="bg-background h-8.5 text-xs"
+                              {...register(`members.${idx}.designation`)}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <p className="text-muted-foreground text-[10px]">
-                    Optional: Add specific role or designation.
-                  </p>
                 </div>
               </CardContent>
             </Card>
@@ -607,10 +856,15 @@ const RegisterStaffPage = () => {
                   </div>
                   <div className="flex flex-col text-left">
                     <span className="text-foreground text-sm font-semibold">
-                      Personal Details
+                      Staff Members List
                     </span>
                     <span className="text-muted-foreground text-xs">
-                      Basic information
+                      {fields.length} member(s) listed under{' '}
+                      {departments.find(
+                        (d) =>
+                          String(d.department_id) ===
+                          String(getValues('department_id'))
+                      )?.name ?? 'selected department'}
                     </span>
                   </div>
                 </div>
@@ -618,78 +872,104 @@ const RegisterStaffPage = () => {
               </button>
             )}
 
-            {/* Step 2: Contact Information */}
+            {/* Step 2: Login Credentials / Passwords */}
             <Card
               className={`border-border border shadow-xs transition-all ${activeStep === 2 ? 'block' : 'hidden'}`}
             >
               <CardHeader className="pb-4">
-                <CardTitle className="text-lg font-semibold">
-                  Contact Information
-                </CardTitle>
-                <CardDescription>
-                  Provide communication details for the staff member.
-                </CardDescription>
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <CardTitle className="text-lg font-semibold">
+                      Configure Passwords
+                    </CardTitle>
+                    <CardDescription>
+                      Configure credentials or generate random passwords for
+                      all.
+                    </CardDescription>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    className="cursor-pointer gap-1.5 self-start sm:self-auto"
+                    onClick={handleGenerateAllPasswords}
+                  >
+                    <COMMON.LOCK className="size-3.5" />
+                    Generate for All
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent className="flex flex-col gap-4">
-                {/* Email */}
-                <div className="flex flex-col gap-1.5">
-                  <Label htmlFor="staff-email">
-                    Email Address <span className="text-destructive">*</span>
-                  </Label>
-                  <div className="relative">
-                    <COMMON.MAIL className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
-                    <Input
-                      id="staff-email"
-                      type="email"
-                      placeholder="name@example.com"
-                      className="bg-muted/30 border-border pl-9"
-                      aria-invalid={!!errors.email}
-                      {...register('email')}
-                    />
-                  </div>
-                  {errors.email && (
-                    <p className="text-destructive text-xs">
-                      {errors.email.message}
-                    </p>
-                  )}
-                  <p className="text-muted-foreground text-[10px]">
-                    This email will be used for login and notifications.
-                  </p>
-                </div>
+                <div className="max-h-120 space-y-4 overflow-y-auto pr-1">
+                  {fields.map((field, idx) => {
+                    const firstName =
+                      getValues(`members.${idx}.first_name`) || '';
+                    const lastName =
+                      getValues(`members.${idx}.last_name`) || '';
+                    const email = getValues(`members.${idx}.email`) || '';
 
-                {/* Phone */}
-                <div className="flex flex-col gap-1.5">
-                  <Label htmlFor="staff-phone">Phone Number</Label>
-                  <div className="flex gap-2">
-                    <Select defaultValue="+91">
-                      <SelectTrigger className="bg-muted/30 border-border w-24">
-                        <SelectValue placeholder="Code" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="+91">+91 (IN)</SelectItem>
-                        <SelectItem value="+1">+1 (US)</SelectItem>
-                        <SelectItem value="+44">+44 (UK)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <div className="relative flex-1">
-                      <COMMON.PHONE className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
-                      <Input
-                        id="staff-phone"
-                        placeholder="98765 43210"
-                        className="bg-muted/30 border-border pl-9"
-                        aria-invalid={!!errors.phone}
-                        {...register('phone')}
-                      />
-                    </div>
-                  </div>
-                  {errors.phone && (
-                    <p className="text-destructive text-xs">
-                      {errors.phone.message}
-                    </p>
-                  )}
-                  <p className="text-muted-foreground text-[10px]">
-                    Include country code.
-                  </p>
+                    return (
+                      <div
+                        key={field.id}
+                        className="bg-card border-border relative rounded-xl border p-4 text-sm shadow-xs"
+                      >
+                        <div className="text-foreground mb-2 font-semibold">
+                          Member #{idx + 1}: {firstName} {lastName}
+                          <span className="text-muted-foreground ml-2 font-mono text-xs font-normal">
+                            ({email})
+                          </span>
+                        </div>
+                        <div className="flex flex-col gap-1.5">
+                          <div className="flex items-center justify-between">
+                            <Label
+                              htmlFor={`password-${idx}`}
+                              className="text-xs"
+                            >
+                              Password{' '}
+                              <span className="text-destructive">*</span>
+                            </Label>
+                            <button
+                              type="button"
+                              className="text-primary cursor-pointer text-xs font-semibold hover:underline"
+                              onClick={() => handleGeneratePassword(idx)}
+                            >
+                              Generate Password
+                            </button>
+                          </div>
+                          <div className="relative">
+                            <COMMON.LOCK className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
+                            <Input
+                              id={`password-${idx}`}
+                              type={visiblePasswords[idx] ? 'text' : 'password'}
+                              placeholder="Enter or generate secure password (min. 8 chars)"
+                              className="bg-background h-9 pr-10 pl-9 text-xs"
+                              aria-invalid={!!errors.members?.[idx]?.password}
+                              {...register(`members.${idx}.password`)}
+                            />
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="absolute top-0 right-0 size-9 cursor-pointer"
+                              onClick={() => togglePasswordVisibility(idx)}
+                              aria-label="Toggle password visibility"
+                            >
+                              {visiblePasswords[idx] ? (
+                                <COMMON.EYE_OFF className="size-4" />
+                              ) : (
+                                <COMMON.EYE className="size-4" />
+                              )}
+                            </Button>
+                          </div>
+                          {errors.members?.[idx]?.password && (
+                            <p className="text-destructive text-[10px]">
+                              {errors.members[idx].password.message}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </CardContent>
             </Card>
@@ -709,15 +989,15 @@ const RegisterStaffPage = () => {
                     {activeStep > 2 ? (
                       <COMMON.CHECK className="size-4" />
                     ) : (
-                      <COMMON.MAIL className="size-4" />
+                      <COMMON.LOCK className="size-4" />
                     )}
                   </div>
                   <div className="flex flex-col text-left">
                     <span className="text-foreground text-sm font-semibold">
-                      Contact Information
+                      Login Credentials
                     </span>
                     <span className="text-muted-foreground text-xs">
-                      Additional contact details (optional)
+                      Configure passwords for the staff list
                     </span>
                   </div>
                 </div>
@@ -725,62 +1005,77 @@ const RegisterStaffPage = () => {
               </button>
             )}
 
-            {/* Step 3: Login Credentials */}
+            {/* Step 3: Review & Confirm */}
             <Card
               className={`border-border border shadow-xs transition-all ${activeStep === 3 ? 'block' : 'hidden'}`}
             >
               <CardHeader className="pb-4">
-                <CardTitle className="text-lg font-semibold">
-                  Login Credentials
+                <CardTitle className="animate-fade-in text-lg font-semibold">
+                  Review Batch Registration
                 </CardTitle>
                 <CardDescription>
-                  Set secure password for the staff account.
+                  Verify all batch entries before creating accounts.
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex flex-col gap-4">
-                {/* Password Input with Generate option */}
-                <div className="flex flex-col gap-1.5">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="staff-password">
-                      Password <span className="text-destructive">*</span>
-                    </Label>
-                    <button
-                      type="button"
-                      onClick={handleGeneratePassword}
-                      className="text-primary cursor-pointer text-xs font-semibold hover:underline"
-                    >
-                      Generate Password
-                    </button>
+                {activeStep === 3 && (
+                  <div className="flex flex-col gap-3">
+                    <div className="bg-muted/30 rounded-xl border p-4 text-sm">
+                      <span className="text-muted-foreground font-semibold">
+                        Target Department:
+                      </span>
+                      <span className="text-foreground ml-2 font-bold">
+                        {departments.find(
+                          (d) =>
+                            String(d.department_id) ===
+                            String(getValues('department_id'))
+                        )?.name ?? '—'}
+                      </span>
+                    </div>
+
+                    <div className="border-border overflow-hidden rounded-xl border shadow-2xs">
+                      <div className="overflow-x-auto">
+                        <table className="w-full border-collapse text-left text-xs">
+                          <thead>
+                            <tr className="bg-muted/40 border-border text-muted-foreground border-b font-bold tracking-wider uppercase">
+                              <th className="p-3">#</th>
+                              <th className="p-3">Name</th>
+                              <th className="p-3">Email</th>
+                              <th className="p-3">Phone</th>
+                              <th className="p-3">Designation</th>
+                              <th className="p-3">Password</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-border divide-y">
+                            {getValues('members').map((m, idx) => (
+                              <tr
+                                key={idx}
+                                className="hover:bg-muted/10 text-foreground font-medium"
+                              >
+                                <td className="text-muted-foreground p-3 font-semibold">
+                                  {idx + 1}
+                                </td>
+                                <td className="p-3 font-semibold">
+                                  {m.first_name} {m.last_name}
+                                </td>
+                                <td className="p-3 font-mono">{m.email}</td>
+                                <td className="p-3 font-mono">
+                                  {m.phone || '—'}
+                                </td>
+                                <td className="p-3">
+                                  {m.designation || 'Staff Member'}
+                                </td>
+                                <td className="bg-muted/20 p-3 font-mono font-bold">
+                                  {m.password}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
                   </div>
-                  <div className="relative">
-                    <COMMON.LOCK className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
-                    <Input
-                      id="staff-password"
-                      type={showPassword ? 'text' : 'password'}
-                      placeholder="Min. 8 characters"
-                      className="bg-muted/30 border-border pr-10 pl-9"
-                      aria-invalid={!!errors.password}
-                      {...register('password')}
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="absolute top-0 right-0 size-9 cursor-pointer"
-                      onClick={() => setShowPassword((p) => !p)}
-                      aria-label={
-                        showPassword ? 'Hide password' : 'Show password'
-                      }
-                    >
-                      {showPassword ? <COMMON.EYE_OFF /> : <COMMON.EYE />}
-                    </Button>
-                  </div>
-                  {errors.password && (
-                    <p className="text-destructive text-xs">
-                      {errors.password.message}
-                    </p>
-                  )}
-                </div>
+                )}
               </CardContent>
             </Card>
 
@@ -793,112 +1088,16 @@ const RegisterStaffPage = () => {
                 className="border-border bg-card hover:bg-muted/30 flex cursor-pointer items-center justify-between rounded-xl border p-4 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <div className="flex items-center gap-3">
-                  <div
-                    className={`flex size-8 items-center justify-center rounded-full ${activeStep > 3 ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}
-                  >
-                    {activeStep > 3 ? (
-                      <COMMON.CHECK className="size-4" />
-                    ) : (
-                      <COMMON.LOCK className="size-4" />
-                    )}
-                  </div>
-                  <div className="flex flex-col text-left">
-                    <span className="text-foreground text-sm font-semibold">
-                      Login Credentials
-                    </span>
-                    <span className="text-muted-foreground text-xs">
-                      Set password for the staff account
-                    </span>
-                  </div>
-                </div>
-                <COMMON.CHEVRON_DOWN className="text-muted-foreground size-4" />
-              </button>
-            )}
-
-            {/* Step 4: Review & Confirm */}
-            <Card
-              className={`border-border border shadow-xs transition-all ${activeStep === 4 ? 'block' : 'hidden'}`}
-            >
-              <CardHeader className="pb-4">
-                <CardTitle className="text-lg font-semibold">
-                  Review & Confirm
-                </CardTitle>
-                <CardDescription>
-                  Verify all details before registering the staff account.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="flex flex-col gap-4">
-                {activeStep === 4 && (
-                  <dl className="bg-muted/30 grid gap-4 rounded-xl border p-4 text-sm">
-                    <div className="grid grid-cols-3 gap-2">
-                      <dt className="text-muted-foreground">Full Name</dt>
-                      <dd className="text-foreground col-span-2 font-semibold">
-                        {getValues('first_name')} {getValues('last_name')}
-                      </dd>
-                    </div>
-                    <div className="grid grid-cols-3 gap-2">
-                      <dt className="text-muted-foreground">Department</dt>
-                      <dd className="text-foreground col-span-2 font-semibold">
-                        {departments.find(
-                          (d) =>
-                            String(d.department_id) ===
-                            String(getValues('department_id'))
-                        )?.name ?? '—'}
-                      </dd>
-                    </div>
-                    {getValues('designation') && (
-                      <div className="grid grid-cols-3 gap-2">
-                        <dt className="text-muted-foreground">
-                          Role/Designation
-                        </dt>
-                        <dd className="text-foreground col-span-2 font-semibold">
-                          {getValues('designation')}
-                        </dd>
-                      </div>
-                    )}
-                    <div className="grid grid-cols-3 gap-2">
-                      <dt className="text-muted-foreground">Email Address</dt>
-                      <dd className="text-foreground col-span-2 font-semibold break-all">
-                        {getValues('email')}
-                      </dd>
-                    </div>
-                    {getValues('phone') && (
-                      <div className="grid grid-cols-3 gap-2">
-                        <dt className="text-muted-foreground">Phone Number</dt>
-                        <dd className="text-foreground col-span-2 font-semibold">
-                          +91 {getValues('phone')}
-                        </dd>
-                      </div>
-                    )}
-                    <div className="grid grid-cols-3 gap-2">
-                      <dt className="text-muted-foreground">Password</dt>
-                      <dd className="text-foreground col-span-2 font-mono font-semibold">
-                        {getValues('password')}
-                      </dd>
-                    </div>
-                  </dl>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Collapsed Step 4 bar (when step !== 4) */}
-            {activeStep !== 4 && (
-              <button
-                type="button"
-                disabled={activeStep < 4}
-                onClick={() => handleStepClick(4)}
-                className="border-border bg-card hover:bg-muted/30 flex cursor-pointer items-center justify-between rounded-xl border p-4 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <div className="flex items-center gap-3">
                   <div className="bg-muted text-muted-foreground flex size-8 items-center justify-center rounded-full">
                     <COMMON.CHECK className="size-4" />
                   </div>
                   <div className="flex flex-col text-left">
                     <span className="text-foreground text-sm font-semibold">
-                      Review & Confirm
+                      Review & Submit
                     </span>
                     <span className="text-muted-foreground text-xs">
-                      Review all details before registration
+                      Review batch of {fields.length} member(s) before
+                      submitting
                     </span>
                   </div>
                 </div>
@@ -914,7 +1113,7 @@ const RegisterStaffPage = () => {
                 onClick={() => navigate('/school/staff')}
                 disabled={isSubmitting}
               >
-                <COMMON.X className="animate-in size-4" />
+                <COMMON.X className="size-4" />
                 Cancel
               </Button>
 
@@ -929,7 +1128,7 @@ const RegisterStaffPage = () => {
                     Back
                   </Button>
                 )}
-                {activeStep < 4 ? (
+                {activeStep < 3 ? (
                   <Button
                     type="button"
                     className="bg-primary text-primary-foreground hover:bg-primary/95 cursor-pointer gap-2"
@@ -946,7 +1145,7 @@ const RegisterStaffPage = () => {
                     disabled={isSubmitting}
                   >
                     {isSubmitting && <COMMON.LOADER className="animate-spin" />}
-                    {isSubmitting ? 'Registering…' : 'Review & Register'}
+                    {isSubmitting ? 'Registering Batch…' : 'Register Batch'}
                   </Button>
                 )}
               </div>

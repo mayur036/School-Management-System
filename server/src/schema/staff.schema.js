@@ -6,18 +6,32 @@ const idParam = z.coerce
   .int('id must be an integer')
   .positive('id must be positive');
 
+const memberSchema = z.object({
+  first_name: z.string().trim().min(1, 'First name is required').max(80),
+  last_name: z.string().trim().min(1, 'Last name is required').max(80),
+  email: z.string().trim().email('Invalid email address').max(150),
+  password: z.string().min(8, 'Password must be at least 8 characters').max(72),
+  phone: z.string().trim().max(20).optional(),
+});
+
 export const createStaffSchema = z.object({
-  body: z.object({
-    department_id: idParam,
-    first_name: z.string().trim().min(1, 'First name is required').max(80),
-    last_name: z.string().trim().min(1, 'Last name is required').max(80),
-    email: z.string().trim().email('Invalid email address').max(150),
-    password: z
-      .string()
-      .min(8, 'Password must be at least 8 characters')
-      .max(72),
-    phone: z.string().trim().max(20).optional(),
-  }),
+  body: z.union([
+    z.object({
+      department_id: idParam,
+      first_name: z.string().trim().min(1, 'First name is required').max(80),
+      last_name: z.string().trim().min(1, 'Last name is required').max(80),
+      email: z.string().trim().email('Invalid email address').max(150),
+      password: z
+        .string()
+        .min(8, 'Password must be at least 8 characters')
+        .max(72),
+      phone: z.string().trim().max(20).optional(),
+    }),
+    z.object({
+      department_id: idParam,
+      members: z.array(memberSchema).min(1, 'At least one member is required'),
+    }),
+  ]),
 });
 
 export const staffIdSchema = z.object({

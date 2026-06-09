@@ -5,15 +5,18 @@ export const ProgressRing = ({ percentage = 0 }) => {
   const normalizedRadius = radius - stroke;
   const circumference = normalizedRadius * 2 * Math.PI;
 
-  const validPercentage = isNaN(percentage) ? 0 : Math.max(0, Math.min(100, percentage));
-  const strokeDashoffset = circumference - (validPercentage / 100) * circumference;
+  const validPercentage = isNaN(percentage)
+    ? 0
+    : Math.max(0, Math.min(100, percentage));
+  const strokeDashoffset =
+    circumference - (validPercentage / 100) * circumference;
 
   const isCompleted = validPercentage === 100;
   const stopColor1 = isCompleted ? '#10b981' : 'hsl(var(--primary))'; // Emerald-500 or Primary Blue
   const stopColor2 = isCompleted ? '#059669' : '#2563eb'; // Emerald-600 or Blue-600 for gradient depth
 
   return (
-    <div className="relative flex items-center justify-center shrink-0">
+    <div className="relative flex shrink-0 items-center justify-center">
       <svg
         height={radius * 2}
         width={radius * 2}
@@ -21,7 +24,13 @@ export const ProgressRing = ({ percentage = 0 }) => {
         style={{ transform: 'rotate(-90deg)', transformOrigin: 'center' }}
       >
         <defs>
-          <linearGradient id="progressRingGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <linearGradient
+            id="progressRingGradient"
+            x1="0%"
+            y1="0%"
+            x2="100%"
+            y2="100%"
+          >
             <stop offset="0%" style={{ stopColor: stopColor1 }} />
             <stop offset="100%" style={{ stopColor: stopColor2 }} />
           </linearGradient>

@@ -128,7 +128,9 @@ const AppSidebar = ({ groups, profilePath = '/', fallbackInitials = 'U' }) => {
             </div>
             <div className="flex min-w-0 flex-col leading-tight">
               <span className="text-sidebar-foreground truncate text-xs font-bold capitalize">
-                {user?.role_name === 'super_admin' ? 'super admin' : user?.school_name}
+                {user?.role_name === 'super_admin'
+                  ? 'super admin'
+                  : user?.school_name}
               </span>
               <span className="text-muted-foreground mt-0.5 text-[10px] leading-normal">
                 {user?.role_name === 'super_admin'

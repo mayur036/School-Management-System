@@ -91,7 +91,7 @@ const updateMyAvatar = asyncHandler(async (req, res) => {
  * @access  Private (school_admin)
  */
 const createStaff = asyncHandler(async (req, res) => {
-  const { first_name, last_name, email, password, phone } = req.body;
+  const { first_name, last_name, email, password, phone, members } = req.body;
   const schoolId = req.user.school_id;
   // validate() coerces but doesn't write back, so normalize the id here.
   const departmentId = Number(req.body.department_id);
@@ -105,6 +105,60 @@ const createStaff = asyncHandler(async (req, res) => {
     throw new ApiError(400, 'Department does not belong to your school');
   }
 
+  // Batch registration
+  if (Array.isArray(members) && members.length > 0) {
+    // 1. Check for duplicate emails in the request array itself
+    const emails = members.map((m) => m.email.trim().toLowerCase());
+    const uniqueEmails = new Set(emails);
+    if (uniqueEmails.size !== emails.length) {
+      throw new ApiError(
+        400,
+        'Duplicate email addresses detected in the registration list'
+      );
+    }
+
+    // 2. Check for duplicate emails in the database
+    for (const member of members) {
+      const existing = await authModel.findUserByEmail(member.email.trim());
+      if (existing) {
+        throw new ApiError(
+          400,
+          `Email "${member.email}" is already registered`
+        );
+      }
+    }
+
+    // 3. Create all staff members
+    const createdStaffMembers = [];
+    for (const member of members) {
+      const { first_name, last_name, email, password, phone } = member;
+      const passwordHash = await hashPassword(password);
+      const staff = await staffModel.createStaff({
+        schoolId,
+        departmentId,
+        firstName: first_name,
+        lastName: last_name,
+        email: email.trim(),
+        passwordHash,
+        phone: phone ?? null,
+        createdBy: req.user.staff_id,
+      });
+      createdStaffMembers.push(staff);
+    }
+
+    return created(
+      res,
+      { staff: createdStaffMembers },
+      'Staff members registered successfully'
+    );
+  }
+
+  // Single registration (backward compatibility)
+  const existing = await authModel.findUserByEmail(email);
+  if (existing) {
+    throw new ApiError(400, `Email "${email}" is already registered`);
+  }
+
   const passwordHash = await hashPassword(password);
 
   const staff = await staffModel.createStaff({
@@ -112,7 +166,7 @@ const createStaff = asyncHandler(async (req, res) => {
     departmentId,
     firstName: first_name,
     lastName: last_name,
-    email,
+    email: email.trim(),
     passwordHash,
     phone: phone ?? null,
     createdBy: req.user.staff_id,
