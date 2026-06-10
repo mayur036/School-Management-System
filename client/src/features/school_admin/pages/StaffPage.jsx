@@ -27,6 +27,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
+import { useDataTable } from '@/hooks/useDataTable';
 import { COMMON, SCHOOL_ADMIN } from '@/lib/icons';
 import {
   formatDate,
@@ -56,25 +57,8 @@ const StaffPage = () => {
     [deptData]
   );
 
-  // Controls State
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
   const [deptFilter, setDeptFilter] = useState('all');
   const [viewMode, setViewMode] = useState('list'); // 'list' or 'grid'
-
-  // Pagination State
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-
-  // Reset page when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, statusFilter, deptFilter]);
-
-  const handleItemsPerPageChange = (size) => {
-    setItemsPerPage(size);
-    setCurrentPage(1);
-  };
 
   // Active item states for dialogs & drawer details
   const [toggleMember, setToggleMember] = useState(null);
@@ -86,36 +70,43 @@ const StaffPage = () => {
     [staff, departments]
   );
 
-  // 2. Client-side Search and Filter logic
-  const filteredStaff = useMemo(() => {
-    return staff.filter((member) => {
+  // Use the custom useDataTable hook
+  const {
+    searchQuery,
+    setSearchQuery,
+    statusFilter,
+    setStatusFilter,
+    currentPage,
+    setCurrentPage,
+    itemsPerPage,
+    handleItemsPerPageChange,
+    filteredData: filteredStaff,
+    paginatedData: paginatedStaff,
+  } = useDataTable({
+    data: staff,
+    searchFilter: (member, q) => {
+      const matchesDept =
+        deptFilter === 'all' || String(member.department_id) === deptFilter;
+      if (!matchesDept) return false;
+
       const fullName = `${member.first_name} ${member.last_name}`.toLowerCase();
       const idStr = formatStaffId(member.staff_id);
       const emailStr = (member.email ?? '').toLowerCase();
       const deptStr = (member.department_name ?? '').toLowerCase();
-      const q = searchQuery.toLowerCase();
 
-      const matchesSearch =
+      return (
         fullName.includes(q) ||
         idStr.includes(q) ||
         emailStr.includes(q) ||
-        deptStr.includes(q);
+        deptStr.includes(q)
+      );
+    },
+  });
 
-      const matchesStatus =
-        statusFilter === 'all' || member.status === statusFilter;
-
-      const matchesDept =
-        deptFilter === 'all' || String(member.department_id) === deptFilter;
-
-      return matchesSearch && matchesStatus && matchesDept;
-    });
-  }, [staff, searchQuery, statusFilter, deptFilter]);
-
-  // Paginated subset of filtered staff
-  const paginatedStaff = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    return filteredStaff.slice(startIndex, startIndex + itemsPerPage);
-  }, [filteredStaff, currentPage, itemsPerPage]);
+  // Reset page when deptFilter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [deptFilter, setCurrentPage]);
 
   const handleExport = () => {
     if (!filteredStaff.length) {

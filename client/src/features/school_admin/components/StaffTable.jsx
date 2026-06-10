@@ -1,3 +1,4 @@
+import EmptyTableState from '@/components/shared/EmptyTableState';
 import StatusBadge from '@/components/shared/StatusBadge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -172,23 +173,7 @@ const StaffCard = ({ member, onViewDetails, onToggleStatus }) => {
   );
 };
 
-const EmptyState = () => (
-  <div className="flex min-h-[40vh] flex-col items-center justify-center gap-4 text-center">
-    <div
-      aria-hidden
-      className="bg-primary/10 text-primary flex size-12 items-center justify-center rounded-xl"
-    >
-      <SCHOOL_ADMIN.STAFF_LIST className="size-6" />
-    </div>
-    <div className="flex flex-col gap-1">
-      <p className="text-foreground font-medium">No staff members found</p>
-      <p className="text-muted-foreground text-sm">
-        Try adjusting your filters, search terms, or register a new staff
-        member.
-      </p>
-    </div>
-  </div>
-);
+
 
 // ── Main Component ─────────────────────────────────────────────
 
@@ -227,7 +212,13 @@ const StaffTable = ({
   }
 
   if (!staff?.length) {
-    return <EmptyState />;
+    return (
+      <EmptyTableState
+        icon={SCHOOL_ADMIN.STAFF_LIST}
+        title="No staff members found"
+        description="Try adjusting your filters, search terms, or register a new staff member."
+      />
+    );
   }
 
   // Grid / Card view rendering

@@ -1,3 +1,4 @@
+import EmptyTableState from '@/components/shared/EmptyTableState';
 import StatusBadge from '@/components/shared/StatusBadge';
 import { Button } from '@/components/ui/button';
 import {
@@ -65,24 +66,7 @@ const SkeletonRows = ({ count = 5 }) =>
     </TableRow>
   ));
 
-// ── Empty state ───────────────────────────────────────────────
 
-const EmptyState = () => (
-  <div className="flex min-h-[40vh] flex-col items-center justify-center gap-4 text-center">
-    <div
-      aria-hidden
-      className="bg-primary/10 text-primary flex size-12 items-center justify-center rounded-xl"
-    >
-      <SUPER_ADMIN.SCHOOLS className="size-6" />
-    </div>
-    <div className="flex flex-col gap-1">
-      <p className="text-foreground font-medium">No schools yet</p>
-      <p className="text-muted-foreground text-sm">
-        Get started by registering your first school using the button above.
-      </p>
-    </div>
-  </div>
-);
 
 // ── Main table ────────────────────────────────────────────────
 
@@ -118,7 +102,13 @@ const SchoolsTable = ({
   }
 
   if (!schools?.length) {
-    return <EmptyState />;
+    return (
+      <EmptyTableState
+        icon={SUPER_ADMIN.SCHOOLS}
+        title="No schools yet"
+        description="Get started by registering your first school using the button above."
+      />
+    );
   }
 
   return (

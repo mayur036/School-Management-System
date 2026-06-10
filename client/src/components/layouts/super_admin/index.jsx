@@ -24,6 +24,7 @@ const config = {
       label: 'Management',
       items: [
         { to: '/super/schools', label: 'Schools', Icon: SUPER_ADMIN.SCHOOLS },
+        { to: '/super/admins', label: 'Admins', Icon: SUPER_ADMIN.USERS },
       ],
     },
     {

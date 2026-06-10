@@ -34,6 +34,9 @@ const SuperAdminDashboard = lazy(
 const SchoolsPage = lazy(
   () => import('./features/super_admin/pages/SchoolsPage')
 );
+const AdminsPage = lazy(
+  () => import('./features/super_admin/pages/AdminsPage')
+);
 
 // School Admin
 const SchoolAdminDashboard = lazy(
@@ -76,6 +79,7 @@ const router = createBrowserRouter([
               { index: true, element: <Navigate to="dashboard" replace /> },
               { path: 'dashboard', element: <SuperAdminDashboard /> },
               { path: 'schools', element: <SchoolsPage /> },
+              { path: 'admins', element: <AdminsPage /> },
               { path: 'profile', element: <ProfileView /> },
             ],
           },

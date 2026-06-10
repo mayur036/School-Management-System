@@ -9,28 +9,23 @@ export const createSchoolSchema = z.object({
   code: z
     .string()
     .trim()
-    .max(30, 'Code must be 30 characters or fewer')
-    .optional()
-    .or(z.literal('')),
+    .min(1, 'Code is required')
+    .max(30, 'Code must be 30 characters or fewer'),
   email: z
     .string()
     .trim()
+    .min(1, 'Email is required')
     .email('Please enter a valid email')
-    .max(150)
-    .optional()
-    .or(z.literal('')),
+    .max(150),
   phone: z
     .string()
     .trim()
-    .max(20, 'Phone must be 20 characters or fewer')
-    .optional()
-    .or(z.literal('')),
+    .regex(/^\d{10}$/, 'Phone number must be exactly 10 digits'),
   address: z
     .string()
     .trim()
-    .max(255, 'Address must be 255 characters or fewer')
-    .optional()
-    .or(z.literal('')),
+    .min(1, 'Address is required')
+    .max(255, 'Address must be 255 characters or fewer'),
 });
 
 export const createSchoolAdminSchema = z.object({
@@ -56,7 +51,5 @@ export const createSchoolAdminSchema = z.object({
   phone: z
     .string()
     .trim()
-    .max(20, 'Phone must be 20 characters or fewer')
-    .optional()
-    .or(z.literal('')),
+    .regex(/^\d{10}$/, 'Phone number must be exactly 10 digits'),
 });

@@ -15,27 +15,24 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { useDataTable } from '@/hooks/useDataTable';
-import { COMMON, SCHOOL_ADMIN } from '@/lib/icons';
+import { COMMON, SUPER_ADMIN } from '@/lib/icons';
 
-import CreateSchoolAdminDialog from '../components/CreateSchoolAdminDialog';
-import CreateSchoolDialog from '../components/CreateSchoolDialog';
-import SchoolsTable from '../components/SchoolsTable';
-import SchoolStatusToggle from '../components/SchoolStatusToggle';
-import { useGetSchoolsQuery } from '../schools.api';
-import { computeSchoolStats, exportSchoolsToCsv } from '../utils/schools.utils';
+import AdminsTable from '../components/AdminsTable';
+import AdminStatusToggle from '../components/AdminStatusToggle';
+import DeleteAdminAlert from '../components/DeleteAdminAlert';
+import { useGetSchoolAdminsQuery } from '../schoolAdmins.api';
+import { computeAdminStats, exportAdminsToCsv } from '../utils/admins.utils';
 
-const SchoolsPage = () => {
-  // Queries
-  const { data, isLoading, error } = useGetSchoolsQuery();
-  const schools = useMemo(() => data?.data?.schools ?? [], [data]);
+const AdminsPage = () => {
+  const { data, isLoading, error } = useGetSchoolAdminsQuery();
+  const admins = useMemo(() => data?.data?.admins ?? [], [data]);
 
   // Dialog states
-  const [statusSchool, setStatusSchool] = useState(null);
-  const [adminSchool, setAdminSchool] = useState(null);
-  const [createOpen, setCreateOpen] = useState(false);
+  const [statusAdmin, setStatusAdmin] = useState(null);
+  const [deleteAdmin, setDeleteAdmin] = useState(null);
 
   // Real-time headline stats
-  const stats = useMemo(() => computeSchoolStats(schools), [schools]);
+  const stats = useMemo(() => computeAdminStats(admins), [admins]);
 
   // Use the custom useDataTable hook
   const {
@@ -47,33 +44,31 @@ const SchoolsPage = () => {
     setCurrentPage,
     itemsPerPage,
     handleItemsPerPageChange,
-    filteredData: filteredSchools,
-    paginatedData: paginatedSchools,
+    filteredData: filteredAdmins,
+    paginatedData: paginatedAdmins,
   } = useDataTable({
-    data: schools,
-    searchFilter: (school, q) => {
-      const nameStr = (school.name ?? '').toLowerCase();
-      const domainStr = (school.domain ?? '').toLowerCase();
-      const idStr = String(school.school_id).toLowerCase();
-      return nameStr.includes(q) || domainStr.includes(q) || idStr.includes(q);
+    data: admins,
+    searchFilter: (admin, q) => {
+      const nameStr = `${admin.first_name} ${admin.last_name}`.toLowerCase();
+      const emailStr = (admin.email ?? '').toLowerCase();
+      const schoolStr = (admin.school_name ?? '').toLowerCase();
+      return (
+        nameStr.includes(q) || emailStr.includes(q) || schoolStr.includes(q)
+      );
     },
   });
 
   const handleExport = () => {
-    if (!filteredSchools.length) {
-      toast.error('No schools found to export');
+    if (!filteredAdmins.length) {
+      toast.error('No admins found to export');
       return;
     }
     try {
-      exportSchoolsToCsv(filteredSchools);
-      toast.success('Schools exported successfully');
+      exportAdminsToCsv(filteredAdmins);
+      toast.success('Admins exported successfully');
     } catch {
-      toast.error('Failed to export schools');
+      toast.error('Failed to export admins');
     }
-  };
-
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
   };
 
   return (
@@ -82,42 +77,35 @@ const SchoolsPage = () => {
       <AppBreadcrumb
         items={[
           { label: 'Super Admin', to: '/super/dashboard' },
-          { label: 'Schools Management' },
+          { label: 'School Admins' },
         ]}
       />
 
-      {/* Page Title & Action */}
+      {/* Page Title */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-foreground text-3xl font-bold tracking-tight">
-            Schools Management
+            School Admins
           </h1>
           <p className="text-muted-foreground mt-1 text-sm">
-            View, manage, and register new schools on the platform.
+            Manage administrators across all registered schools.
           </p>
         </div>
-        <Button
-          onClick={() => setCreateOpen(true)}
-          className="bg-primary text-primary-foreground hover:bg-primary/95 cursor-pointer gap-2 shadow-sm transition-all"
-        >
-          <COMMON.PLUS data-icon="inline-start" />
-          Register School
-        </Button>
       </div>
 
       {/* ── Stats Summary Grid ────────────────────────────────── */}
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <StatCard
-          Icon={COMMON.BUILDING}
-          label="Total Schools"
+          Icon={SUPER_ADMIN.USERS}
+          label="Total Admins"
           value={stats.total}
-          subtext="All registered schools"
+          subtext="Across all schools"
           accentClassName="border-l-blue-500"
           iconChipClassName="bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400"
         />
         <StatCard
           Icon={COMMON.CHECK}
-          label="Active Schools"
+          label="Active Admins"
           value={stats.active}
           subtext={`${stats.activePct}% of total`}
           subtextClassName="font-semibold text-emerald-600 dark:text-emerald-400"
@@ -126,17 +114,17 @@ const SchoolsPage = () => {
         />
         <StatCard
           Icon={COMMON.X}
-          label="Inactive Schools"
+          label="Inactive Admins"
           value={stats.inactive}
           subtext="Currently suspended"
           accentClassName="border-l-amber-500"
           iconChipClassName="bg-amber-500/10 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400"
         />
         <StatCard
-          Icon={SCHOOL_ADMIN.REGISTER_STAFF}
+          Icon={SUPER_ADMIN.CREATE_ADMIN}
           label="New This Month"
           value={stats.joinedThisMonth}
-          subtext="Recently onboarded"
+          subtext="Recently registered"
           accentClassName="border-l-purple-500"
           iconChipClassName="bg-purple-500/10 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400"
         />
@@ -149,9 +137,9 @@ const SchoolsPage = () => {
           <COMMON.SEARCH className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
           <Input
             className="bg-muted/40 border-border pl-9"
-            placeholder="Search schools by name or domain..."
+            placeholder="Search by name, email, or school..."
             value={searchQuery}
-            onChange={handleSearchChange}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
 
@@ -207,46 +195,42 @@ const SchoolsPage = () => {
       {/* Error state */}
       {error && (
         <div className="bg-destructive/10 text-destructive rounded-lg p-4 text-sm">
-          {error.message || 'Failed to load schools. Please try again.'}
+          {error.message || 'Failed to load school admins. Please try again.'}
         </div>
       )}
 
       {/* ── Main Data View (Table) ────────────────────── */}
       <div className="flex flex-col gap-4">
-        <SchoolsTable
-          schools={paginatedSchools}
+        <AdminsTable
+          admins={paginatedAdmins}
           isLoading={isLoading}
-          onToggleStatus={setStatusSchool}
-          onAddAdmin={setAdminSchool}
+          onToggleStatus={setStatusAdmin}
+          onDeleteAdmin={setDeleteAdmin}
         />
 
         {!isLoading && (
           <AppPagination
             currentPage={currentPage}
-            totalItems={filteredSchools.length}
+            totalItems={filteredAdmins.length}
             itemsPerPage={itemsPerPage}
             onPageChange={setCurrentPage}
             onItemsPerPageChange={handleItemsPerPageChange}
-            itemsLabel="schools"
+            itemsLabel="admins"
           />
         )}
       </div>
 
       {/* Dialogs */}
-      <CreateSchoolDialog
-        externalOpen={createOpen}
-        onExternalOpenChange={setCreateOpen}
+      <AdminStatusToggle
+        admin={statusAdmin}
+        onClose={() => setStatusAdmin(null)}
       />
-      <SchoolStatusToggle
-        school={statusSchool}
-        onClose={() => setStatusSchool(null)}
-      />
-      <CreateSchoolAdminDialog
-        school={adminSchool}
-        onClose={() => setAdminSchool(null)}
+      <DeleteAdminAlert
+        admin={deleteAdmin}
+        onClose={() => setDeleteAdmin(null)}
       />
     </div>
   );
 };
 
-export default SchoolsPage;
+export default AdminsPage;

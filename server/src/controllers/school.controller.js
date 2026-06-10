@@ -11,6 +11,11 @@ import { hashPassword } from '../utils/password.js';
 const createSchool = asyncHandler(async (req, res) => {
   const { name, code, email, phone, address } = req.body;
 
+  const existing = await schoolModel.getSchoolByEmail(email);
+  if (existing) {
+    throw new ApiError(400, 'A school with this email already exists');
+  }
+
   const school = await schoolModel.createSchool({
     name,
     code: code ?? null,

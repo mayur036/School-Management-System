@@ -72,6 +72,13 @@ BEGIN
   SELECT * FROM schools WHERE school_id = p_school_id;
 END $$
 
+-- sp_get_school_by_email : single school by email
+DROP PROCEDURE IF EXISTS sp_get_school_by_email $$
+CREATE PROCEDURE sp_get_school_by_email(IN p_email VARCHAR(150))
+BEGIN
+  SELECT * FROM schools WHERE email = p_email LIMIT 1;
+END $$
+
 -- sp_update_school_status : activate / deactivate
 DROP PROCEDURE IF EXISTS sp_update_school_status $$
 CREATE PROCEDURE sp_update_school_status(
@@ -117,6 +124,33 @@ BEGIN
   JOIN roles r ON r.role_id = s.role_id
   LEFT JOIN schools sch ON sch.school_id = s.school_id
   WHERE s.staff_id = LAST_INSERT_ID();
+END $$
+
+-- sp_list_all_school_admins : list all admins globally with their school info
+DROP PROCEDURE IF EXISTS sp_list_all_school_admins $$
+CREATE PROCEDURE sp_list_all_school_admins()
+BEGIN
+  SELECT
+    s.staff_id, s.role_id, r.role_name, s.school_id, sch.name AS school_name, s.department_id,
+    s.first_name, s.last_name, s.email, s.phone, s.avatar_url,
+    s.status, s.created_at
+  FROM staff s
+  JOIN roles r ON r.role_id = s.role_id
+  LEFT JOIN schools sch ON sch.school_id = s.school_id
+  WHERE r.role_name = 'school_admin'
+  ORDER BY s.created_at DESC;
+END $$
+
+-- sp_delete_school_admin : permanently delete a school admin
+DROP PROCEDURE IF EXISTS sp_delete_school_admin $$
+CREATE PROCEDURE sp_delete_school_admin(
+  IN p_staff_id INT
+)
+BEGIN
+  DELETE s
+  FROM staff s
+  JOIN roles r ON r.role_id = s.role_id
+  WHERE s.staff_id = p_staff_id AND r.role_name = 'school_admin';
 END $$
 
 -- ============================================================

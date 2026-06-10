@@ -1,6 +1,8 @@
 import { callProcedure, callProcedureOne } from '../utils/callProcedure.js';
 
 const schoolModel = {
+  getSchoolByEmail: (email) => callProcedureOne('sp_get_school_by_email', [email]),
+
   createSchool: ({ name, code, email, phone, address, createdBy }) =>
     callProcedureOne('sp_create_school', [
       name,

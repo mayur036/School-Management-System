@@ -30,6 +30,6 @@ const axiosBaseQuery =
 export const baseApi = createApi({
   reducerPath: 'baseApi',
   baseQuery: axiosBaseQuery(),
-  tagTypes: ['User', 'School', 'Department', 'Staff'],
+  tagTypes: ['User', 'School', 'Department', 'Staff', 'SchoolAdmin'],
   endpoints: () => ({}),
 });

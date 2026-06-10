@@ -148,6 +148,9 @@ staff (1) ────< (N) schools        created_by
 | `sp_get_school(id)`                                             | School detail                         | super admin  |
 | `sp_update_school_status(id, status)`                           | Activate/deactivate                   | super admin  |
 | `sp_create_school_admin(school_id, name, email, hash, ...)`     | Create school_admin in `staff`        | super admin  |
+| `sp_list_all_school_admins()`                                   | List all admins globally              | super admin  |
+| `sp_delete_school_admin(staff_id)`                              | Permanently delete admin              | super admin  |
+| `sp_get_school_by_email(email)`                                 | Check for duplicate school emails     | super admin  |
 | `sp_create_department(school_id, name)`                         | Add department                        | school admin |
 | `sp_list_departments(school_id)`                                | Departments of a school               | school admin |
 | `sp_create_staff(school_id, dept_id, role_id, ..., created_by)` | Register staff                        | school admin |
@@ -308,7 +311,9 @@ own `feature.api.js`. Cache coherence is driven by `tagTypes` + `providesTags` /
 
 - [x] Extend schools api (or `schoolAdmins.api.js`): `createSchoolAdmin` → `POST /api/schools/:id/admins`
 - [x] "Add admin" form from a school's detail/row; surface the created credentials
-- **Done when:** super admin creates a school admin for a school via the UI
+- [x] Create `schoolAdminManager` routes and controllers (`GET`, `PATCH`, `DELETE` `/api/school-admins`)
+- [x] Build `AdminsPage` with search, filtering, `AdminStatusToggle`, and `DeleteAdminAlert`
+- **Done when:** super admin creates, lists, updates, and deletes a school admin via the UI
 
 #### Phase 7.4 — School Admin: Departments ✅
 
@@ -334,16 +339,19 @@ own `feature.api.js`. Cache coherence is driven by `tagTypes` + `providesTags` /
 
 #### Phase 7.7 — Cross-cutting polish
 
-- [ ] Centralized RTK Query error → toast handling; consistent loading skeletons / empty states
+- [x] Centralized RTK Query error → toast handling; consistent loading skeletons / empty states (implemented in SchoolsTable, StaffTable, and ErrorPage redesign)
 - [ ] Verify tag invalidation matrix end-to-end (mutations refresh the right lists)
 - [x] Accessibility / responsive pass on the new pages (stats cards made mobile-friendly with shadcn components)
+- [x] UI Refactoring (ProfileView extracted to ProfileTabContent, standardized StatCard usage across School Admin and Super Admin dashboards)
 
 - **Done when (Phase 7 overall):** full flow works in the browser end-to-end — super admin creates a school + admin; that admin logs in, adds a department, registers staff; staff logs in and views/edits their profile
 
 ### Phase 8 — Polish (optional)
 
 - [ ] Email credentials to new admins/staff (templates/)
-- [ ] Pagination/search on lists
+- [x] Pagination/search on lists (implemented client-side filtering, searching, pagination, and CSV export on StaffPage, SchoolsPage, and AdminsPage)
+- [x] Code optimization (extracted `useDataTable` custom hook and `EmptyTableState` shared component)
+- [x] Strict Validation (enforced required fields and unique emails across all schemas and API routes)
 - [ ] Dashboard charts (recharts)
 - [ ] Audit fields / soft delete
 - [ ] API docs (docs/)
