@@ -24,6 +24,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { COMMON } from '@/lib/icons';
+import { copyToClipboard } from '@/lib/utils';
 import { createSchoolAdminSchema } from '@/schemas/school.schema';
 
 import { useCreateSchoolAdminMutation } from '../schools.api';
@@ -88,7 +89,7 @@ const CreateSchoolAdminDialog = ({ school, onClose }) => {
     if (!credentials) return;
     const text = `Email: ${credentials.email}\nPassword: ${credentials.password}`;
     try {
-      await navigator.clipboard.writeText(text);
+      await copyToClipboard(text);
       setCopied(true);
       toast.success('Credentials copied to clipboard');
       setTimeout(() => setCopied(false), 2000);

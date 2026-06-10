@@ -26,6 +26,7 @@ import {
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { COMMON } from '@/lib/icons';
+import { copyToClipboard } from '@/lib/utils';
 import { batchRegisterStaffSchema } from '@/schemas/staff.schema';
 
 import { useGetDepartmentsQuery } from '../departments.api';
@@ -248,7 +249,7 @@ const RegisterStaffPage = () => {
       )
       .join('\n---\n\n');
     try {
-      await navigator.clipboard.writeText(text);
+      await copyToClipboard(text);
       setCopied(true);
       toast.success('All credentials copied to clipboard');
       setTimeout(() => setCopied(false), 2000);
@@ -260,7 +261,7 @@ const RegisterStaffPage = () => {
   const handleCopySingle = async (member, idx) => {
     const text = `Name: ${member.name}\nDepartment: ${member.department}\nEmail: ${member.email}\nPassword: ${member.password}`;
     try {
-      await navigator.clipboard.writeText(text);
+      await copyToClipboard(text);
       toast.success(`Copied credentials for Member #${idx + 1}`);
     } catch {
       toast.error('Failed to copy');

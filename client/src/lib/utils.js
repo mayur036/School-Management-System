@@ -98,3 +98,41 @@ export const formatDate = (dateString, format = 'short', code = 'en-GB') => {
       return new Date(dateString).toLocaleDateString(code);
   }
 };
+
+/**
+ * Robustly copies text to the clipboard, falling back to a textarea
+ * approach if the Clipboard API is unavailable (e.g. non-secure local IP contexts).
+ */
+export const copyToClipboard = async (text) => {
+  if (navigator.clipboard && window.isSecureContext) {
+    return navigator.clipboard.writeText(text);
+  }
+
+  // Fallback for non-secure contexts
+  return new Promise((resolve, reject) => {
+    try {
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+
+      // Avoid scrolling to bottom
+      textArea.style.top = '0';
+      textArea.style.left = '0';
+      textArea.style.position = 'fixed';
+
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+
+      const successful = document.execCommand('copy');
+      document.body.removeChild(textArea);
+
+      if (successful) {
+        resolve();
+      } else {
+        reject(new Error('Fallback copy failed'));
+      }
+    } catch (err) {
+      reject(err);
+    }
+  });
+};
