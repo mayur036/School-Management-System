@@ -1,7 +1,10 @@
+import { env } from '../config/env.js';
+import { sendEmail } from '../config/mailer.js';
 import { ApiError } from '../middleware/error.js';
 import authModel from '../models/auth.model.js';
 import departmentModel from '../models/department.model.js';
 import staffModel from '../models/staff.model.js';
+import { welcomeEmailTemplate } from '../templates/welcomeEmailTemplate.js';
 import { asyncHandler, created, ok } from '../utils/apiResponse.js';
 import { destroyImage, uploadAvatar } from '../utils/cloudinary.js';
 import { comparePassword, hashPassword } from '../utils/password.js';
@@ -130,6 +133,8 @@ const createStaff = asyncHandler(async (req, res) => {
 
     // 3. Create all staff members
     const createdStaffMembers = [];
+    const emailPromises = [];
+
     for (const member of members) {
       const { first_name, last_name, email, password, phone } = member;
       const passwordHash = await hashPassword(password);
@@ -144,7 +149,27 @@ const createStaff = asyncHandler(async (req, res) => {
         createdBy: req.user.staff_id,
       });
       createdStaffMembers.push(staff);
+
+      // Prepare email dispatch
+      emailPromises.push(
+        sendEmail({
+          to: email.trim(),
+          subject: 'Welcome to CampusCore - Your Staff Credentials',
+          html: welcomeEmailTemplate({
+            name: `${first_name} ${last_name}`,
+            email: email.trim(),
+            password, // Raw password
+            roleName: 'Staff Member',
+            loginUrl: `${env.client.url}/login`,
+          }),
+        }).catch((err) =>
+          console.error(`Failed to send welcome email to ${email}:`, err)
+        )
+      );
     }
+
+    // Fire-and-forget emails
+    Promise.allSettled(emailPromises);
 
     return created(
       res,
@@ -171,6 +196,19 @@ const createStaff = asyncHandler(async (req, res) => {
     phone: phone ?? null,
     createdBy: req.user.staff_id,
   });
+
+  // Async email dispatch (fire-and-forget)
+  sendEmail({
+    to: email.trim(),
+    subject: 'Welcome to CampusCore - Your Staff Credentials',
+    html: welcomeEmailTemplate({
+      name: `${first_name} ${last_name}`,
+      email: email.trim(),
+      password, // Raw password
+      roleName: 'Staff Member',
+      loginUrl: `${env.client.url}/login`,
+    }),
+  }).catch((err) => console.error('Failed to send welcome email:', err));
 
   return created(res, { staff }, 'Staff registered successfully');
 });

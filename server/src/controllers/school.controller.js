@@ -1,5 +1,8 @@
+import { env } from '../config/env.js';
+import { sendEmail } from '../config/mailer.js';
 import { ApiError } from '../middleware/error.js';
 import schoolModel from '../models/school.model.js';
+import { welcomeEmailTemplate } from '../templates/welcomeEmailTemplate.js';
 import { asyncHandler, created, ok } from '../utils/apiResponse.js';
 import { hashPassword } from '../utils/password.js';
 
@@ -96,6 +99,19 @@ const createSchoolAdmin = asyncHandler(async (req, res) => {
     phone: phone ?? null,
     createdBy: req.user.staff_id,
   });
+
+  // Async email dispatch (fire-and-forget)
+  sendEmail({
+    to: email,
+    subject: 'Welcome to CampusCore - Your Admin Credentials',
+    html: welcomeEmailTemplate({
+      name: `${first_name} ${last_name}`,
+      email,
+      password, // Raw password
+      roleName: 'School Admin',
+      loginUrl: `${env.client.url}/login`,
+    }),
+  }).catch((err) => console.error('Failed to send welcome email:', err));
 
   return created(res, { admin }, 'School admin created successfully');
 });
