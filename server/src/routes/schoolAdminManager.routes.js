@@ -18,8 +18,7 @@ const router = Router();
 // Protect all routes and allow only super_admin
 router.use(protect, authorize('super_admin'));
 
-router.route('/')
-  .get(listAllSchoolAdmins);
+router.route('/').get(listAllSchoolAdmins);
 
 router.patch(
   '/:id/status',
@@ -27,10 +26,6 @@ router.patch(
   updateSchoolAdminStatus
 );
 
-router.delete(
-  '/:id',
-  validate(staffIdSchema),
-  deleteSchoolAdmin
-);
+router.delete('/:id', validate(staffIdSchema), deleteSchoolAdmin);
 
 export default router;

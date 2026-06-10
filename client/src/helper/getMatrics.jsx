@@ -12,7 +12,7 @@ export const getMetrics = (user, data = {}) => {
     const activeStaffCount = data.activeStaffCount ?? 0;
     const activePct =
       staffCount > 0 ? Math.round((activeStaffCount / staffCount) * 100) : 0;
-      
+
     return [
       {
         label: 'Departments',

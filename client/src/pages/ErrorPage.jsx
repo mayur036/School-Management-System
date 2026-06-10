@@ -18,7 +18,8 @@ import { roleHome } from '@/lib/roles';
 const ERROR_MAP = {
   400: {
     title: 'Bad Request',
-    message: 'The request could not be understood by the server. Please check the link and try again.',
+    message:
+      'The request could not be understood by the server. Please check the link and try again.',
     Icon: COMMON.SHIELD_ALERT,
     iconColor: 'text-warning',
     iconBg: 'bg-warning/10',
@@ -30,7 +31,8 @@ const ERROR_MAP = {
   },
   401: {
     title: 'Authentication Required',
-    message: 'You need to be signed in to access this resource. Please sign in and try again.',
+    message:
+      'You need to be signed in to access this resource. Please sign in and try again.',
     Icon: COMMON.LOCK,
     iconColor: 'text-warning',
     iconBg: 'bg-warning/10',
@@ -42,7 +44,8 @@ const ERROR_MAP = {
   },
   403: {
     title: 'Access Denied',
-    message: "You don't have permission to view this page. Contact your administrator if you believe this is a mistake.",
+    message:
+      "You don't have permission to view this page. Contact your administrator if you believe this is a mistake.",
     Icon: COMMON.SHIELD_ALERT,
     iconColor: 'text-warning',
     iconBg: 'bg-warning/10',
@@ -53,7 +56,8 @@ const ERROR_MAP = {
   },
   404: {
     title: 'Page Not Found',
-    message: "We couldn't find the page you're looking for. It may have been moved, renamed, or never existed.",
+    message:
+      "We couldn't find the page you're looking for. It may have been moved, renamed, or never existed.",
     Icon: COMMON.FILE_QUESTION,
     iconColor: 'text-primary',
     iconBg: 'bg-primary/10',
@@ -65,7 +69,8 @@ const ERROR_MAP = {
   },
   500: {
     title: 'Something Went Wrong',
-    message: 'An unexpected error occurred on our end. Our team has been notified — please try again shortly.',
+    message:
+      'An unexpected error occurred on our end. Our team has been notified — please try again shortly.',
     Icon: COMMON.SERVER_CRASH,
     iconColor: 'text-destructive',
     iconBg: 'bg-destructive/10',
@@ -77,7 +82,8 @@ const ERROR_MAP = {
   },
   503: {
     title: 'Service Unavailable',
-    message: 'The service is temporarily down for maintenance. Please check back in a few minutes.',
+    message:
+      'The service is temporarily down for maintenance. Please check back in a few minutes.',
     Icon: COMMON.WRENCH,
     iconColor: 'text-destructive',
     iconBg: 'bg-destructive/10',
@@ -98,7 +104,8 @@ const ErrorPage = () => {
 
   if (isRouteErrorResponse(error)) {
     statusCode = error.status;
-    technicalDetail = error.data?.message || error.data || error.statusText || '';
+    technicalDetail =
+      error.data?.message || error.data || error.statusText || '';
   } else if (error) {
     statusCode = 500;
     technicalDetail = error.message || String(error);
@@ -106,21 +113,23 @@ const ErrorPage = () => {
     statusCode = 404;
   }
 
-  const { title, message, Icon, iconColor, iconBg, troubleshooting } = ERROR_MAP[statusCode] ?? {
-    title: 'Unexpected Error',
-    message: 'An unexpected error occurred. Please try again.',
-    Icon: COMMON.SERVER_CRASH,
-    iconColor: 'text-destructive',
-    iconBg: 'bg-destructive/10',
-    troubleshooting: [
-      'Wait a few minutes and try again',
-      'Contact technical support',
-    ],
-  };
+  const { title, message, Icon, iconColor, iconBg, troubleshooting } =
+    ERROR_MAP[statusCode] ?? {
+      title: 'Unexpected Error',
+      message: 'An unexpected error occurred. Please try again.',
+      Icon: COMMON.SERVER_CRASH,
+      iconColor: 'text-destructive',
+      iconBg: 'bg-destructive/10',
+      troubleshooting: [
+        'Wait a few minutes and try again',
+        'Contact technical support',
+      ],
+    };
 
   const isServerError = statusCode >= 500;
   const [referenceId] = useState(
-    () => `ERR-${statusCode}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`
+    () =>
+      `ERR-${statusCode}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`
   );
 
   const homeTarget = isAuthenticated ? roleHome(user?.role_name) : '/';
@@ -131,40 +140,48 @@ const ErrorPage = () => {
       role="main"
       className="bg-background text-foreground relative flex min-h-screen items-center justify-center p-4 sm:p-8"
     >
-      <div className="border-border bg-card w-full max-w-5xl flex flex-col md:flex-row rounded-xl border shadow-sm overflow-hidden">
-        
+      <div className="border-border bg-card flex w-full max-w-5xl flex-col overflow-hidden rounded-xl border shadow-sm md:flex-row">
         {/* Main Error Content */}
-        <section className="relative flex-1 p-8 sm:p-12 flex flex-col justify-center overflow-hidden">
+        <section className="relative flex flex-1 flex-col justify-center overflow-hidden p-8 sm:p-12">
           {/* Subtle Watermark Background */}
-          <div className="absolute right-[-5%] top-[-5%] text-[14rem] font-black leading-none text-muted/30 select-none pointer-events-none z-0 hidden sm:block">
+          <div className="text-muted/30 pointer-events-none absolute top-[-5%] right-[-5%] z-0 hidden text-[14rem] leading-none font-black select-none sm:block">
             {statusCode}
           </div>
 
           <div className="relative z-10">
             <div className="mb-6 flex items-center gap-4">
-              <div className={`flex size-14 items-center justify-center rounded-lg ${iconBg} ${iconColor}`}>
+              <div
+                className={`flex size-14 items-center justify-center rounded-lg ${iconBg} ${iconColor}`}
+              >
                 <Icon className="size-7" strokeWidth={2} />
               </div>
               <div>
-                <div className="text-muted-foreground text-sm font-medium">Error {statusCode}</div>
+                <div className="text-muted-foreground text-sm font-medium">
+                  Error {statusCode}
+                </div>
                 <h1 className="text-foreground text-2xl font-bold tracking-tight sm:text-3xl">
                   {title}
                 </h1>
               </div>
             </div>
-            
-            <p className="text-muted-foreground mb-8 text-base leading-relaxed max-w-md">
+
+            <p className="text-muted-foreground mb-8 max-w-md text-base leading-relaxed">
               {message}
             </p>
 
             {/* Troubleshooting Steps */}
             {troubleshooting && (
               <div className="mb-10 space-y-3">
-                <h4 className="text-sm font-semibold text-foreground">What you can do:</h4>
+                <h4 className="text-foreground text-sm font-semibold">
+                  What you can do:
+                </h4>
                 <ul className="space-y-2">
                   {troubleshooting.map((step, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-                      <COMMON.CHECK_CIRCLE className="size-4 text-primary shrink-0 mt-0.5" />
+                    <li
+                      key={i}
+                      className="text-muted-foreground flex items-start gap-2 text-sm"
+                    >
+                      <COMMON.CHECK_CIRCLE className="text-primary mt-0.5 size-4 shrink-0" />
                       <span>{step}</span>
                     </li>
                   ))}
@@ -173,10 +190,7 @@ const ErrorPage = () => {
             )}
 
             <div className="flex flex-wrap gap-3">
-              <Button
-                asChild
-                className="cursor-pointer font-medium"
-              >
+              <Button asChild className="cursor-pointer font-medium">
                 <Link to={homeTarget}>
                   <COMMON.HOME className="mr-2 size-4" />
                   {homeLabel}
@@ -194,7 +208,7 @@ const ErrorPage = () => {
                 <Button
                   variant="ghost"
                   onClick={() => navigate(0)}
-                  className="cursor-pointer font-medium text-muted-foreground hover:text-foreground"
+                  className="text-muted-foreground hover:text-foreground cursor-pointer font-medium"
                 >
                   <COMMON.ROTATE_CCW className="mr-2 size-4" />
                   Try again
@@ -205,32 +219,42 @@ const ErrorPage = () => {
         </section>
 
         {/* Support & Technical Details (Side Panel) */}
-        <section className="bg-muted/30 border-border flex w-full flex-col justify-between border-t p-8 sm:p-12 md:w-96 md:border-t-0 md:border-l relative z-10">
+        <section className="bg-muted/30 border-border relative z-10 flex w-full flex-col justify-between border-t p-8 sm:p-12 md:w-96 md:border-t-0 md:border-l">
           <div>
             <h3 className="text-foreground mb-6 flex items-center gap-2 text-sm font-semibold">
-              <COMMON.LIFE_BUOY className="size-4 text-muted-foreground" />
+              <COMMON.LIFE_BUOY className="text-muted-foreground size-4" />
               Need more help?
             </h3>
-            
+
             <div className="space-y-4">
-              <Link to="/support" className="flex items-center justify-between p-3 rounded-lg border border-border bg-background hover:border-primary/50 transition-colors group">
+              <Link
+                to="/support"
+                className="border-border bg-background hover:border-primary/50 group flex items-center justify-between rounded-lg border p-3 transition-colors"
+              >
                 <div className="flex items-center gap-3">
-                  <div className="bg-primary/10 text-primary p-2 rounded-md">
+                  <div className="bg-primary/10 text-primary rounded-md p-2">
                     <COMMON.MAIL className="size-4" />
                   </div>
-                  <span className="text-sm font-medium text-foreground">Contact Support</span>
+                  <span className="text-foreground text-sm font-medium">
+                    Contact Support
+                  </span>
                 </div>
-                <COMMON.CHEVRON_RIGHT className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                <COMMON.CHEVRON_RIGHT className="text-muted-foreground group-hover:text-primary size-4 transition-colors" />
               </Link>
 
-              <Link to="/status" className="flex items-center justify-between p-3 rounded-lg border border-border bg-background hover:border-primary/50 transition-colors group">
+              <Link
+                to="/status"
+                className="border-border bg-background hover:border-primary/50 group flex items-center justify-between rounded-lg border p-3 transition-colors"
+              >
                 <div className="flex items-center gap-3">
-                  <div className="bg-success/10 text-success p-2 rounded-md">
+                  <div className="bg-success/10 text-success rounded-md p-2">
                     <COMMON.ACTIVITY className="size-4" />
                   </div>
-                  <span className="text-sm font-medium text-foreground">System Status</span>
+                  <span className="text-foreground text-sm font-medium">
+                    System Status
+                  </span>
                 </div>
-                <COMMON.CHEVRON_RIGHT className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                <COMMON.CHEVRON_RIGHT className="text-muted-foreground group-hover:text-primary size-4 transition-colors" />
               </Link>
             </div>
           </div>
@@ -238,22 +262,26 @@ const ErrorPage = () => {
           {/* Technical Details */}
           <div className="mt-12">
             <h3 className="text-foreground mb-4 flex items-center gap-2 text-sm font-semibold">
-              <COMMON.INFO className="size-4 text-muted-foreground" />
+              <COMMON.INFO className="text-muted-foreground size-4" />
               Technical Details
             </h3>
-            
+
             <div className="space-y-4">
               <div className="space-y-1.5">
-                <div className="text-muted-foreground text-xs font-medium">Reference ID</div>
-                <div className="bg-background border-border text-foreground rounded-md border px-2.5 py-1.5 text-xs font-mono select-all">
+                <div className="text-muted-foreground text-xs font-medium">
+                  Reference ID
+                </div>
+                <div className="bg-background border-border text-foreground rounded-md border px-2.5 py-1.5 font-mono text-xs select-all">
                   {referenceId}
                 </div>
               </div>
 
               {technicalDetail && (
                 <div className="space-y-1.5">
-                  <div className="text-muted-foreground text-xs font-medium">Message</div>
-                  <div className="text-muted-foreground text-xs wrap-break-word max-h-32 overflow-y-auto">
+                  <div className="text-muted-foreground text-xs font-medium">
+                    Message
+                  </div>
+                  <div className="text-muted-foreground max-h-32 overflow-y-auto text-xs wrap-break-word">
                     {technicalDetail}
                   </div>
                 </div>
@@ -261,7 +289,6 @@ const ErrorPage = () => {
             </div>
           </div>
         </section>
-
       </div>
     </main>
   );

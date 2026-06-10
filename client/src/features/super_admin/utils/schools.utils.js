@@ -12,13 +12,15 @@ export const computeSchoolStats = (schools) => {
   const total = schools.length;
   const active = schools.filter((s) => s.status === 'active').length;
   const inactive = schools.filter((s) => s.status === 'inactive').length;
-  
+
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
   const joinedThisMonth = schools.filter((s) => {
     if (!s.created_at) return false;
     const date = new Date(s.created_at);
-    return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+    return (
+      date.getMonth() === currentMonth && date.getFullYear() === currentYear
+    );
   }).length;
 
   return {
@@ -59,7 +61,10 @@ export const exportSchoolsToCsv = (schools) => {
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.setAttribute('href', url);
-  link.setAttribute('download', `schools_export_${new Date().toISOString().slice(0, 10)}.csv`);
+  link.setAttribute(
+    'download',
+    `schools_export_${new Date().toISOString().slice(0, 10)}.csv`
+  );
   link.style.visibility = 'hidden';
   document.body.appendChild(link);
   link.click();

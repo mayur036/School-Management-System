@@ -12,7 +12,7 @@ const EmptyTableState = ({ icon: Icon, title, description }) => {
       <div className="flex flex-col gap-1 px-4">
         <p className="text-foreground font-medium">{title}</p>
         {description && (
-          <p className="text-muted-foreground text-sm max-w-75 md:max-w-100">
+          <p className="text-muted-foreground max-w-75 text-sm md:max-w-100">
             {description}
           </p>
         )}

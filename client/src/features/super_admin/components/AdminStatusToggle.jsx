@@ -28,7 +28,9 @@ const AdminStatusToggle = ({ admin, onClose }) => {
       );
       onClose();
     } catch (err) {
-      toast.error(err?.data?.message || err?.message || 'Failed to update status');
+      toast.error(
+        err?.data?.message || err?.message || 'Failed to update status'
+      );
     }
   };
 
@@ -48,7 +50,7 @@ const AdminStatusToggle = ({ admin, onClose }) => {
           </AlertDialogTitle>
           <AlertDialogDescription>
             Are you sure you want to {isActivating ? 'activate' : 'deactivate'}{' '}
-            <span className="font-semibold text-foreground">
+            <span className="text-foreground font-semibold">
               {admin.first_name} {admin.last_name}
             </span>
             ?
@@ -68,11 +70,11 @@ const AdminStatusToggle = ({ admin, onClose }) => {
             disabled={isLoading}
             className={`cursor-pointer gap-2 ${
               isActivating
-                ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
-                : 'bg-amber-600 hover:bg-amber-700 text-white'
+                ? 'bg-emerald-600 text-white hover:bg-emerald-700'
+                : 'bg-amber-600 text-white hover:bg-amber-700'
             }`}
           >
-            {isLoading && <COMMON.LOADER className="animate-spin size-4" />}
+            {isLoading && <COMMON.LOADER className="size-4 animate-spin" />}
             {isLoading
               ? 'Updating...'
               : isActivating

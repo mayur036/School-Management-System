@@ -173,8 +173,6 @@ const StaffCard = ({ member, onViewDetails, onToggleStatus }) => {
   );
 };
 
-
-
 // ── Main Component ─────────────────────────────────────────────
 
 const StaffTable = ({

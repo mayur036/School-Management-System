@@ -13,17 +13,16 @@ async function test() {
       LEFT JOIN schools sch ON sch.school_id = s.school_id
       WHERE r.role_name = 'school_admin'
     `);
-    console.log("MANUAL QUERY RESULT:", result[0]);
+    console.log('MANUAL QUERY RESULT:', result[0]);
 
     try {
       const procResult = await callProcedure('sp_list_all_school_admins');
-      console.log("PROCEDURE RESULT:", procResult);
+      console.log('PROCEDURE RESULT:', procResult);
     } catch (e) {
-      console.log("PROCEDURE ERROR:", e.message);
+      console.log('PROCEDURE ERROR:', e.message);
     }
-
   } catch (err) {
-    console.error("ERROR:", err);
+    console.error('ERROR:', err);
   } finally {
     process.exit();
   }

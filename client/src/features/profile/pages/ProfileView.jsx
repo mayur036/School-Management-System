@@ -6,12 +6,7 @@ import StatCard from '@/components/shared/StatCard';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useGetDepartmentsQuery } from '@/features/school_admin/departments.api';
 import { useGetStaffQuery } from '@/features/school_admin/staff.api';
 import { getMetrics } from '@/helper/getMatrics';
@@ -533,8 +528,6 @@ export const ProfileView = () => {
       />
     </div>
   );
-
-
 };
 
 export default ProfileView;

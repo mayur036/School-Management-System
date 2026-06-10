@@ -66,8 +66,6 @@ const SkeletonRows = ({ count = 5 }) =>
     </TableRow>
   ));
 
-
-
 // ── Main table ────────────────────────────────────────────────
 
 const SchoolsTable = ({

@@ -12,13 +12,15 @@ export const computeAdminStats = (admins) => {
   const total = admins.length;
   const active = admins.filter((a) => a.status === 'active').length;
   const inactive = admins.filter((a) => a.status === 'inactive').length;
-  
+
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
   const joinedThisMonth = admins.filter((a) => {
     if (!a.created_at) return false;
     const date = new Date(a.created_at);
-    return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+    return (
+      date.getMonth() === currentMonth && date.getFullYear() === currentYear
+    );
   }).length;
 
   return {
@@ -63,7 +65,10 @@ export const exportAdminsToCsv = (admins) => {
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.setAttribute('href', url);
-  link.setAttribute('download', `school_admins_export_${new Date().toISOString().slice(0, 10)}.csv`);
+  link.setAttribute(
+    'download',
+    `school_admins_export_${new Date().toISOString().slice(0, 10)}.csv`
+  );
   link.style.visibility = 'hidden';
   document.body.appendChild(link);
   link.click();

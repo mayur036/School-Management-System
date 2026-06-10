@@ -53,8 +53,6 @@ const SkeletonRows = ({ count = 5 }) =>
     </TableRow>
   ));
 
-
-
 const AdminsTable = ({ admins, isLoading, onToggleStatus, onDeleteAdmin }) => {
   if (isLoading) {
     return (
