@@ -11,7 +11,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -66,12 +65,6 @@ const CreateSchoolDialog = ({ externalOpen = false, onExternalOpenChange }) => {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>
-        <Button className="cursor-pointer gap-2">
-          <COMMON.PLUS data-icon="inline-start" />
-          Add School
-        </Button>
-      </DialogTrigger>
 
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>

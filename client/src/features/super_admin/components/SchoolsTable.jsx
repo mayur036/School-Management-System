@@ -1,4 +1,4 @@
-import { Badge } from '@/components/ui/badge';
+import StatusBadge from '@/components/shared/StatusBadge';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -18,26 +18,26 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { COMMON, SUPER_ADMIN } from '@/lib/icons';
+import { SUPER_ADMIN } from '@/lib/icons';
 import { formatDate } from '@/lib/utils';
 
 // ── Status badge ──────────────────────────────────────────────
 
-const StatusBadge = ({ status }) => {
-  const isActive = status === 'active';
-  return (
-    <Badge
-      className={
-        isActive
-          ? 'bg-success text-success-foreground'
-          : 'bg-destructive text-destructive-foreground'
-      }
-    >
-      <span className="mr-1 inline-block size-1.5 rounded-full bg-current" />
-      {isActive ? 'Active' : 'Inactive'}
-    </Badge>
-  );
-};
+// const StatusBadge = ({ status }) => {
+//   const isActive = status === 'active';
+//   return (
+//     <Badge
+//       className={
+//         isActive
+//           ? 'bg-success text-success-foreground'
+//           : 'bg-destructive text-destructive-foreground'
+//       }
+//     >
+//       <span className="mr-1 inline-block size-1.5 rounded-full bg-current" />
+//       {isActive ? 'Active' : 'Inactive'}
+//     </Badge>
+//   );
+// };
 
 // ── Skeleton rows (loading state) ─────────────────────────────
 
@@ -67,7 +67,7 @@ const SkeletonRows = ({ count = 5 }) =>
 
 // ── Empty state ───────────────────────────────────────────────
 
-const EmptyState = ({ onCreateClick }) => (
+const EmptyState = () => (
   <div className="flex min-h-[40vh] flex-col items-center justify-center gap-4 text-center">
     <div
       aria-hidden
@@ -78,13 +78,9 @@ const EmptyState = ({ onCreateClick }) => (
     <div className="flex flex-col gap-1">
       <p className="text-foreground font-medium">No schools yet</p>
       <p className="text-muted-foreground text-sm">
-        Get started by registering your first school.
+        Get started by registering your first school using the button above.
       </p>
     </div>
-    <Button className="cursor-pointer gap-2" onClick={onCreateClick}>
-      <COMMON.PLUS data-icon="inline-start" />
-      Add School
-    </Button>
   </div>
 );
 
@@ -93,7 +89,7 @@ const EmptyState = ({ onCreateClick }) => (
 const SchoolsTable = ({
   schools,
   isLoading,
-  onCreateClick,
+
   onToggleStatus,
   onAddAdmin,
 }) => {
@@ -122,7 +118,7 @@ const SchoolsTable = ({
   }
 
   if (!schools?.length) {
-    return <EmptyState onCreateClick={onCreateClick} />;
+    return <EmptyState />;
   }
 
   return (
@@ -151,7 +147,7 @@ const SchoolsTable = ({
                 {school.email || '—'}
               </TableCell>
               <TableCell>
-                <StatusBadge status={school.status} />
+                <StatusBadge status={school.status} pulse={false} />
               </TableCell>
               <TableCell className="text-muted-foreground hidden tabular-nums lg:table-cell">
                 {formatDate(school.created_at, 'medium')}

@@ -2,24 +2,16 @@ import { useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 import AppBreadcrumb from '@/components/shared/AppBreadcrumb';
+import StatCard from '@/components/shared/StatCard';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { useGetDepartmentsQuery } from '@/features/school_admin/departments.api';
 import { useGetStaffQuery } from '@/features/school_admin/staff.api';
 import { getMetrics } from '@/helper/getMatrics';
@@ -29,14 +21,13 @@ import { formatDate } from '@/lib/utils';
 
 import ChangePasswordDialog from '../components/ChangePasswordDialog';
 import EditProfileDialog from '../components/EditProfileDialog';
+import ProfileTabContent from '../components/ProfileTabContent';
 import ProgressRing from '../components/ProgressRing';
 import {
   ALLOWED_TYPES,
-  languagePreference,
   MAX_SIZE,
   ROLE_LABELS,
   TABS_LIST,
-  timezonePreference,
 } from '../constants/profile.constants';
 import { useUploadAvatarMutation } from '../profile.api';
 import { getBreadcrumbRoleLabel, getInitials } from '../utils/profile.utils';
@@ -82,6 +73,11 @@ export const ProfileView = () => {
     };
   }, [user, deptData, staffData]);
 
+  const metrics = useMemo(
+    () => getMetrics(user, schoolAdminMetrics),
+    [user, schoolAdminMetrics]
+  );
+
   if (!user) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
@@ -111,8 +107,6 @@ export const ProfileView = () => {
   const completionPercentage = Math.round(
     (completedCount / completionItems.length) * 100
   );
-
-  const metrics = getMetrics(user, schoolAdminMetrics);
 
   const handleAvatarChange = async (event) => {
     const file = event.target.files?.[0];
@@ -264,27 +258,7 @@ export const ProfileView = () => {
       {metrics.length > 0 && (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
           {metrics.map((metric) => (
-            <Card
-              key={metric.label}
-              className={`border-border bg-card border border-l-4 ${metric.color}`}
-            >
-              <CardContent className="flex flex-row items-center gap-2.5 p-2.5 sm:gap-3.5 sm:p-4">
-                <div className="bg-background flex size-8 shrink-0 items-center justify-center rounded-xl text-inherit shadow-xs sm:size-10">
-                  <metric.icon className="size-4 sm:size-5" />
-                </div>
-                <div className="flex min-w-0 flex-col">
-                  <span className="text-muted-foreground truncate text-[9px] font-semibold tracking-normal uppercase sm:text-xs sm:tracking-wider">
-                    {metric.label}
-                  </span>
-                  <span className="text-foreground mt-0.5 truncate text-base leading-none font-bold sm:text-2xl">
-                    {metric.value}
-                  </span>
-                  <span className="text-muted-foreground mt-0.5 hidden truncate text-[9px] sm:block sm:text-[10px]">
-                    {metric.trend}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
+            <StatCard key={metric.label} {...metric} />
           ))}
         </div>
       )}
@@ -439,12 +413,34 @@ export const ProfileView = () => {
                 <COMMON.X className="size-4" />
                 Back to Settings
               </Button>
-              {renderTabContent(mobileActiveSubView)}
+              <ProfileTabContent
+                tabId={mobileActiveSubView}
+                user={user}
+                bio={bio}
+                timezone={timezone}
+                language={language}
+                setIsEditProfileOpen={setIsEditProfileOpen}
+                setIsChangePasswordOpen={setIsChangePasswordOpen}
+                setTimezone={setTimezone}
+                setLanguage={setLanguage}
+              />
             </div>
           )}
 
           {/* Desktop tabbed panel view container */}
-          <div className="hidden lg:block">{renderTabContent(activeTab)}</div>
+          <div className="hidden lg:block">
+            <ProfileTabContent
+              tabId={activeTab}
+              user={user}
+              bio={bio}
+              timezone={timezone}
+              language={language}
+              setIsEditProfileOpen={setIsEditProfileOpen}
+              setIsChangePasswordOpen={setIsChangePasswordOpen}
+              setTimezone={setTimezone}
+              setLanguage={setLanguage}
+            />
+          </div>
         </div>
 
         {/* 3. RIGHT SIDEBAR: ACCOUNT SECURITY & RECENT ACTIVITIES (Span 3) */}
@@ -538,325 +534,7 @@ export const ProfileView = () => {
     </div>
   );
 
-  // Tab switcher view renderer
-  function renderTabContent(tabId) {
-    switch (tabId) {
-      case 'profile':
-        return (
-          <div className="flex flex-col gap-6">
-            {/* Personal Info Grid */}
-            <Card className="border-border bg-card border">
-              <CardHeader className="flex flex-row items-center justify-between pb-3">
-                <div>
-                  <CardTitle className="text-base font-bold">
-                    Personal Information
-                  </CardTitle>
-                  <CardDescription className="text-xs">
-                    Your personal profile detail records.
-                  </CardDescription>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsEditProfileOpen(true)}
-                  className="cursor-pointer gap-1.5 text-xs"
-                >
-                  Edit
-                </Button>
-              </CardHeader>
-              <CardContent className="px-5 pb-5">
-                <div className="grid grid-cols-2 gap-x-4 gap-y-4 text-xs sm:grid-cols-2">
-                  <div className="flex flex-col">
-                    <span className="text-muted-foreground font-semibold">
-                      First Name
-                    </span>
-                    <span className="text-foreground mt-1 text-sm font-medium">
-                      {user.first_name}
-                    </span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-muted-foreground font-semibold">
-                      Last Name
-                    </span>
-                    <span className="text-foreground mt-1 text-sm font-medium">
-                      {user.last_name || '—'}
-                    </span>
-                  </div>
-                  <div className="col-span-2 flex flex-col sm:col-span-1">
-                    <span className="text-muted-foreground font-semibold">
-                      Email Address
-                    </span>
-                    <span className="text-foreground mt-1 text-sm font-medium break-all">
-                      {user.email}
-                    </span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-muted-foreground font-semibold">
-                      Phone Number
-                    </span>
-                    <span className="text-foreground mt-1 text-sm font-medium">
-                      {user.phone || 'Not configured'}
-                    </span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-muted-foreground font-semibold">
-                      Role Access
-                    </span>
-                    <Badge className="bg-primary/10 text-primary mt-1 w-fit border-none text-[9px] capitalize shadow-none">
-                      {user.role_name?.replace('_', ' ')}
-                    </Badge>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-muted-foreground font-semibold">
-                      Department
-                    </span>
-                    <Badge className="bg-muted text-muted-foreground mt-1 w-fit border-none text-[9px] shadow-none">
-                      {user.department_name || 'Not assigned'}
-                    </Badge>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-muted-foreground font-semibold">
-                      Time Zone
-                    </span>
-                    <span className="text-foreground mt-1 text-sm font-medium">
-                      {timezone || 'Not set'}
-                    </span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-muted-foreground font-semibold">
-                      Language
-                    </span>
-                    <span className="text-foreground mt-1 text-sm font-medium">
-                      {language || 'Not set'}
-                    </span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
 
-            {/* About / Bio Panel */}
-            <Card className="border-border bg-card border">
-              <CardHeader className="flex flex-row items-center justify-between pb-3">
-                <CardTitle className="text-base font-bold">
-                  About / Bio
-                </CardTitle>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsEditProfileOpen(true)}
-                  className="cursor-pointer gap-1.5 text-xs"
-                >
-                  Edit
-                </Button>
-              </CardHeader>
-              <CardContent className="px-5 pb-5">
-                <p
-                  className={`text-xs leading-relaxed ${
-                    bio ? 'text-foreground' : 'text-muted-foreground italic'
-                  }`}
-                >
-                  {bio || 'No bio added yet.'}
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        );
-      case 'security':
-        return (
-          <Card className="border-border bg-card border">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base font-bold">
-                Account Security Options
-              </CardTitle>
-              <CardDescription className="text-xs">
-                Manage your credentials, 2-factor authentication, and login
-                sessions.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-5 px-5 pb-5">
-              <div className="flex items-center justify-between border-b pb-4">
-                <div className="flex flex-col">
-                  <span className="text-foreground text-sm font-semibold">
-                    Password Update
-                  </span>
-                  <span className="text-muted-foreground mt-0.5 text-xs">
-                    Keep your account secure with robust credentials.
-                  </span>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsChangePasswordOpen(true)}
-                  className="cursor-pointer text-xs"
-                >
-                  Change Password
-                </Button>
-              </div>
-
-              <div className="flex items-center justify-between border-b pb-4">
-                <div className="flex flex-col">
-                  <span className="text-foreground text-sm font-semibold">
-                    Two-Factor Authentication
-                  </span>
-                  <span className="text-muted-foreground mt-0.5 text-xs">
-                    Verification code required at login sessions.
-                  </span>
-                </div>
-                <Badge className="bg-muted text-muted-foreground border-none text-xs shadow-none">
-                  Not configured
-                </Badge>
-              </div>
-
-              <div className="space-y-3 pt-1">
-                <h4 className="text-foreground text-xs font-bold tracking-wider uppercase">
-                  Active Device Sessions
-                </h4>
-                <div className="text-muted-foreground flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed py-6 text-center text-xs">
-                  <COMMON.SHIELD className="size-7 opacity-40" />
-                  Session tracking is coming soon.
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        );
-      case 'notifications':
-        return (
-          <Card className="border-border bg-card border">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base font-bold">
-                Notification Configuration
-              </CardTitle>
-              <CardDescription className="text-xs">
-                Select your preferred channels for system updates and messages.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4 px-5 pb-5">
-              <div className="flex items-center justify-between py-2.5">
-                <div className="flex flex-col">
-                  <span className="text-foreground text-xs font-semibold">
-                    Email Notifications
-                  </span>
-                  <span className="text-muted-foreground mt-0.5 text-[10px]">
-                    Send transaction details and report logs via email.
-                  </span>
-                </div>
-                <input
-                  type="checkbox"
-                  defaultChecked
-                  className="accent-primary size-4 rounded"
-                />
-              </div>
-              <div className="flex items-center justify-between border-t py-2.5">
-                <div className="flex flex-col">
-                  <span className="text-foreground text-xs font-semibold">
-                    SMS Alerts
-                  </span>
-                  <span className="text-muted-foreground mt-0.5 text-[10px]">
-                    Critical security changes or onboarding messages.
-                  </span>
-                </div>
-                <input
-                  type="checkbox"
-                  className="accent-primary size-4 rounded"
-                />
-              </div>
-              <div className="flex items-center justify-between border-t py-2.5">
-                <div className="flex flex-col">
-                  <span className="text-foreground text-xs font-semibold">
-                    Weekly Activity Digest
-                  </span>
-                  <span className="text-muted-foreground mt-0.5 text-[10px]">
-                    Consolidated summary report of school department actions.
-                  </span>
-                </div>
-                <input
-                  type="checkbox"
-                  defaultChecked
-                  className="accent-primary size-4 rounded"
-                />
-              </div>
-            </CardContent>
-          </Card>
-        );
-      case 'activity':
-        return (
-          <Card className="border-border bg-card border">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base font-bold">
-                Activity Audit Logs
-              </CardTitle>
-              <CardDescription className="text-xs">
-                Detailed chronological log of your profile actions.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="px-5 pb-5">
-              <div className="text-muted-foreground flex flex-col items-center justify-center gap-2 py-10 text-center text-xs">
-                <COMMON.ACTIVITY className="size-8 opacity-40" />
-                Activity audit logs are coming soon.
-              </div>
-            </CardContent>
-          </Card>
-        );
-      case 'preferences':
-        return (
-          <Card className="border-border bg-card border">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base font-bold">
-                General Preferences
-              </CardTitle>
-              <CardDescription className="text-xs">
-                Manage layout views and default values.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4 px-5 pb-5 text-xs">
-              <div className="space-y-1.5">
-                <Label htmlFor="defaultTimezone" className="font-semibold">
-                  Time Zone Preference
-                </Label>
-                <Select value={timezone} onValueChange={setTimezone}>
-                  <SelectTrigger
-                    id="defaultTimezone"
-                    className="w-full text-xs"
-                  >
-                    <SelectValue placeholder="Select timezone" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {timezonePreference.map((timezone) => (
-                      <SelectItem key={timezone.value} value={timezone.value}>
-                        {timezone.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-1.5 pt-2">
-                <Label htmlFor="defaultLanguage" className="font-semibold">
-                  Language Preference
-                </Label>
-                <Select value={language} onValueChange={setLanguage}>
-                  <SelectTrigger
-                    id="defaultLanguage"
-                    className="w-full text-xs"
-                  >
-                    <SelectValue placeholder="Select language" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {languagePreference.map((lang) => (
-                      <SelectItem key={lang.value} value={lang.value}>
-                        {lang.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-          </Card>
-        );
-      default:
-        return null;
-    }
-  }
 };
 
 export default ProfileView;

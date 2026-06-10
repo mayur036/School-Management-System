@@ -58,8 +58,8 @@ const StaffStatusChart = ({ active = 0, inactive = 0, isLoading }) => {
                 innerRadius={60}
                 strokeWidth={4}
               >
-                {data.map((entry) => (
-                  <Cell key={entry.key} fill={entry.fill} />
+                {data.map((entry, index) => (
+                  <Cell key={index} fill={entry.fill} />
                 ))}
                 <Label
                   content={({ viewBox }) => {

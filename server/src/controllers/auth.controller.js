@@ -16,7 +16,7 @@ const COOKIE_NAME = 'token';
 const cookieOptions = {
   httpOnly: true,
   secure: isProduction,
-  sameSite: 'strict',
+  sameSite: isProduction ? 'none' : 'strict',
   path: '/',
 };
 

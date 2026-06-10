@@ -1,11 +1,6 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
-/**
- * Compact KPI card: left accent border, coloured icon chip, label, value and
- * an optional sub-line (hidden on mobile). Shared across the school-admin
- * dashboard, staff directory and departments pages.
- */
 const StatCard = ({
   Icon,
   label,
