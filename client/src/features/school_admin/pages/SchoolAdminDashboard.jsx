@@ -4,9 +4,9 @@ import { useAuth } from '@/hooks/useAuth';
 
 import QuickActions from '../components/dashboard/QuickActions';
 import RecentStaff from '../components/dashboard/RecentStaff';
+import SchoolAdminStatCard from '../components/dashboard/SchoolAdminStatCard';
 import StaffByDepartmentChart from '../components/dashboard/StaffByDepartmentChart';
 import StaffStatusChart from '../components/dashboard/StaffStatusChart';
-import StatCards from '../components/dashboard/StatCards';
 import { useGetDepartmentsQuery } from '../departments.api';
 import { useGetStaffQuery } from '../staff.api';
 import {
@@ -51,7 +51,7 @@ export const SchoolAdminDashboard = () => {
       </div>
 
       {/* KPI cards */}
-      <StatCards stats={stats} isLoading={isLoading} />
+      <SchoolAdminStatCard stats={stats} isLoading={isLoading} />
 
       {/* Charts: bar (span 2) + donut */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">

@@ -1,40 +1,30 @@
 import { formatDate, formatPhoneNumber, formatStaffId } from '@/lib/utils';
 
-/** True when a date falls in the current calendar month/year. */
-const isThisMonth = (dateString) => {
-  if (!dateString) return false;
-  const date = new Date(dateString);
-  const now = new Date();
-  return (
-    date.getMonth() === now.getMonth() &&
-    date.getFullYear() === now.getFullYear()
-  );
-};
-
-/**
- * Aggregate the headline staff metrics shared by the dashboard and the
- * staff directory page.
- */
 export const computeStaffStats = (staff = [], departments = []) => {
   const total = staff.length;
   const active = staff.filter((s) => s.status === 'active').length;
-  const activePct = total > 0 ? Math.round((active / total) * 100) : 0;
-  const joinedThisMonth = staff.filter((s) => isThisMonth(s.created_at)).length;
+  const inactive = staff.filter((s) => s.status === 'inactive').length;
+
+  let latestName = 'None';
+  let latestDate = '—';
+  if (total > 0) {
+    const [latest] = [...staff].sort(
+      (a, b) => new Date(b.created_at) - new Date(a.created_at)
+    );
+    latestName = `${latest.first_name} ${latest.last_name}`;
+    latestDate = formatDate(latest.created_at, 'medium');
+  }
 
   return {
     total,
     active,
-    inactive: total - active,
-    activePct,
-    deptsCount: departments.length,
-    joinedThisMonth,
+    inactive,
+    departments: departments.length,
+    latestName,
+    latestDate,
   };
 };
 
-/**
- * Staff headcount per department name, sorted desc and capped. Adds an
- * "Unassigned" bucket when some staff have no department.
- */
 export const groupStaffByDepartmentName = (
   staff = [],
   departments = [],

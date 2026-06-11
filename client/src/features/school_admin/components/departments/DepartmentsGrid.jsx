@@ -14,7 +14,7 @@ import {
   getDeptGradient,
   getDeptIcon,
   getDeptStatusMeta,
-} from '../utils/departments.utils';
+} from '../../utils/departments.utils';
 
 export const DepartmentsGrid = ({
   departments,

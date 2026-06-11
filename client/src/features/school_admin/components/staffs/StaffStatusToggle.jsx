@@ -12,15 +12,8 @@ import {
 } from '@/components/ui/alert-dialog';
 import { COMMON } from '@/lib/icons';
 
-import { useUpdateStaffStatusMutation } from '../staff.api';
+import { useUpdateStaffStatusMutation } from '../../staff.api';
 
-/**
- * Confirmation dialog before toggling a staff member's status between active ↔ inactive.
- *
- * Props:
- *   member  – the staff member object (null when closed)
- *   onClose – callback to clear the selected staff member
- */
 const StaffStatusToggle = ({ member, onClose }) => {
   const [updateStatus, { isLoading }] = useUpdateStaffStatusMutation();
 

@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/card';
 import { COMMON, SCHOOL_ADMIN } from '@/lib/icons';
 
-import CreateDepartmentDialog from '../CreateDepartmentDialog';
+import CreateDepartmentDialog from '../departments/CreateDepartmentDialog';
 
 // Shared tile styling for both link- and button-based actions.
 const tileClass =

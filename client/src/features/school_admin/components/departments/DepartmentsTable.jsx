@@ -23,7 +23,7 @@ import {
   getDeptGradient,
   getDeptIcon,
   getDeptStatusMeta,
-} from '../utils/departments.utils';
+} from '../../utils/departments.utils';
 
 // Skeleton rows (loading state)
 const SkeletonRows = ({ count = 5 }) =>

@@ -1,4 +1,4 @@
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts';
 
 import {
   Card,
@@ -16,57 +16,82 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { SCHOOL_ADMIN } from '@/lib/icons';
 
 const chartConfig = {
-  count: { label: 'Staff', color: 'var(--chart-1)' },
+  count: { label: 'Staff Members', color: '#6366f1' }, // Indigo-500
 };
 
 const StaffByDepartmentChart = ({ data = [], isLoading }) => (
-  <Card className="border-border bg-card flex flex-col">
-    <CardHeader>
-      <CardTitle className="text-base">Staff by Department</CardTitle>
+  <Card className="border-border bg-card flex flex-col shadow-sm">
+    <CardHeader className="pb-4">
+      <CardTitle className="text-base font-bold">Staff Distribution</CardTitle>
       <CardDescription>Headcount across each department</CardDescription>
     </CardHeader>
     <CardContent className="flex-1">
       {isLoading ? (
-        <Skeleton className="h-65 w-full" />
+        <Skeleton className="h-65 w-full rounded-xl" />
       ) : data.length === 0 ? (
-        <div className="text-muted-foreground flex h-65 flex-col items-center justify-center gap-2 text-center text-sm">
-          <SCHOOL_ADMIN.DEPARTMENTS className="size-8 opacity-40" />
-          No department data yet
+        <div className="text-muted-foreground flex h-65 flex-col items-center justify-center gap-3 text-center text-sm">
+          <div className="bg-muted rounded-full p-4">
+            <SCHOOL_ADMIN.DEPARTMENTS className="size-8 opacity-40" />
+          </div>
+          <p>No department data yet</p>
         </div>
       ) : (
         <ChartContainer
           config={chartConfig}
           className="aspect-auto h-65 w-full"
         >
-          <BarChart
+          <AreaChart
             accessibilityLayer
             data={data}
-            layout="vertical"
-            margin={{ left: 4, right: 16 }}
+            margin={{ left: -16, right: 16, top: 12, bottom: 0 }}
           >
-            <CartesianGrid horizontal={false} />
+            <defs>
+              <linearGradient id="fillCount" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#6366f1" stopOpacity={0.4} />
+                <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid
+              vertical={false}
+              strokeDasharray="3 3"
+              opacity={0.3}
+            />
             <XAxis
-              type="number"
+              dataKey="name"
+              tickLine={false}
+              axisLine={false}
+              fontSize={12}
+              tickMargin={12}
+              tickFormatter={(v) => (v.length > 12 ? `${v.slice(0, 12)}…` : v)}
+            />
+            <YAxis
               allowDecimals={false}
               tickLine={false}
               axisLine={false}
+              fontSize={12}
             />
-            <YAxis
-              type="category"
-              dataKey="name"
-              width={110}
-              tickLine={false}
-              axisLine={false}
-              tickFormatter={(v) => (v.length > 14 ? `${v.slice(0, 14)}…` : v)}
+            <ChartTooltip
+              cursor={{
+                stroke: '#6366f1',
+                strokeWidth: 1,
+                strokeDasharray: '4 4',
+              }}
+              content={<ChartTooltipContent indicator="line" />}
             />
-            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-            <Bar
+            <Area
+              type="monotone"
               dataKey="count"
-              fill="var(--color-count)"
-              radius={[0, 6, 6, 0]}
-              maxBarSize={28}
+              stroke="#6366f1"
+              strokeWidth={3}
+              fill="url(#fillCount)"
+              activeDot={{
+                r: 6,
+                fill: '#6366f1',
+                stroke: '#fff',
+                strokeWidth: 2,
+              }}
             />
-          </BarChart>
+          </AreaChart>
         </ChartContainer>
       )}
     </CardContent>

@@ -25,7 +25,7 @@ import {
 import { SCHOOL_ADMIN, SUPER_ADMIN } from '@/lib/icons';
 import { formatDate, formatStaffId, getInitials } from '@/lib/utils';
 
-import { getDeptBadgeClass } from '../utils/departments.utils';
+import { getDeptBadgeClass } from '../../utils/departments.utils';
 
 // ── Skeleton rows (loading state) ─────────────────────────────
 

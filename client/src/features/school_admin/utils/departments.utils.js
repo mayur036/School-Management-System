@@ -93,19 +93,14 @@ export const getDeptStatusMeta = (dept) => {
     : { dotClass: 'bg-green-500', label: 'active' };
 };
 
-/**
- * Page-level department metrics: totals, average staff per department and
- * the most recently created department.
- */
-export const computeDepartmentMetrics = (departments = [], staff = []) => {
-  const totalDepts = departments.length;
+export const computeDepartmentStats = (departments = [], staff = []) => {
+  const total = departments.length;
   const totalStaff = staff.length;
-  const avgStaff =
-    totalDepts > 0 ? (totalStaff / totalDepts).toFixed(1) : '0.0';
+  const avgStaff = total > 0 ? (totalStaff / total).toFixed(1) : '0.0';
 
   let latestDeptName = 'None';
   let latestDeptDateStr = '—';
-  if (totalDepts > 0) {
+  if (total > 0) {
     const [latest] = [...departments].sort(
       (a, b) => new Date(b.created_at) - new Date(a.created_at)
     );
@@ -114,10 +109,10 @@ export const computeDepartmentMetrics = (departments = [], staff = []) => {
   }
 
   return {
-    totalDepts,
-    totalStaff,
-    avgStaff,
-    latestDeptName,
-    latestDeptDateStr,
+    total,
+    staff: totalStaff,
+    avg: avgStaff,
+    latestName: latestDeptName,
+    latestDate: latestDeptDateStr,
   };
 };

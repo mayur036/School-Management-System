@@ -3,7 +3,6 @@ import { toast } from 'sonner';
 
 import AppBreadcrumb from '@/components/shared/AppBreadcrumb';
 import AppPagination from '@/components/shared/AppPagination';
-import StatCard from '@/components/shared/StatCard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -17,15 +16,16 @@ import { useGetStaffQuery } from '@/features/school_admin/staff.api';
 import { COMMON } from '@/lib/icons';
 import { cn } from '@/lib/utils';
 
-import CreateDepartmentDialog from '../components/CreateDepartmentDialog';
-import DepartmentsGrid from '../components/DepartmentsGrid';
-import DepartmentsTable from '../components/DepartmentsTable';
+import CreateDepartmentDialog from '../components/departments/CreateDepartmentDialog';
+import DepartmentsGrid from '../components/departments/DepartmentsGrid';
+import DepartmentsStatCard from '../components/departments/DepartmentsStatCard';
+import DepartmentsTable from '../components/departments/DepartmentsTable';
 import {
   DEPARTMENT_SORT_OPTIONS,
   DEPARTMENT_STATUS_FILTERS,
 } from '../constants/departments.constants';
 import { useGetDepartmentsQuery } from '../departments.api';
-import { computeDepartmentMetrics } from '../utils/departments.utils';
+import { computeDepartmentStats } from '../utils/departments.utils';
 import { countStaffByDepartmentId } from '../utils/staff.utils';
 
 const DepartmentsPage = () => {
@@ -56,10 +56,12 @@ const DepartmentsPage = () => {
 
   // Staff count per department + page summary metrics
   const staffCounts = useMemo(() => countStaffByDepartmentId(staff), [staff]);
-  const metrics = useMemo(
-    () => computeDepartmentMetrics(departments, staff),
+  const stats = useMemo(
+    () => computeDepartmentStats(departments, staff),
     [departments, staff]
   );
+
+  console.log(stats);
 
   // Filter and Sort Logic
   const processedDepartments = useMemo(() => {
@@ -148,47 +150,8 @@ const DepartmentsPage = () => {
         </div>
       </div>
 
-      {/* Metrics Summary Row */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          Icon={COMMON.BUILDING}
-          label="Total Departments"
-          value={metrics.totalDepts}
-          subtext="All active departments"
-          accentClassName="border-l-purple-500"
-          iconChipClassName="bg-purple-500/10 text-purple-600 dark:bg-purple-500/20"
-          className="shadow-xs"
-        />
-        <StatCard
-          Icon={COMMON.USERS_GROUP}
-          label="Total Staff"
-          value={metrics.totalStaff}
-          subtext="Across all departments"
-          accentClassName="border-l-emerald-500"
-          iconChipClassName="bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20"
-          className="shadow-xs"
-        />
-        <StatCard
-          Icon={COMMON.FILE_TEXT}
-          label="Average Staff"
-          value={metrics.avgStaff}
-          subtext="Per department"
-          accentClassName="border-l-orange-500"
-          iconChipClassName="bg-orange-500/10 text-orange-600 dark:bg-orange-500/20"
-          className="shadow-xs"
-        />
-        <StatCard
-          Icon={COMMON.CALENDAR}
-          label="Latest Added"
-          value={metrics.latestDeptName}
-          valueClassName="text-xs sm:text-lg"
-          subtext={metrics.latestDeptDateStr}
-          accentClassName="border-l-blue-500"
-          iconChipClassName="bg-blue-500/10 text-blue-600 dark:bg-blue-500/20"
-          className="shadow-xs"
-        />
-      </div>
-
+      {/* stats Summary Row */}
+      <DepartmentsStatCard stats={stats} isLoading={deptLoading} />
       {/* Error state */}
       {deptError && (
         <div className="bg-destructive/10 text-destructive rounded-lg p-4 text-sm">

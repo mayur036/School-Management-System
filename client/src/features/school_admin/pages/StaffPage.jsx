@@ -4,7 +4,6 @@ import { toast } from 'sonner';
 
 import AppBreadcrumb from '@/components/shared/AppBreadcrumb';
 import AppPagination from '@/components/shared/AppPagination';
-import StatCard from '@/components/shared/StatCard';
 import StatusBadge from '@/components/shared/StatusBadge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -28,7 +27,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { useDataTable } from '@/hooks/useDataTable';
-import { COMMON, SCHOOL_ADMIN } from '@/lib/icons';
+import { COMMON } from '@/lib/icons';
 import {
   formatDate,
   formatPhoneNumber,
@@ -36,8 +35,9 @@ import {
   getInitials,
 } from '@/lib/utils';
 
-import StaffStatusToggle from '../components/StaffStatusToggle';
-import StaffTable from '../components/StaffTable';
+import StaffStatCard from '../components/staffs/StaffStatCard';
+import StaffStatusToggle from '../components/staffs/StaffStatusToggle';
+import StaffTable from '../components/staffs/StaffTable';
 import { useGetDepartmentsQuery } from '../departments.api';
 import { useGetStaffQuery } from '../staff.api';
 import { computeStaffStats, exportStaffToCsv } from '../utils/staff.utils';
@@ -157,41 +157,7 @@ const StaffPage = () => {
       </div>
 
       {/* ── Stats Summary Grid ────────────────────────────────── */}
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-        <StatCard
-          Icon={SCHOOL_ADMIN.STAFF_LIST}
-          label="Total Staff"
-          value={stats.total}
-          subtext="All departments"
-          accentClassName="border-l-blue-500"
-          iconChipClassName="bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400"
-        />
-        <StatCard
-          Icon={COMMON.CHECK}
-          label="Active Staff"
-          value={stats.active}
-          subtext={`${stats.activePct}% of total`}
-          subtextClassName="font-semibold text-emerald-600 dark:text-emerald-400"
-          accentClassName="border-l-emerald-500"
-          iconChipClassName="bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400"
-        />
-        <StatCard
-          Icon={SCHOOL_ADMIN.DEPARTMENTS}
-          label="Departments"
-          value={stats.deptsCount}
-          subtext="Academic & Admin"
-          accentClassName="border-l-amber-500"
-          iconChipClassName="bg-amber-500/10 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400"
-        />
-        <StatCard
-          Icon={SCHOOL_ADMIN.REGISTER_STAFF}
-          label="New This Month"
-          value={stats.joinedThisMonth}
-          subtext="Recently joined"
-          accentClassName="border-l-purple-500"
-          iconChipClassName="bg-purple-500/10 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400"
-        />
-      </div>
+      <StaffStatCard stats={stats} isLoading={staffLoading} />
 
       {/* ── Controls & Actions Bar ────────────────────────────── */}
       <div className="bg-card border-border flex flex-col gap-3 rounded-xl border p-4 sm:flex-row sm:items-center sm:justify-between">

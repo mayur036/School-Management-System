@@ -18,7 +18,7 @@ import { Label } from '@/components/ui/label';
 import { COMMON } from '@/lib/icons';
 import { createDepartmentSchema } from '@/schemas/department.schema';
 
-import { useCreateDepartmentMutation } from '../departments.api';
+import { useCreateDepartmentMutation } from '../../departments.api';
 
 const CreateDepartmentDialog = ({
   externalOpen = false,
