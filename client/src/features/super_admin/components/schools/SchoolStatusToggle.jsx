@@ -10,7 +10,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { COMMON } from '@/lib/icons';
+import { BASE } from '@/lib/icons';
 
 import { useUpdateSchoolStatusMutation } from '../../schools.api';
 
@@ -58,7 +58,7 @@ const SchoolStatusToggle = ({ school, onClose }) => {
             onClick={handleConfirm}
             disabled={isLoading}
           >
-            {isLoading && <COMMON.LOADER className="animate-spin" />}
+            {isLoading && <BASE.LOADER className="animate-spin" />}
             {willActivate ? 'Activate' : 'Deactivate'}
           </AlertDialogAction>
         </AlertDialogFooter>

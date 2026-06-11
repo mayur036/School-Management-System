@@ -20,7 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { COMMON, SUPER_ADMIN } from '@/lib/icons';
+import { ACTIONS, BASE, EMPTY_STATE } from '@/lib/icons';
 import { formatDate, getInitials } from '@/lib/utils';
 
 const SkeletonRows = ({ count = 5 }) =>
@@ -81,7 +81,7 @@ const AdminsTable = ({ admins, isLoading, onToggleStatus, onDeleteAdmin }) => {
   if (!admins?.length) {
     return (
       <EmptyTableState
-        icon={SUPER_ADMIN.USERS}
+        icon={EMPTY_STATE.NO_DATA}
         title="No admins found"
         description="Register a school and add its administrators to see them here."
       />
@@ -148,7 +148,7 @@ const AdminsTable = ({ admins, isLoading, onToggleStatus, onDeleteAdmin }) => {
                       className="cursor-pointer"
                       aria-label={`Actions for ${admin.first_name}`}
                     >
-                      <SUPER_ADMIN.ACTIONS className="size-4" />
+                      <BASE.MORE_V className="size-4" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
@@ -159,7 +159,7 @@ const AdminsTable = ({ admins, isLoading, onToggleStatus, onDeleteAdmin }) => {
                         className="cursor-pointer gap-2"
                         onClick={() => onToggleStatus(admin)}
                       >
-                        <SUPER_ADMIN.POWER data-icon="inline-start" />
+                        <BASE.POWER className="size-4 text-muted-foreground" data-icon="inline-start" />
                         {admin.status === 'active' ? 'Deactivate' : 'Activate'}
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
@@ -167,7 +167,7 @@ const AdminsTable = ({ admins, isLoading, onToggleStatus, onDeleteAdmin }) => {
                         className="text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer flex-nowrap gap-2 whitespace-nowrap"
                         onClick={() => onDeleteAdmin(admin)}
                       >
-                        <COMMON.TRASH className="size-4 shrink-0" />
+                        <ACTIONS.DELETE className="size-4 shrink-0" />
                         Delete Admin
                       </DropdownMenuItem>
                     </DropdownMenuGroup>

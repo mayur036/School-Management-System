@@ -1,5 +1,3 @@
-import { Edit, MoreVertical, Trash2 } from 'lucide-react';
-
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import {
@@ -8,6 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { ACTIONS, BASE } from '@/lib/icons';
 import { cn, formatDate } from '@/lib/utils';
 
 import {
@@ -77,7 +76,7 @@ export const DepartmentsGrid = ({
                     size="icon"
                     className="size-8 cursor-pointer rounded-lg"
                   >
-                    <MoreVertical className="text-muted-foreground size-4" />
+                    <BASE.MORE_V className="text-muted-foreground size-4" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="text-xs">
@@ -85,14 +84,14 @@ export const DepartmentsGrid = ({
                     onClick={() => onEdit?.(dept)}
                     className="cursor-pointer gap-2"
                   >
-                    <Edit className="size-3.5" />
+                    <ACTIONS.EDIT className="size-3.5" />
                     <span>Edit Department</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => onDelete?.(dept)}
                     className="text-destructive focus:text-destructive cursor-pointer gap-2"
                   >
-                    <Trash2 className="size-3.5" />
+                    <ACTIONS.DELETE className="size-3.5" />
                     <span>Delete Department</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>

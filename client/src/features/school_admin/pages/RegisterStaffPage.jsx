@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
@@ -25,7 +24,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { COMMON } from '@/lib/icons';
+import { ACTIONS, BASE, STATUS } from '@/lib/icons';
 import { copyToClipboard } from '@/lib/utils';
 import { batchRegisterStaffSchema } from '@/schemas/staff.schema';
 
@@ -279,7 +278,7 @@ const RegisterStaffPage = () => {
   if (deptsLoading) {
     return (
       <div className="mx-auto flex min-h-[50vh] w-full max-w-xl flex-col items-center justify-center gap-3">
-        <COMMON.LOADER className="text-primary size-8 animate-spin" />
+        <BASE.LOADER className="text-primary size-8 animate-spin" />
         <p className="text-muted-foreground text-sm">
           Loading registration data...
         </p>
@@ -333,7 +332,7 @@ const RegisterStaffPage = () => {
         <Card className="max-w-xs border-blue-500/20 bg-blue-500/5 py-0 shadow-xs">
           <CardContent className="flex items-center gap-3 p-3 text-xs">
             <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600">
-              <COMMON.SHIELD className="size-4" />
+              <BASE.SHIELD className="size-4" />
             </div>
             <div>
               <p className="text-foreground font-semibold">Secure & Private</p>
@@ -365,9 +364,9 @@ const RegisterStaffPage = () => {
                 onClick={handleCopyAll}
               >
                 {copied ? (
-                  <COMMON.CHECK className="text-success size-3.5" />
+                  <STATUS.ACTIVE className="text-success size-3.5" />
                 ) : (
-                  <COMMON.COPY className="size-3.5" />
+                  <BASE.COPY className="size-3.5" />
                 )}
                 {copied ? 'Copied All!' : 'Copy All Credentials'}
               </Button>
@@ -395,7 +394,7 @@ const RegisterStaffPage = () => {
                       title="Copy member details"
                       onClick={() => handleCopySingle(c, idx)}
                     >
-                      <COMMON.COPY className="size-3.5" />
+                      <BASE.COPY className="size-3.5" />
                     </Button>
                   </div>
                   <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
@@ -483,7 +482,7 @@ const RegisterStaffPage = () => {
                       }`}
                     >
                       {isCompleted ? (
-                        <COMMON.CHECK className="size-4" />
+                        <STATUS.ACTIVE className="size-4" />
                       ) : (
                         step.id
                       )}
@@ -539,7 +538,7 @@ const RegisterStaffPage = () => {
                     }`}
                   >
                     {isCompleted ? (
-                      <COMMON.CHECK className="size-3.5" />
+                      <STATUS.ACTIVE className="size-3.5" />
                     ) : (
                       step.id
                     )}
@@ -638,7 +637,7 @@ const RegisterStaffPage = () => {
                         })
                       }
                     >
-                      <COMMON.PLUS className="size-3.5" />
+                      <ACTIONS.CREATE className="size-3.5" />
                       Add Member
                     </Button>
                   </div>
@@ -661,7 +660,7 @@ const RegisterStaffPage = () => {
                               className="text-destructive hover:bg-destructive/10 h-7 cursor-pointer gap-1 px-2 text-xs"
                               onClick={() => remove(idx)}
                             >
-                              <Trash2 className="size-3.5" />
+                              <ACTIONS.DELETE className="size-3.5" />
                               Remove
                             </Button>
                           )}
@@ -786,7 +785,7 @@ const RegisterStaffPage = () => {
               >
                 <div className="flex items-center gap-3">
                   <div className="bg-primary/10 text-primary flex size-8 items-center justify-center rounded-full">
-                    <COMMON.CHECK className="size-4" />
+                    <STATUS.ACTIVE className="size-4" />
                   </div>
                   <div className="flex flex-col text-left">
                     <span className="text-foreground text-sm font-semibold">
@@ -802,7 +801,7 @@ const RegisterStaffPage = () => {
                     </span>
                   </div>
                 </div>
-                <COMMON.CHEVRON_DOWN className="text-muted-foreground size-4" />
+                <BASE.CHEVRON_DOWN className="text-muted-foreground size-4" />
               </button>
             )}
 
@@ -828,7 +827,7 @@ const RegisterStaffPage = () => {
                     className="cursor-pointer gap-1.5 self-start sm:self-auto"
                     onClick={handleGenerateAllPasswords}
                   >
-                    <COMMON.LOCK className="size-3.5" />
+                    <BASE.LOCK className="size-3.5" />
                     Generate for All
                   </Button>
                 </div>
@@ -871,7 +870,7 @@ const RegisterStaffPage = () => {
                             </button>
                           </div>
                           <div className="relative">
-                            <COMMON.LOCK className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
+                            <BASE.LOCK className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
                             <Input
                               id={`password-${idx}`}
                               type={visiblePasswords[idx] ? 'text' : 'password'}
@@ -889,9 +888,9 @@ const RegisterStaffPage = () => {
                               aria-label="Toggle password visibility"
                             >
                               {visiblePasswords[idx] ? (
-                                <COMMON.EYE_OFF className="size-4" />
+                                <BASE.EYE_OFF className="size-4" />
                               ) : (
-                                <COMMON.EYE className="size-4" />
+                                <BASE.EYE className="size-4" />
                               )}
                             </Button>
                           </div>
@@ -921,9 +920,9 @@ const RegisterStaffPage = () => {
                     className={`flex size-8 items-center justify-center rounded-full ${activeStep > 2 ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}
                   >
                     {activeStep > 2 ? (
-                      <COMMON.CHECK className="size-4" />
+                      <STATUS.ACTIVE className="size-4" />
                     ) : (
-                      <COMMON.LOCK className="size-4" />
+                      <BASE.LOCK className="size-4" />
                     )}
                   </div>
                   <div className="flex flex-col text-left">
@@ -935,7 +934,7 @@ const RegisterStaffPage = () => {
                     </span>
                   </div>
                 </div>
-                <COMMON.CHEVRON_DOWN className="text-muted-foreground size-4" />
+                <BASE.CHEVRON_DOWN className="text-muted-foreground size-4" />
               </button>
             )}
 
@@ -1023,7 +1022,7 @@ const RegisterStaffPage = () => {
               >
                 <div className="flex items-center gap-3">
                   <div className="bg-muted text-muted-foreground flex size-8 items-center justify-center rounded-full">
-                    <COMMON.CHECK className="size-4" />
+                    <STATUS.ACTIVE className="size-4" />
                   </div>
                   <div className="flex flex-col text-left">
                     <span className="text-foreground text-sm font-semibold">
@@ -1035,7 +1034,7 @@ const RegisterStaffPage = () => {
                     </span>
                   </div>
                 </div>
-                <COMMON.CHEVRON_DOWN className="text-muted-foreground size-4" />
+                <BASE.CHEVRON_DOWN className="text-muted-foreground size-4" />
               </button>
             )}
 
@@ -1047,7 +1046,7 @@ const RegisterStaffPage = () => {
                 onClick={() => navigate('/school/staff')}
                 disabled={isSubmitting}
               >
-                <COMMON.X className="size-4" />
+                <STATUS.INACTIVE className="size-4" />
                 Cancel
               </Button>
 
@@ -1069,7 +1068,7 @@ const RegisterStaffPage = () => {
                     onClick={handleNext}
                   >
                     Next
-                    <COMMON.ARROW_RIGHT className="size-4" />
+                    <BASE.ARROW_RIGHT className="size-4" />
                   </Button>
                 ) : (
                   <Button
@@ -1078,7 +1077,7 @@ const RegisterStaffPage = () => {
                     onClick={handleSubmit(onSubmit)}
                     disabled={isSubmitting}
                   >
-                    {isSubmitting && <COMMON.LOADER className="animate-spin" />}
+                    {isSubmitting && <BASE.LOADER className="animate-spin" />}
                     {isSubmitting ? 'Registering Batch…' : 'Register Batch'}
                   </Button>
                 )}

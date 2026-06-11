@@ -10,7 +10,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { COMMON } from '@/lib/icons';
+import { BASE } from '@/lib/icons';
 
 import { useDeleteSchoolAdminMutation } from '../../schoolAdmins.api';
 
@@ -35,7 +35,7 @@ const DeleteAdminAlert = ({ admin, onClose }) => {
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle className="text-destructive flex items-center gap-2">
-            <COMMON.SHIELD_ALERT className="size-5" />
+            <BASE.SHIELD_ALERT className="size-5" />
             Delete Admin
           </AlertDialogTitle>
           <AlertDialogDescription>
@@ -59,7 +59,7 @@ const DeleteAdminAlert = ({ admin, onClose }) => {
             disabled={isLoading}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90 cursor-pointer gap-2"
           >
-            {isLoading && <COMMON.LOADER className="size-4 animate-spin" />}
+            {isLoading && <BASE.LOADER className="size-4 animate-spin" />}
             {isLoading ? 'Deleting...' : 'Yes, Delete Admin'}
           </AlertDialogAction>
         </AlertDialogFooter>

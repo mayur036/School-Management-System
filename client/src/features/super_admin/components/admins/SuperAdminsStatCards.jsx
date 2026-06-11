@@ -1,14 +1,14 @@
 import StatCard from '@/components/shared/StatCard';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { COMMON } from '@/lib/icons';
+import { BASE, STATS } from '@/lib/icons';
 
 const SuperAdminsStatCards = ({ stats, isLoading }) => {
   const items = [
     {
       label: 'Total Admins',
       value: stats.total,
-      Icon: COMMON.USERS_GROUP,
+      Icon: STATS.TOTAL_ADMINS,
       subtext: 'All school admins',
       accentClassName: 'border-blue-500',
       iconChipClassName: 'bg-blue-500/10 text-blue-500',
@@ -16,7 +16,7 @@ const SuperAdminsStatCards = ({ stats, isLoading }) => {
     {
       label: 'Active Admins',
       value: stats.active,
-      Icon: COMMON.SHIELD_CHECK,
+      Icon: STATS.ACTIVE_ADMINS,
       subtext: 'Currently active',
       accentClassName: 'border-emerald-500',
       iconChipClassName: 'bg-emerald-500/10 text-emerald-500',
@@ -24,7 +24,7 @@ const SuperAdminsStatCards = ({ stats, isLoading }) => {
     {
       label: 'Inactive Admins',
       value: stats.inactive,
-      Icon: COMMON.SHIELD_ALERT,
+      Icon: STATS.INACTIVE_ADMINS,
       subtext: 'Suspended accounts',
       accentClassName: 'border-amber-500',
       iconChipClassName: 'bg-amber-500/10 text-amber-500',
@@ -32,7 +32,7 @@ const SuperAdminsStatCards = ({ stats, isLoading }) => {
     {
       label: 'New This Month',
       value: stats.joinedThisMonth,
-      Icon: COMMON.PLUS,
+      Icon: BASE.CALENDAR,
       subtext: 'Recently joined',
       accentClassName: 'border-purple-500',
       iconChipClassName: 'bg-purple-500/10 text-purple-500',

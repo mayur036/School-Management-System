@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { COMMON, SCHOOL_ADMIN } from '@/lib/icons';
+import { BASE, SCHOOL_ADMIN } from '@/lib/icons';
 
 import CreateDepartmentDialog from '../departments/CreateDepartmentDialog';
 
@@ -29,7 +29,7 @@ const ActionTile = ({ Icon, chip, label, description }) => (
         {description}
       </span>
     </span>
-    <COMMON.CHEVRON_RIGHT className="text-muted-foreground ml-auto size-4 shrink-0 transition-transform group-hover:translate-x-0.5" />
+    <BASE.CHEVRON_RIGHT className="text-muted-foreground ml-auto size-4 shrink-0 transition-transform group-hover:translate-x-0.5" />
   </>
 );
 

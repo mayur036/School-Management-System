@@ -10,7 +10,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { COMMON } from '@/lib/icons';
+import { BASE } from '@/lib/icons';
 
 import { useUpdateSchoolAdminStatusMutation } from '../../schoolAdmins.api';
 
@@ -43,7 +43,7 @@ const AdminStatusToggle = ({ admin, onClose }) => {
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle className="flex items-center gap-2">
-            <COMMON.POWER
+            <BASE.POWER
               className={`size-5 ${isActivating ? 'text-emerald-500' : 'text-amber-500'}`}
             />
             {isActivating ? 'Activate Admin' : 'Deactivate Admin'}
@@ -74,7 +74,7 @@ const AdminStatusToggle = ({ admin, onClose }) => {
                 : 'bg-amber-600 text-white hover:bg-amber-700'
             }`}
           >
-            {isLoading && <COMMON.LOADER className="size-4 animate-spin" />}
+            {isLoading && <BASE.LOADER className="size-4 animate-spin" />}
             {isLoading
               ? 'Updating...'
               : isActivating

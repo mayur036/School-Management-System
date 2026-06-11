@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { COMMON } from '@/lib/icons';
+import { BASE, STATUS } from '@/lib/icons';
 import { formatPhoneNumber } from '@/lib/utils';
 
 import {
@@ -204,7 +204,7 @@ const ProfileTabContent = ({
                 Active Device Sessions
               </h4>
               <div className="text-muted-foreground flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed py-6 text-center text-xs">
-                <COMMON.SHIELD className="size-7 opacity-40" />
+                <BASE.SHIELD className="size-7 opacity-40" />
                 Session tracking is coming soon.
               </div>
             </div>
@@ -283,7 +283,7 @@ const ProfileTabContent = ({
           </CardHeader>
           <CardContent className="px-5 pb-5">
             <div className="text-muted-foreground flex flex-col items-center justify-center gap-2 py-10 text-center text-xs">
-              <COMMON.ACTIVITY className="size-8 opacity-40" />
+              <STATUS.ACTIVE className="size-8 opacity-40" />
               Activity audit logs are coming soon.
             </div>
           </CardContent>

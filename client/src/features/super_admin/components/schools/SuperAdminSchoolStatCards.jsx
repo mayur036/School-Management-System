@@ -1,14 +1,14 @@
 import StatCard from '@/components/shared/StatCard';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { COMMON, SCHOOL_ADMIN } from '@/lib/icons';
+import { BASE, STATS } from '@/lib/icons';
 
 export const SuperAdminSchoolStatCards = ({ stats, isLoading }) => {
   const items = [
     {
       label: 'Total Schools',
       value: stats.total,
-      Icon: COMMON.BUILDING,
+      Icon: STATS.TOTAL_SCHOOLS,
       subtext: 'All registered schools',
       accentClassName: 'border-blue-500',
       iconChipClassName: 'bg-blue-500/10 text-blue-500',
@@ -16,7 +16,7 @@ export const SuperAdminSchoolStatCards = ({ stats, isLoading }) => {
     {
       label: 'Active Schools',
       value: stats.active,
-      Icon: COMMON.CHECK,
+      Icon: STATS.ACTIVE_SCHOOLS,
       subtext: '80% of total',
       subtextClassName: 'font-semibold text-emerald-500',
       accentClassName: 'border-emerald-500',
@@ -25,7 +25,7 @@ export const SuperAdminSchoolStatCards = ({ stats, isLoading }) => {
     {
       label: 'Inactive Schools',
       value: stats.inactive,
-      Icon: COMMON.X,
+      Icon: STATS.INACTIVE_SCHOOLS,
       subtext: 'Currently suspended',
       accentClassName: 'border-amber-500',
       iconChipClassName: 'bg-amber-500/10 text-amber-500',
@@ -33,7 +33,7 @@ export const SuperAdminSchoolStatCards = ({ stats, isLoading }) => {
     {
       label: 'New This Month',
       value: stats.joinedThisMonth,
-      Icon: SCHOOL_ADMIN.REGISTER_STAFF,
+      Icon: BASE.CALENDAR,
       subtext: 'Recently onboarded',
       accentClassName: 'border-purple-500',
       iconChipClassName: 'bg-purple-500/10 text-purple-500',

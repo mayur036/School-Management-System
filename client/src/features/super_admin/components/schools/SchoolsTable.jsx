@@ -19,7 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { SUPER_ADMIN } from '@/lib/icons';
+import { BASE, EMPTY_STATE, SUPER_ADMIN } from '@/lib/icons';
 import { formatDate } from '@/lib/utils';
 
 // ── Skeleton rows (loading state) ─────────────────────────────
@@ -78,7 +78,7 @@ const SchoolsTable = ({ schools, isLoading, onToggleStatus, onAddAdmin }) => {
   if (!schools?.length) {
     return (
       <EmptyTableState
-        icon={SUPER_ADMIN.SCHOOLS}
+        icon={EMPTY_STATE.NO_DATA}
         title="No schools yet"
         description="Get started by registering your first school using the button above."
       />
@@ -125,7 +125,7 @@ const SchoolsTable = ({ schools, isLoading, onToggleStatus, onAddAdmin }) => {
                       className="cursor-pointer"
                       aria-label={`Actions for ${school.name}`}
                     >
-                      <SUPER_ADMIN.ACTIONS />
+                      <BASE.MORE_V className="size-4" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
@@ -143,7 +143,7 @@ const SchoolsTable = ({ schools, isLoading, onToggleStatus, onAddAdmin }) => {
                         className="cursor-pointer gap-2"
                         onClick={() => onToggleStatus(school)}
                       >
-                        <SUPER_ADMIN.POWER data-icon="inline-start" />
+                        <BASE.POWER className="size-4 text-muted-foreground" data-icon="inline-start" />
                         {school.status === 'active' ? 'Deactivate' : 'Activate'}
                       </DropdownMenuItem>
                     </DropdownMenuGroup>

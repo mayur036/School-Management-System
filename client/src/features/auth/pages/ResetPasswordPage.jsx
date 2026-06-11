@@ -9,22 +9,22 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useResetPasswordMutation } from '@/features/auth/auth.api';
-import { COMMON } from '@/lib/icons';
+import { BASE, STATUS } from '@/lib/icons';
 import { resetPasswordSchema } from '@/schemas/auth.schema';
 
 const HIGHLIGHTS = [
   {
-    Icon: COMMON.LOCK,
+    Icon: BASE.LOCK,
     title: 'Strong Password Security',
     subtitle: 'rules enforced to keep your account safe',
   },
   {
-    Icon: COMMON.SHIELD_CHECK,
+    Icon: BASE.SHIELD_CHECK,
     title: 'Safe Password Hashing',
     subtitle: 'passwords are encrypted using bcrypt hashing',
   },
   {
-    Icon: COMMON.CHECK,
+    Icon: STATUS.ACTIVE,
     title: 'Instant Login Activation',
     subtitle: 'log back in immediately after updating',
   },
@@ -89,12 +89,12 @@ export const ResetPasswordPage = () => {
         >
           {theme === 'dark' ? (
             <>
-              <COMMON.SUN className="size-4" />
+              <BASE.SUN className="size-4" />
               <span>Light mode</span>
             </>
           ) : (
             <>
-              <COMMON.MOON className="size-4" />
+              <BASE.MOON className="size-4" />
               <span>Dark mode</span>
             </>
           )}
@@ -108,7 +108,7 @@ export const ResetPasswordPage = () => {
         {/* Logo */}
         <div className="flex items-center gap-3">
           <div className="flex size-10 items-center justify-center rounded-xl border border-white/5 bg-white/10 text-white">
-            <COMMON.GRADUATION_CAP className="size-6" />
+            <BASE.GRADUATION_CAP className="size-6" />
           </div>
           <div className="flex flex-col">
             <span className="text-lg leading-none font-bold tracking-tight">
@@ -167,7 +167,7 @@ export const ResetPasswordPage = () => {
 
           <div className="flex items-center gap-3">
             <div className="flex size-10 items-center justify-center rounded-xl border border-white/5 bg-white/10 text-white">
-              <COMMON.GRADUATION_CAP className="size-6" />
+              <BASE.GRADUATION_CAP className="size-6" />
             </div>
             <div className="flex flex-col">
               <span className="text-lg leading-none font-bold tracking-tight">
@@ -186,7 +186,7 @@ export const ResetPasswordPage = () => {
             {!token ? (
               <div className="space-y-4 text-center">
                 <div className="bg-destructive/10 text-destructive mx-auto flex size-16 items-center justify-center rounded-2xl">
-                  <COMMON.X className="size-8 stroke-3" />
+                  <STATUS.INACTIVE className="size-8 stroke-3" />
                 </div>
                 <div className="space-y-2">
                   <h2 className="text-foreground text-2xl font-bold tracking-tight">
@@ -230,7 +230,7 @@ export const ResetPasswordPage = () => {
                       New Password
                     </Label>
                     <div className="relative">
-                      <COMMON.LOCK className="text-muted-foreground absolute top-1/2 left-3.5 size-4 -translate-y-1/2" />
+                      <BASE.LOCK className="text-muted-foreground absolute top-1/2 left-3.5 size-4 -translate-y-1/2" />
                       <Input
                         id="password"
                         type={showPassword ? 'text' : 'password'}
@@ -250,9 +250,9 @@ export const ResetPasswordPage = () => {
                         }
                       >
                         {showPassword ? (
-                          <COMMON.EYE_OFF className="size-4" />
+                          <BASE.EYE_OFF className="size-4" />
                         ) : (
-                          <COMMON.EYE className="size-4" />
+                          <BASE.EYE className="size-4" />
                         )}
                       </button>
                     </div>
@@ -272,7 +272,7 @@ export const ResetPasswordPage = () => {
                       Confirm New Password
                     </Label>
                     <div className="relative">
-                      <COMMON.LOCK className="text-muted-foreground absolute top-1/2 left-3.5 size-4 -translate-y-1/2" />
+                      <BASE.LOCK className="text-muted-foreground absolute top-1/2 left-3.5 size-4 -translate-y-1/2" />
                       <Input
                         id="confirmPassword"
                         type={showConfirmPassword ? 'text' : 'password'}
@@ -293,9 +293,9 @@ export const ResetPasswordPage = () => {
                         }
                       >
                         {showConfirmPassword ? (
-                          <COMMON.EYE_OFF className="size-4" />
+                          <BASE.EYE_OFF className="size-4" />
                         ) : (
-                          <COMMON.EYE className="size-4" />
+                          <BASE.EYE className="size-4" />
                         )}
                       </button>
                     </div>
@@ -316,7 +316,7 @@ export const ResetPasswordPage = () => {
                         <span
                           className={`flex size-4 shrink-0 items-center justify-center rounded-full ${hasMinLength ? 'bg-emerald-500/10 text-emerald-500' : 'bg-muted text-muted-foreground'}`}
                         >
-                          <COMMON.CHECK className="size-2.5 stroke-3" />
+                          <STATUS.ACTIVE className="size-2.5 stroke-3" />
                         </span>
                         <span
                           className={
@@ -332,7 +332,7 @@ export const ResetPasswordPage = () => {
                         <span
                           className={`flex size-4 shrink-0 items-center justify-center rounded-full ${hasNumberOrSpecial ? 'bg-emerald-500/10 text-emerald-500' : 'bg-muted text-muted-foreground'}`}
                         >
-                          <COMMON.CHECK className="size-2.5 stroke-3" />
+                          <STATUS.ACTIVE className="size-2.5 stroke-3" />
                         </span>
                         <span
                           className={
@@ -353,9 +353,9 @@ export const ResetPasswordPage = () => {
                     disabled={isLoading}
                   >
                     {isLoading ? (
-                      <COMMON.LOADER className="size-4 animate-spin" />
+                      <BASE.LOADER className="size-4 animate-spin" />
                     ) : (
-                      <COMMON.LOCK className="size-4" />
+                      <BASE.LOCK className="size-4" />
                     )}
                     {isLoading ? 'Resetting password…' : 'Reset password'}
                   </Button>

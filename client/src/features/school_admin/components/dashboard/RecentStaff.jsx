@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { COMMON, SCHOOL_ADMIN } from '@/lib/icons';
+import { BASE, SCHOOL_ADMIN } from '@/lib/icons';
 import { formatDate, getInitials } from '@/lib/utils';
 
 const RecentStaff = ({ staff = [], isLoading }) => (
@@ -25,7 +25,7 @@ const RecentStaff = ({ staff = [], isLoading }) => (
         className="text-primary inline-flex items-center gap-1 text-xs font-medium hover:underline"
       >
         View all
-        <COMMON.ARROW_RIGHT className="size-3.5" />
+        <BASE.ARROW_RIGHT className="size-3.5" />
       </Link>
     </CardHeader>
     <CardContent>

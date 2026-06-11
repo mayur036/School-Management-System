@@ -15,7 +15,7 @@ import {
   ChartTooltipContent,
 } from '@/components/ui/chart';
 import { Skeleton } from '@/components/ui/skeleton';
-import { COMMON } from '@/lib/icons';
+import { BASE } from '@/lib/icons';
 
 const chartConfig = {
   active: { label: 'Active Staff', color: '#10b981' },
@@ -41,7 +41,7 @@ const StaffStatusChart = ({ active = 0, inactive = 0, isLoading }) => {
         ) : total === 0 ? (
           <div className="text-muted-foreground flex h-65 flex-col items-center justify-center gap-3 text-center text-sm">
             <div className="bg-muted rounded-full p-4">
-              <COMMON.USERS_GROUP className="size-8 opacity-40" />
+              <BASE.USERS className="size-8 opacity-40" />
             </div>
             <p>No staff yet</p>
           </div>

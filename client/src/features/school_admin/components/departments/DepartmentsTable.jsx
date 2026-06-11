@@ -1,5 +1,3 @@
-import { Edit, MoreVertical, Trash2 } from 'lucide-react';
-
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -16,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { ACTIONS, BASE } from '@/lib/icons';
 import { cn, formatDate } from '@/lib/utils';
 
 import {
@@ -165,7 +164,7 @@ const DepartmentsTable = ({
                       className="text-muted-foreground hover:text-foreground size-8 cursor-pointer rounded-lg"
                       title="Edit Department"
                     >
-                      <Edit className="size-4" />
+                      <ACTIONS.EDIT className="size-4" />
                     </Button>
 
                     {/* More actions dropdown */}
@@ -176,7 +175,7 @@ const DepartmentsTable = ({
                           size="icon"
                           className="text-muted-foreground hover:text-foreground size-8 cursor-pointer rounded-lg"
                         >
-                          <MoreVertical className="size-4" />
+                          <BASE.MORE_V className="size-4" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="text-xs">
@@ -184,14 +183,14 @@ const DepartmentsTable = ({
                           onClick={() => onEdit?.(dept)}
                           className="cursor-pointer gap-2"
                         >
-                          <Edit className="size-3.5" />
+                          <ACTIONS.EDIT className="size-3.5" />
                           <span>Edit Department</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => onDelete?.(dept)}
                           className="text-destructive focus:text-destructive cursor-pointer gap-2"
                         >
-                          <Trash2 className="size-3.5" />
+                          <ACTIONS.DELETE className="size-3.5" />
                           <span>Delete Department</span>
                         </DropdownMenuItem>
                       </DropdownMenuContent>

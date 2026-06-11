@@ -1,4 +1,4 @@
-import { COMMON } from '@/lib/icons';
+import { BASE } from '@/lib/icons';
 
 export const MAX_SIZE = 2 * 1024 * 1024; // 2 MB
 export const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
@@ -10,11 +10,11 @@ export const ROLE_LABELS = {
 };
 
 export const TABS_LIST = [
-  { id: 'profile', label: 'Profile', icon: COMMON.USER },
-  { id: 'security', label: 'Security', icon: COMMON.SHIELD },
-  { id: 'notifications', label: 'Notifications', icon: COMMON.BELL },
-  { id: 'activity', label: 'Activity Logs', icon: COMMON.CLOCK },
-  { id: 'preferences', label: 'Preferences', icon: COMMON.SETTINGS },
+  { id: 'profile', label: 'Profile', icon: BASE.USER },
+  { id: 'security', label: 'Security', icon: BASE.SHIELD },
+  { id: 'notifications', label: 'Notifications', icon: BASE.BELL },
+  { id: 'activity', label: 'Activity Logs', icon: BASE.CLOCK },
+  { id: 'preferences', label: 'Preferences', icon: BASE.SETTINGS },
 ];
 
 export const languagePreference = [
@@ -42,31 +42,31 @@ export const QUICK_ACTIONS = [
   {
     title: 'Edit Profile',
     description: 'Update your profile information',
-    icon: COMMON.USER,
+    icon: BASE.USER,
     action: 'edit-profile',
   },
   {
     title: 'Change Password',
     description: 'Update your password',
-    icon: COMMON.SHIELD,
+    icon: BASE.SHIELD,
     action: 'change-password',
   },
   {
     title: 'Notification Preferences',
     description: 'Update your notification preferences',
-    icon: COMMON.BELL,
+    icon: BASE.BELL,
     action: 'notification-preferences',
   },
   {
     title: 'Activity Logs',
     description: 'View your activity logs',
-    icon: COMMON.CLOCK,
+    icon: BASE.CLOCK,
     action: 'activity-logs',
   },
   {
     title: 'Profile Preferences',
     description: 'Update your profile preferences',
-    icon: COMMON.SETTINGS,
+    icon: BASE.SETTINGS,
     action: 'profile-preferences',
   },
 ];

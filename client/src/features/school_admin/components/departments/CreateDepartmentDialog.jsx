@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { COMMON } from '@/lib/icons';
+import { ACTIONS, BASE } from '@/lib/icons';
 import { createDepartmentSchema } from '@/schemas/department.schema';
 
 import { useCreateDepartmentMutation } from '../../departments.api';
@@ -63,7 +63,7 @@ const CreateDepartmentDialog = ({
       {!hideTrigger && (
         <DialogTrigger asChild>
           <Button className="cursor-pointer gap-2">
-            <COMMON.PLUS data-icon="inline-start" />
+            <ACTIONS.CREATE data-icon="inline-start" />
             Add Department
           </Button>
         </DialogTrigger>
@@ -114,7 +114,7 @@ const CreateDepartmentDialog = ({
             className="cursor-pointer gap-2"
             disabled={isLoading}
           >
-            {isLoading && <COMMON.LOADER className="animate-spin" />}
+            {isLoading && <BASE.LOADER className="animate-spin" />}
             {isLoading ? 'Creating…' : 'Create Department'}
           </Button>
         </DialogFooter>

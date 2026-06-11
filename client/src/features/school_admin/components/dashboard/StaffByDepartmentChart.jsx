@@ -13,7 +13,7 @@ import {
   ChartTooltipContent,
 } from '@/components/ui/chart';
 import { Skeleton } from '@/components/ui/skeleton';
-import { SCHOOL_ADMIN } from '@/lib/icons';
+import { EMPTY_STATE } from '@/lib/icons';
 
 const chartConfig = {
   count: { label: 'Staff Members', color: '#6366f1' }, // Indigo-500
@@ -31,7 +31,7 @@ const StaffByDepartmentChart = ({ data = [], isLoading }) => (
       ) : data.length === 0 ? (
         <div className="text-muted-foreground flex h-65 flex-col items-center justify-center gap-3 text-center text-sm">
           <div className="bg-muted rounded-full p-4">
-            <SCHOOL_ADMIN.DEPARTMENTS className="size-8 opacity-40" />
+            <EMPTY_STATE.NO_DATA className="size-8 opacity-40" />
           </div>
           <p>No department data yet</p>
         </div>

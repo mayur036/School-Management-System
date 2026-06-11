@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/hooks/useAuth';
-import { COMMON } from '@/lib/icons';
+import { BASE, STATUS } from '@/lib/icons';
 import { formatDate } from '@/lib/utils';
 
 import ChangePasswordDialog from '../components/ChangePasswordDialog';
@@ -47,7 +47,7 @@ export const ProfileView = () => {
   if (!user) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <COMMON.LOADER className="text-muted-foreground size-6 animate-spin" />
+        <BASE.LOADER className="text-muted-foreground size-6 animate-spin" />
       </div>
     );
   }
@@ -154,9 +154,9 @@ export const ProfileView = () => {
                 title="Change profile picture"
               >
                 {isUploadingAvatar ? (
-                  <COMMON.LOADER className="size-4 animate-spin" />
+                  <BASE.LOADER className="size-4 animate-spin" />
                 ) : (
-                  <COMMON.CAMERA className="size-4" />
+                  <BASE.CAMERA className="size-4" />
                 )}
               </button>
             </div>
@@ -170,21 +170,21 @@ export const ProfileView = () => {
                 <StatusBadge status={user.status} />
               </div>
               <span className="text-muted-foreground mt-1 flex items-center justify-center gap-1.5 text-sm sm:justify-start">
-                <COMMON.SHIELD className="text-primary size-4" />
+                <BASE.SHIELD className="text-primary size-4" />
                 {ROLE_LABELS[user.role_name] || user.role_name}
               </span>
 
               {/* Status details metadata row */}
               <div className="text-muted-foreground mt-3 flex flex-wrap justify-center gap-x-4 gap-y-1.5 text-xs sm:justify-start">
                 <span className="flex items-center gap-1">
-                  <COMMON.CLOCK className="size-3.5" />
+                  <BASE.CLOCK className="size-3.5" />
                   Last Login:{' '}
                   {user.last_login_at
                     ? formatDate(user.last_login_at, 'short-time')
                     : 'Never'}
                 </span>
                 <span className="flex items-center gap-1">
-                  <COMMON.CALENDAR className="size-3.5" />
+                  <BASE.CALENDAR className="size-3.5" />
                   Joined: {formatDate(user.created_at, 'long')}
                 </span>
               </div>
@@ -198,14 +198,14 @@ export const ProfileView = () => {
               onClick={() => setIsEditProfileOpen(true)}
               className="flex-1 cursor-pointer gap-2 rounded-xl text-xs sm:flex-initial sm:text-sm"
             >
-              <COMMON.USER className="size-4" />
+              <BASE.USER className="size-4" />
               Edit Profile
             </Button>
             <Button
               onClick={() => setIsChangePasswordOpen(true)}
               className="bg-primary text-primary-foreground hover:bg-primary/95 flex-1 cursor-pointer gap-2 rounded-xl text-xs sm:flex-initial sm:text-sm"
             >
-              <COMMON.LOCK className="size-4" />
+              <BASE.LOCK className="size-4" />
               Change Password
             </Button>
           </div>
@@ -243,7 +243,7 @@ export const ProfileView = () => {
                 >
                   <span className="text-muted-foreground">{item.label}</span>
                   {item.completed ? (
-                    <COMMON.CHECK className="size-4 font-bold text-emerald-500" />
+                    <STATUS.ACTIVE className="size-4 font-bold text-emerald-500" />
                   ) : (
                     <span className="size-2 rounded-full bg-amber-400" />
                   )}
@@ -290,7 +290,7 @@ export const ProfileView = () => {
                         <tab.icon className="text-primary size-4.5" />
                         {tab.label}
                       </div>
-                      <COMMON.CHEVRON_RIGHT className="text-muted-foreground size-4" />
+                      <BASE.CHEVRON_RIGHT className="text-muted-foreground size-4" />
                     </button>
                   ))}
                 </div>
@@ -309,15 +309,15 @@ export const ProfileView = () => {
                     className="text-foreground/80 flex w-full cursor-pointer items-center justify-between px-2 py-3 text-xs font-semibold"
                   >
                     Change Password
-                    <COMMON.CHEVRON_RIGHT className="text-muted-foreground size-4" />
+                    <BASE.CHEVRON_RIGHT className="text-muted-foreground size-4" />
                   </button>
                   <button className="text-foreground/80 flex w-full cursor-pointer items-center justify-between px-2 py-3 text-xs font-semibold">
                     Export My Data
-                    <COMMON.CHEVRON_RIGHT className="text-muted-foreground size-4" />
+                    <BASE.CHEVRON_RIGHT className="text-muted-foreground size-4" />
                   </button>
                   <button className="text-foreground/80 flex w-full cursor-pointer items-center justify-between px-2 py-3 text-xs font-semibold">
                     Logout All Devices
-                    <COMMON.CHEVRON_RIGHT className="text-destructive size-4" />
+                    <BASE.CHEVRON_RIGHT className="text-destructive size-4" />
                   </button>
                 </div>
               </Card>
@@ -331,7 +331,7 @@ export const ProfileView = () => {
                 onClick={() => setMobileActiveSubView(null)}
                 className="text-muted-foreground -ml-2 w-fit cursor-pointer gap-2"
               >
-                <COMMON.X className="size-4" />
+                <STATUS.INACTIVE className="size-4" />
                 Back to Settings
               </Button>
               <ProfileTabContent
@@ -426,7 +426,7 @@ export const ProfileView = () => {
             </CardHeader>
             <CardContent className="px-5 pb-5">
               <div className="text-muted-foreground flex flex-col items-center justify-center gap-2 py-6 text-center text-xs">
-                <COMMON.ACTIVITY className="size-7 opacity-40" />
+                <STATUS.ACTIVE className="size-7 opacity-40" />
                 Activity tracking is coming soon.
               </div>
             </CardContent>

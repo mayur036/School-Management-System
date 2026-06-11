@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { useDataTable } from '@/hooks/useDataTable';
-import { COMMON } from '@/lib/icons';
+import { ACTIONS, BASE } from '@/lib/icons';
 
 import CreateSchoolAdminDialog from '../components/schools/CreateSchoolAdminDialog';
 import CreateSchoolDialog from '../components/schools/CreateSchoolDialog';
@@ -96,7 +96,7 @@ const SchoolsPage = () => {
           onClick={() => setCreateOpen(true)}
           className="bg-primary text-primary-foreground hover:bg-primary/95 cursor-pointer gap-2 shadow-sm transition-all"
         >
-          <COMMON.PLUS data-icon="inline-start" />
+          <ACTIONS.CREATE data-icon="inline-start" />
           Register School
         </Button>
       </div>
@@ -108,7 +108,7 @@ const SchoolsPage = () => {
       <div className="bg-card border-border flex flex-col gap-3 rounded-xl border p-4 sm:flex-row sm:items-center sm:justify-between">
         {/* Search */}
         <div className="relative max-w-md flex-1">
-          <COMMON.SEARCH className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
+          <BASE.SEARCH className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
           <Input
             className="bg-muted/40 border-border pl-9"
             placeholder="Search schools by name or domain..."
@@ -126,7 +126,7 @@ const SchoolsPage = () => {
                 variant="outline"
                 className="border-border bg-card cursor-pointer gap-2"
               >
-                <COMMON.FILTER data-icon="inline-start" />
+                <BASE.FILTER data-icon="inline-start" />
                 Filter
               </Button>
             </DropdownMenuTrigger>
@@ -160,7 +160,7 @@ const SchoolsPage = () => {
             className="border-border bg-card cursor-pointer gap-2"
             onClick={handleExport}
           >
-            <COMMON.EXPORT data-icon="inline-start" />
+            <BASE.DOWNLOAD data-icon="inline-start" />
             Export
           </Button>
         </div>

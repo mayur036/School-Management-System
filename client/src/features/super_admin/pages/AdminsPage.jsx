@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { useDataTable } from '@/hooks/useDataTable';
-import { COMMON } from '@/lib/icons';
+import { BASE } from '@/lib/icons';
 
 import AdminsTable from '../components/admins/AdminsTable';
 import AdminStatusToggle from '../components/admins/AdminStatusToggle';
@@ -100,7 +100,7 @@ const AdminsPage = () => {
       <div className="bg-card border-border flex flex-col gap-3 rounded-xl border p-4 sm:flex-row sm:items-center sm:justify-between">
         {/* Search */}
         <div className="relative max-w-md flex-1">
-          <COMMON.SEARCH className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
+          <BASE.SEARCH className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
           <Input
             className="bg-muted/40 border-border pl-9"
             placeholder="Search by name, email, or school..."
@@ -118,7 +118,7 @@ const AdminsPage = () => {
                 variant="outline"
                 className="border-border bg-card cursor-pointer gap-2"
               >
-                <COMMON.FILTER data-icon="inline-start" />
+                <BASE.FILTER data-icon="inline-start" />
                 Filter
               </Button>
             </DropdownMenuTrigger>
@@ -152,7 +152,7 @@ const AdminsPage = () => {
             className="border-border bg-card cursor-pointer gap-2"
             onClick={handleExport}
           >
-            <COMMON.EXPORT data-icon="inline-start" />
+            <BASE.DOWNLOAD data-icon="inline-start" />
             Export
           </Button>
         </div>

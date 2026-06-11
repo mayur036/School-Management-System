@@ -1,26 +1,65 @@
+/**
+ * @file superAdmin.icons.jsx
+ * @description Icons scoped to the Super Admin role.
+ * Super Admin manages the platform: schools, admins, system health, billing.
+ */
+
 import {
+  Activity,
+  BadgeCheck,
   Building2,
-  EllipsisVertical,
+  ChartColumnIncreasing,
+  CircleCheck,
+  CircleOff,
+  Cpu,
+  KeyRound,
   LayoutDashboard,
   LogOut,
-  Power,
+  School,
   Settings,
   ShieldAlert,
-  User,
+  UserCheck,
+  UserCog,
   UserPlus,
+  UserRound,
   Users,
+  UserX,
 } from 'lucide-react';
 
 export const SUPER_ADMIN = {
-  ACTIONS: EllipsisVertical,
-  CREATE_ADMIN: UserPlus,
+  // Sidebar Navigation
   DASHBOARD: LayoutDashboard,
-  LOGOUT: LogOut,
-  POWER: Power,
-  PROFILE: User,
-  SCHOOLS: Building2,
-  SECURITY: ShieldAlert,
-  SETTINGS: Settings,
+  SCHOOLS: School,
+  ADMINS: UserCog,
   USERS: Users,
+  SETTINGS: Settings,
+  LOGOUT: LogOut,
+
+  // Profile
+  PROFILE: UserRound,
+
+  // School Actions
+  ADD_SCHOOL: School,
+  SCHOOL_ACTIVE: CircleCheck,
+  SCHOOL_INACTIVE: CircleOff,
+
+  // Admin Actions
+  CREATE_ADMIN: UserPlus,
+  MANAGE_ADMIN: UserCog,
+  ADMIN_ACTIVE: UserCheck,
+  ADMIN_INACTIVE: UserX,
+
+  // Stats / Analytics
+  STATS_SCHOOLS: Building2,
+  STATS_ADMINS: UserCog,
+  STATS_STAFF: BadgeCheck,
+  STATS_AVG_STAFF: ChartColumnIncreasing,
+
+  // System
+  SECURITY: ShieldAlert,
+  PERMISSIONS: KeyRound,
+  SYSTEM_HEALTH: Activity,
+  SYSTEM_MONITOR: Cpu,
 };
+
 export default SUPER_ADMIN;

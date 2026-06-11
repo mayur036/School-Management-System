@@ -16,7 +16,7 @@ import { Input } from '@/components/ui/input';
 import { useSidebar } from '@/components/ui/sidebar';
 import { useAuth } from '@/hooks/useAuth';
 import { useLogout } from '@/hooks/useLogout';
-import { COMMON } from '@/lib/icons';
+import { BASE } from '@/lib/icons';
 import { cn } from '@/lib/utils';
 
 const PAGE_INFOS = {
@@ -101,11 +101,11 @@ const AppHeader = ({
             className="text-muted-foreground hover:bg-muted/40 hover:text-foreground -ml-2 h-9 w-9 cursor-pointer rounded-lg"
             aria-label="Toggle Menu"
           >
-            <COMMON.MENU className="size-5" />
+            <BASE.MENU className="size-5" />
           </Button>
           <div className="flex items-center gap-2">
             <div className="bg-primary text-primary-foreground flex size-8 items-center justify-center rounded-lg">
-              <COMMON.GRADUATION_CAP className="size-5" />
+              <BASE.GRADUATION_CAP className="size-5" />
             </div>
             <span className="text-foreground text-base font-bold tracking-tight">
               CampusCore
@@ -132,7 +132,7 @@ const AppHeader = ({
             placeholder="Search schools, admins, staff..."
             className="bg-muted/40 h-9 w-full rounded-lg pr-10 text-xs transition-all"
           />
-          <COMMON.SEARCH className="text-muted-foreground/60 pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2" />
+          <BASE.SEARCH className="text-muted-foreground/60 pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2" />
         </div>
       </div>
 
@@ -141,7 +141,7 @@ const AppHeader = ({
         {/* Sliding Theme Toggle Switch */}
         <button
           onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-          className="bg-muted/45 border-border/20 border-muted-foreground relative flex h-8 w-14 cursor-pointer items-center rounded-full border p-1 transition-colors"
+          className="bg-muted/45 border-border/20 relative flex h-8 w-14 cursor-pointer items-center rounded-full border p-1 transition-colors"
           title="Toggle dark mode"
         >
           <div
@@ -151,16 +151,16 @@ const AppHeader = ({
             )}
           >
             {theme === 'dark' ? (
-              <COMMON.MOON className="size-3.5" />
+              <BASE.MOON className="size-3.5" />
             ) : (
-              <COMMON.SUN className="size-3.5" />
+              <BASE.SUN className="size-3.5" />
             )}
           </div>
         </button>
 
         {/* Notifications */}
         <button className="hover:bg-muted/50 text-muted-foreground hover:text-foreground relative flex size-9 cursor-pointer items-center justify-center rounded-full transition-colors">
-          <COMMON.BELL className="size-[18px]" />
+          <BASE.BELL className="size-4.5" />
           <Badge className="bg-destructive text-muted border-background absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full border p-0 text-[9px] font-bold">
             3
           </Badge>
@@ -195,7 +195,7 @@ const AppHeader = ({
                     {user.role_name?.replace('_', ' ')}
                   </span>
                 </div>
-                <COMMON.CHEVRON_DOWN className="text-muted-foreground/60 hidden size-3.5 transition-transform duration-200 group-hover:translate-y-0.5 sm:block" />
+                <BASE.CHEVRON_DOWN className="text-muted-foreground/60 hidden size-3.5 transition-transform duration-200 group-hover:translate-y-0.5 sm:block" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end" forceMount>

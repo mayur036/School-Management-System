@@ -1,14 +1,14 @@
 import StatCard from '@/components/shared/StatCard';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { COMMON } from '@/lib/icons';
+import { STATS } from '@/lib/icons';
 
 export const SuperAdminStatCards = ({ stats, isLoading }) => {
   const items = [
     {
       label: 'Total Schools',
       value: stats.totalSchools,
-      Icon: COMMON.BUILDING,
+      Icon: STATS.TOTAL_SCHOOLS,
       subtext: 'Registered schools',
       accentClassName: 'border-blue-500',
       iconChipClassName: 'bg-blue-500/10 text-blue-500',
@@ -16,7 +16,7 @@ export const SuperAdminStatCards = ({ stats, isLoading }) => {
     {
       label: 'Active Schools',
       value: stats.activeSchools,
-      Icon: COMMON.ACTIVITY,
+      Icon: STATS.ACTIVE_SCHOOLS,
       subtext: 'Currently active',
       accentClassName: 'border-emerald-500',
       iconChipClassName: 'bg-emerald-500/10 text-emerald-500',
@@ -24,7 +24,7 @@ export const SuperAdminStatCards = ({ stats, isLoading }) => {
     {
       label: 'Total Admins',
       value: stats.totalAdmins,
-      Icon: COMMON.USERS_GROUP,
+      Icon: STATS.TOTAL_ADMINS,
       subtext: 'School admins',
       accentClassName: 'border-purple-500',
       iconChipClassName: 'bg-purple-500/10 text-purple-500',
@@ -32,7 +32,7 @@ export const SuperAdminStatCards = ({ stats, isLoading }) => {
     {
       label: 'Active Admins',
       value: stats.activeAdmins,
-      Icon: COMMON.SHIELD_CHECK,
+      Icon: STATS.ACTIVE_ADMINS,
       subtext: 'Active accounts',
       accentClassName: 'border-emerald-500',
       iconChipClassName: 'bg-emerald-500/10 text-emerald-500',

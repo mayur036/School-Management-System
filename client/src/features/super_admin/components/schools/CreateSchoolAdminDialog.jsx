@@ -23,7 +23,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { COMMON } from '@/lib/icons';
+import { BASE, STATUS } from '@/lib/icons';
 import { copyToClipboard } from '@/lib/utils';
 import { createSchoolAdminSchema } from '@/schemas/school.schema';
 
@@ -159,9 +159,9 @@ const CreateSchoolAdminDialog = ({ school, onClose }) => {
                 onClick={handleCopy}
               >
                 {copied ? (
-                  <COMMON.CHECK data-icon="inline-start" />
+                  <STATUS.ACTIVE data-icon="inline-start" />
                 ) : (
-                  <COMMON.COPY data-icon="inline-start" />
+                  <BASE.COPY data-icon="inline-start" />
                 )}
                 {copied ? 'Copied!' : 'Copy Credentials'}
               </Button>
@@ -257,7 +257,7 @@ const CreateSchoolAdminDialog = ({ school, onClose }) => {
                       showPassword ? 'Hide password' : 'Show password'
                     }
                   >
-                    {showPassword ? <COMMON.EYE_OFF /> : <COMMON.EYE />}
+                    {showPassword ? <BASE.EYE_OFF /> : <BASE.EYE />}
                   </Button>
                 </div>
                 {errors.password && (
@@ -299,7 +299,7 @@ const CreateSchoolAdminDialog = ({ school, onClose }) => {
                 className="cursor-pointer gap-2"
                 disabled={isLoading}
               >
-                {isLoading && <COMMON.LOADER className="animate-spin" />}
+                {isLoading && <BASE.LOADER className="animate-spin" />}
                 {isLoading ? 'Creating…' : 'Create Admin'}
               </Button>
             </DialogFooter>

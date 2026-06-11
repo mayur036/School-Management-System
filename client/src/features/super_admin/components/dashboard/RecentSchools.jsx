@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { SUPER_ADMIN } from '@/lib/icons';
+import { EMPTY_STATE } from '@/lib/icons';
 
 export const RecentSchools = ({ schools = [], isLoading }) => {
   return (
@@ -34,7 +34,7 @@ export const RecentSchools = ({ schools = [], isLoading }) => {
           </div>
         ) : schools.length === 0 ? (
           <div className="text-muted-foreground flex h-40 flex-col items-center justify-center gap-2 text-center text-sm">
-            <SUPER_ADMIN.SCHOOLS className="size-8 opacity-40" />
+            <EMPTY_STATE.NO_DATA className="size-8 opacity-40" />
             No schools recently onboarded
           </div>
         ) : (

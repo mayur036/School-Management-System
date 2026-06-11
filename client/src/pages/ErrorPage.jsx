@@ -8,7 +8,7 @@ import {
 
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
-import COMMON from '@/lib/icons/common.icons';
+import { ACTIONS, BASE, EMPTY_STATE, STATUS } from '@/lib/icons';
 import { roleHome } from '@/lib/roles';
 
 /**
@@ -20,7 +20,7 @@ const ERROR_MAP = {
     title: 'Bad Request',
     message:
       'The request could not be understood by the server. Please check the link and try again.',
-    Icon: COMMON.SHIELD_ALERT,
+    Icon: BASE.SHIELD_ALERT,
     iconColor: 'text-warning',
     iconBg: 'bg-warning/10',
     troubleshooting: [
@@ -33,7 +33,7 @@ const ERROR_MAP = {
     title: 'Authentication Required',
     message:
       'You need to be signed in to access this resource. Please sign in and try again.',
-    Icon: COMMON.LOCK,
+    Icon: BASE.LOCK,
     iconColor: 'text-warning',
     iconBg: 'bg-warning/10',
     troubleshooting: [
@@ -46,7 +46,7 @@ const ERROR_MAP = {
     title: 'Access Denied',
     message:
       "You don't have permission to view this page. Contact your administrator if you believe this is a mistake.",
-    Icon: COMMON.SHIELD_ALERT,
+    Icon: BASE.SHIELD_ALERT,
     iconColor: 'text-warning',
     iconBg: 'bg-warning/10',
     troubleshooting: [
@@ -58,7 +58,7 @@ const ERROR_MAP = {
     title: 'Page Not Found',
     message:
       "We couldn't find the page you're looking for. It may have been moved, renamed, or never existed.",
-    Icon: COMMON.FILE_QUESTION,
+    Icon: EMPTY_STATE.NO_DATA,
     iconColor: 'text-primary',
     iconBg: 'bg-primary/10',
     troubleshooting: [
@@ -71,7 +71,7 @@ const ERROR_MAP = {
     title: 'Something Went Wrong',
     message:
       'An unexpected error occurred on our end. Our team has been notified — please try again shortly.',
-    Icon: COMMON.SERVER_CRASH,
+    Icon: EMPTY_STATE.SERVER_ERROR,
     iconColor: 'text-destructive',
     iconBg: 'bg-destructive/10',
     troubleshooting: [
@@ -84,7 +84,7 @@ const ERROR_MAP = {
     title: 'Service Unavailable',
     message:
       'The service is temporarily down for maintenance. Please check back in a few minutes.',
-    Icon: COMMON.WRENCH,
+    Icon: BASE.WRENCH,
     iconColor: 'text-destructive',
     iconBg: 'bg-destructive/10',
     troubleshooting: [
@@ -117,7 +117,7 @@ const ErrorPage = () => {
     ERROR_MAP[statusCode] ?? {
       title: 'Unexpected Error',
       message: 'An unexpected error occurred. Please try again.',
-      Icon: COMMON.SERVER_CRASH,
+      Icon: EMPTY_STATE.SERVER_ERROR,
       iconColor: 'text-destructive',
       iconBg: 'bg-destructive/10',
       troubleshooting: [
@@ -181,7 +181,7 @@ const ErrorPage = () => {
                       key={i}
                       className="text-muted-foreground flex items-start gap-2 text-sm"
                     >
-                      <COMMON.CHECK_CIRCLE className="text-primary mt-0.5 size-4 shrink-0" />
+                      <STATUS.ACTIVE className="text-primary mt-0.5 size-4 shrink-0" />
                       <span>{step}</span>
                     </li>
                   ))}
@@ -192,7 +192,7 @@ const ErrorPage = () => {
             <div className="flex flex-wrap gap-3">
               <Button asChild className="cursor-pointer font-medium">
                 <Link to={homeTarget}>
-                  <COMMON.HOME className="mr-2 size-4" />
+                  <BASE.HOME className="mr-2 size-4" />
                   {homeLabel}
                 </Link>
               </Button>
@@ -201,7 +201,7 @@ const ErrorPage = () => {
                 onClick={() => navigate(-1)}
                 className="cursor-pointer font-medium"
               >
-                <COMMON.ARROW_LEFT className="mr-2 size-4" />
+                <BASE.ARROW_LEFT className="mr-2 size-4" />
                 Go back
               </Button>
               {isServerError && (
@@ -210,7 +210,7 @@ const ErrorPage = () => {
                   onClick={() => navigate(0)}
                   className="text-muted-foreground hover:text-foreground cursor-pointer font-medium"
                 >
-                  <COMMON.ROTATE_CCW className="mr-2 size-4" />
+                  <ACTIONS.RESTORE className="mr-2 size-4" />
                   Try again
                 </Button>
               )}
@@ -222,7 +222,7 @@ const ErrorPage = () => {
         <section className="bg-muted/30 border-border relative z-10 flex w-full flex-col justify-between border-t p-8 sm:p-12 md:w-96 md:border-t-0 md:border-l">
           <div>
             <h3 className="text-foreground mb-6 flex items-center gap-2 text-sm font-semibold">
-              <COMMON.LIFE_BUOY className="text-muted-foreground size-4" />
+              <BASE.LIFE_BUOY className="text-muted-foreground size-4" />
               Need more help?
             </h3>
 
@@ -233,13 +233,13 @@ const ErrorPage = () => {
               >
                 <div className="flex items-center gap-3">
                   <div className="bg-primary/10 text-primary rounded-md p-2">
-                    <COMMON.MAIL className="size-4" />
+                    <BASE.MAIL className="size-4" />
                   </div>
                   <span className="text-foreground text-sm font-medium">
                     Contact Support
                   </span>
                 </div>
-                <COMMON.CHEVRON_RIGHT className="text-muted-foreground group-hover:text-primary size-4 transition-colors" />
+                <BASE.CHEVRON_RIGHT className="text-muted-foreground group-hover:text-primary size-4 transition-colors" />
               </Link>
 
               <Link
@@ -248,13 +248,13 @@ const ErrorPage = () => {
               >
                 <div className="flex items-center gap-3">
                   <div className="bg-success/10 text-success rounded-md p-2">
-                    <COMMON.ACTIVITY className="size-4" />
+                    <STATUS.ACTIVE className="size-4" />
                   </div>
                   <span className="text-foreground text-sm font-medium">
                     System Status
                   </span>
                 </div>
-                <COMMON.CHEVRON_RIGHT className="text-muted-foreground group-hover:text-primary size-4 transition-colors" />
+                <BASE.CHEVRON_RIGHT className="text-muted-foreground group-hover:text-primary size-4 transition-colors" />
               </Link>
             </div>
           </div>
@@ -262,7 +262,7 @@ const ErrorPage = () => {
           {/* Technical Details */}
           <div className="mt-12">
             <h3 className="text-foreground mb-4 flex items-center gap-2 text-sm font-semibold">
-              <COMMON.INFO className="text-muted-foreground size-4" />
+              <BASE.INFO className="text-muted-foreground size-4" />
               Technical Details
             </h3>
 

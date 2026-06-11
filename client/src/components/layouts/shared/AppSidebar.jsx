@@ -17,7 +17,7 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { useAuth } from '@/hooks/useAuth';
-import { COMMON } from '@/lib/icons';
+import { BASE } from '@/lib/icons';
 import { cn } from '@/lib/utils';
 
 // Active nav uses a quiet primary tint (per design system), never a full fill.
@@ -86,7 +86,7 @@ const AppSidebar = ({ groups, profilePath = '/', fallbackInitials = 'U' }) => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="bg-primary text-primary-foreground border-primary/5 flex size-10 shrink-0 items-center justify-center rounded-xl border">
-              <COMMON.GRADUATION_CAP className="size-6" />
+              <BASE.GRADUATION_CAP className="size-6" />
             </div>
             <div className="flex min-w-0 flex-col">
               <span className="text-sidebar-foreground text-sm leading-none font-bold tracking-tight">
@@ -125,7 +125,7 @@ const AppSidebar = ({ groups, profilePath = '/', fallbackInitials = 'U' }) => {
         <div className="border-primary/10 bg-primary/5 dark:border-primary/20 dark:bg-primary/5 rounded-xl border p-3">
           <div className="flex items-center gap-2.5">
             <div className="bg-primary/10 text-primary dark:bg-primary/20 flex size-8 shrink-0 items-center justify-center rounded-lg">
-              <COMMON.SHIELD className="size-4.5" />
+              <BASE.SHIELD className="size-4.5" />
             </div>
             <div className="flex min-w-0 flex-col leading-tight">
               <span className="text-sidebar-foreground line-clamp-2 text-xs font-bold capitalize">
@@ -181,7 +181,7 @@ const AppSidebar = ({ groups, profilePath = '/', fallbackInitials = 'U' }) => {
                 {user.email}
               </span>
             </div>
-            <COMMON.CHEVRON_RIGHT className="text-muted-foreground/45 ml-auto size-3.5 shrink-0 transition-transform duration-200 group-hover/footer:translate-x-0.5" />
+            <BASE.CHEVRON_RIGHT className="text-muted-foreground/45 ml-auto size-3.5 shrink-0 transition-transform duration-200 group-hover/footer:translate-x-0.5" />
           </Link>
         )}
       </SidebarFooter>

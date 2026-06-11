@@ -1,14 +1,4 @@
-import {
-  Atom,
-  Binary,
-  BookOpen,
-  Building2,
-  Dumbbell,
-  Globe,
-  Heart,
-  Lightbulb,
-  Palette,
-} from 'lucide-react';
+import { SCHOOL_ADMIN } from '@/lib/icons';
 
 export const DEPARTMENT_DESCRIPTIONS = {
   arts: 'Visual arts, performing arts, and design studies',
@@ -43,15 +33,15 @@ export const DEPARTMENT_GRADIENTS = {
 };
 
 export const DEPARTMENT_ICONS = {
-  arts: Palette,
-  humanities: Globe,
-  languages: BookOpen,
-  mathematics: Binary,
-  science: Atom,
-  physical: Dumbbell,
-  research: Lightbulb,
-  student: Heart,
-  default: Building2,
+  arts: SCHOOL_ADMIN.DEPT_ARTS,
+  humanities: SCHOOL_ADMIN.DEPT_HUMANITIES,
+  languages: SCHOOL_ADMIN.DEPT_LANGUAGES,
+  mathematics: SCHOOL_ADMIN.DEPT_MATHEMATICS,
+  science: SCHOOL_ADMIN.DEPT_SCIENCE,
+  physical: SCHOOL_ADMIN.DEPT_PHYSICAL,
+  research: SCHOOL_ADMIN.DEPT_RESEARCH,
+  student: SCHOOL_ADMIN.DEPT_STUDENT,
+  default: SCHOOL_ADMIN.DEPT_DEFAULT,
 };
 
 // A department created within this many days is flagged as "New".

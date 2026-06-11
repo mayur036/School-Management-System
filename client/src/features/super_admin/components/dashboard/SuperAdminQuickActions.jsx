@@ -1,4 +1,3 @@
-import { Plus, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
@@ -9,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { ACTIONS, SUPER_ADMIN } from '@/lib/icons';
 
 export const SuperAdminQuickActions = () => {
   const navigate = useNavigate();
@@ -25,7 +25,7 @@ export const SuperAdminQuickActions = () => {
           className="border-primary/20 hover:bg-primary/5 hover:text-primary w-full justify-start"
           onClick={() => navigate('/super/schools')}
         >
-          <Plus className="mr-2 h-4 w-4" />
+          <ACTIONS.CREATE className="mr-2 h-4 w-4" />
           Add New School
         </Button>
         <Button
@@ -33,7 +33,7 @@ export const SuperAdminQuickActions = () => {
           className="border-primary/20 hover:bg-primary/5 hover:text-primary w-full justify-start"
           onClick={() => navigate('/super/admins')}
         >
-          <Users className="mr-2 h-4 w-4" />
+          <SUPER_ADMIN.USERS className="mr-2 h-4 w-4" />
           Manage Admins
         </Button>
       </CardContent>

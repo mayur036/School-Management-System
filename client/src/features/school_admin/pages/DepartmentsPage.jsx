@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useGetStaffQuery } from '@/features/school_admin/staff.api';
-import { COMMON } from '@/lib/icons';
+import { BASE } from '@/lib/icons';
 import { cn } from '@/lib/utils';
 
 import CreateDepartmentDialog from '../components/departments/CreateDepartmentDialog';
@@ -163,7 +163,7 @@ const DepartmentsPage = () => {
       <div className="border-border bg-card flex flex-col gap-3 rounded-xl border p-3.5 shadow-xs sm:flex-row sm:items-center sm:justify-between">
         {/* Search */}
         <div className="relative w-full sm:max-w-xs">
-          <COMMON.SEARCH className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
+          <BASE.SEARCH className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
           <Input
             placeholder="Search departments..."
             value={searchQuery}
@@ -223,7 +223,7 @@ const DepartmentsPage = () => {
             size="sm"
             className="border-border hover:bg-muted/30 h-9 cursor-pointer gap-1.5 rounded-lg text-xs font-semibold"
           >
-            <COMMON.FILTER className="size-3.5" />
+            <BASE.FILTER className="size-3.5" />
             Filter
           </Button>
 
@@ -241,7 +241,7 @@ const DepartmentsPage = () => {
               )}
               title="List View"
             >
-              <COMMON.LIST_VIEW className="size-4" />
+              <BASE.LIST_VIEW className="size-4" />
             </Button>
             {/* Grid layout mode */}
             <Button
@@ -256,7 +256,7 @@ const DepartmentsPage = () => {
               )}
               title="Grid View"
             >
-              <COMMON.GRID_VIEW className="size-4" />
+              <BASE.GRID_VIEW className="size-4" />
             </Button>
           </div>
         </div>

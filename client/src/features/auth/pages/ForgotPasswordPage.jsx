@@ -9,22 +9,22 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useForgotPasswordMutation } from '@/features/auth/auth.api';
-import { COMMON } from '@/lib/icons';
+import { BASE, STATUS } from '@/lib/icons';
 import { forgotPasswordSchema } from '@/schemas/auth.schema';
 
 const HIGHLIGHTS = [
   {
-    Icon: COMMON.SHIELD,
+    Icon: BASE.SHIELD,
     title: 'Secure Account Recovery',
     subtitle: 'using industry standard verification token',
   },
   {
-    Icon: COMMON.CLOCK,
+    Icon: BASE.CLOCK,
     title: 'Timed Token Validation',
     subtitle: 'token expires in 1 hour for security',
   },
   {
-    Icon: COMMON.MAIL,
+    Icon: BASE.MAIL,
     title: 'Instant Email Delivery',
     subtitle: 'direct reset link to your registered email',
   },
@@ -68,12 +68,12 @@ export const ForgotPasswordPage = () => {
         >
           {theme === 'dark' ? (
             <>
-              <COMMON.SUN className="size-4" />
+              <BASE.SUN className="size-4" />
               <span>Light mode</span>
             </>
           ) : (
             <>
-              <COMMON.MOON className="size-4" />
+              <BASE.MOON className="size-4" />
               <span>Dark mode</span>
             </>
           )}
@@ -87,7 +87,7 @@ export const ForgotPasswordPage = () => {
         {/* Logo */}
         <div className="flex items-center gap-3">
           <div className="flex size-10 items-center justify-center rounded-xl border border-white/5 bg-white/10 text-white">
-            <COMMON.GRADUATION_CAP className="size-6" />
+            <BASE.GRADUATION_CAP className="size-6" />
           </div>
           <div className="flex flex-col">
             <span className="text-lg leading-none font-bold tracking-tight">
@@ -146,7 +146,7 @@ export const ForgotPasswordPage = () => {
 
           <div className="flex items-center gap-3">
             <div className="flex size-10 items-center justify-center rounded-xl border border-white/5 bg-white/10 text-white">
-              <COMMON.GRADUATION_CAP className="size-6" />
+              <BASE.GRADUATION_CAP className="size-6" />
             </div>
             <div className="flex flex-col">
               <span className="text-lg leading-none font-bold tracking-tight">
@@ -187,7 +187,7 @@ export const ForgotPasswordPage = () => {
                       Email address
                     </Label>
                     <div className="relative">
-                      <COMMON.MAIL className="text-muted-foreground absolute top-1/2 left-3.5 size-4 -translate-y-1/2" />
+                      <BASE.MAIL className="text-muted-foreground absolute top-1/2 left-3.5 size-4 -translate-y-1/2" />
                       <Input
                         id="email"
                         type="email"
@@ -212,9 +212,9 @@ export const ForgotPasswordPage = () => {
                     disabled={isLoading}
                   >
                     {isLoading ? (
-                      <COMMON.LOADER className="size-4 animate-spin" />
+                      <BASE.LOADER className="size-4 animate-spin" />
                     ) : (
-                      <COMMON.ARROW_RIGHT className="size-4" />
+                      <BASE.ARROW_RIGHT className="size-4" />
                     )}
                     {isLoading ? 'Sending link…' : 'Send password reset link'}
                   </Button>
@@ -233,7 +233,7 @@ export const ForgotPasswordPage = () => {
             ) : (
               <div className="space-y-6 text-center">
                 <div className="mx-auto flex size-16 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-500">
-                  <COMMON.CHECK className="size-8 stroke-3" />
+                  <STATUS.ACTIVE className="size-8 stroke-3" />
                 </div>
 
                 <div className="space-y-2">

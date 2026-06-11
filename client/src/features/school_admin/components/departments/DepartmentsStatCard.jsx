@@ -1,7 +1,7 @@
 import StatCard from '@/components/shared/StatCard';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { COMMON } from '@/lib/icons';
+import { BASE, STATS } from '@/lib/icons';
 
 const DepartmentsStatCard = ({ stats, isLoading }) => {
   const items = [
@@ -9,7 +9,7 @@ const DepartmentsStatCard = ({ stats, isLoading }) => {
       label: 'Total Departments',
       value: stats?.total,
       subtext: 'All active departments',
-      Icon: COMMON.BUILDING,
+      Icon: STATS.TOTAL_DEPARTMENTS,
       iconChipClassName: 'bg-purple-500/10 text-purple-500',
       accentClassName: 'border-purple-500',
     },
@@ -17,7 +17,7 @@ const DepartmentsStatCard = ({ stats, isLoading }) => {
       label: 'Total Staff',
       value: stats?.staff,
       subtext: 'Across all departments',
-      Icon: COMMON.USERS_GROUP,
+      Icon: STATS.TOTAL_STAFF,
       iconChipClassName: 'bg-emerald-500/10 text-emerald-500',
       accentClassName: 'border-emerald-500',
     },
@@ -25,7 +25,7 @@ const DepartmentsStatCard = ({ stats, isLoading }) => {
       label: 'Average Staff',
       value: stats?.avg,
       subtext: 'Per department',
-      Icon: COMMON.FILE_TEXT,
+      Icon: STATS.AVG_STAFF_PER_SCHOOL,
       iconChipClassName: 'bg-orange-500/10 text-orange-500',
       accentClassName: 'border-orange-500',
     },
@@ -33,7 +33,7 @@ const DepartmentsStatCard = ({ stats, isLoading }) => {
       label: 'Latest Added',
       value: stats?.latestName,
       subtext: stats?.latestDate,
-      Icon: COMMON.CALENDAR,
+      Icon: BASE.CALENDAR,
       iconChipClassName: 'bg-blue-500/10 text-blue-500',
       accentClassName: 'border-blue-500',
     },

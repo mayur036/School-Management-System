@@ -22,7 +22,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { COMMON } from '@/lib/icons';
+import { BASE } from '@/lib/icons';
 import { cn } from '@/lib/utils';
 import { editProfileSchema } from '@/schemas/profile.schema';
 
@@ -267,7 +267,7 @@ export const EditProfileDialog = ({
               className="bg-primary text-primary-foreground hover:bg-primary/95 cursor-pointer rounded-xl text-xs sm:text-sm"
             >
               {isUpdatingProfile && (
-                <COMMON.LOADER className="mr-2 size-3 animate-spin" />
+                <BASE.LOADER className="mr-2 size-3 animate-spin" />
               )}
               Save Changes
             </Button>

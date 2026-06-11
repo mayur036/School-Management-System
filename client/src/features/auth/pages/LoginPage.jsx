@@ -10,23 +10,23 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useLoginMutation } from '@/features/auth/auth.api';
-import { COMMON } from '@/lib/icons';
+import { BASE } from '@/lib/icons';
 import { roleHome } from '@/lib/roles';
 import { loginSchema } from '@/schemas/auth.schema';
 
 const HIGHLIGHTS = [
   {
-    Icon: COMMON.BUILDING,
+    Icon: BASE.BUILDING,
     title: 'Multi-tenant administration',
     subtitle: 'for every school',
   },
   {
-    Icon: COMMON.USERS_GROUP,
+    Icon: BASE.USERS,
     title: 'Department-organized',
     subtitle: 'staff directory',
   },
   {
-    Icon: COMMON.SHIELD_CHECK,
+    Icon: BASE.SHIELD_CHECK,
     title: 'Role-based access',
     subtitle: 'for admins and staff',
   },
@@ -78,12 +78,12 @@ export const LoginPage = () => {
         >
           {theme === 'dark' ? (
             <>
-              <COMMON.SUN className="size-4" />
+              <BASE.SUN className="size-4" />
               <span>Light mode</span>
             </>
           ) : (
             <>
-              <COMMON.MOON className="size-4" />
+              <BASE.MOON className="size-4" />
               <span>Dark mode</span>
             </>
           )}
@@ -98,7 +98,7 @@ export const LoginPage = () => {
         {/* Logo */}
         <div className="flex items-center gap-3">
           <div className="flex size-10 items-center justify-center rounded-xl border border-white/5 bg-white/10 text-white">
-            <COMMON.GRADUATION_CAP className="size-6" />
+            <BASE.GRADUATION_CAP className="size-6" />
           </div>
           <div className="flex flex-col">
             <span className="text-lg leading-none font-bold tracking-tight">
@@ -160,7 +160,7 @@ export const LoginPage = () => {
 
           <div className="flex items-center gap-3">
             <div className="flex size-10 items-center justify-center rounded-xl border border-white/5 bg-white/10 text-white">
-              <COMMON.GRADUATION_CAP className="size-6" />
+              <BASE.GRADUATION_CAP className="size-6" />
             </div>
             <div className="flex flex-col">
               <span className="text-lg leading-none font-bold tracking-tight">
@@ -198,7 +198,7 @@ export const LoginPage = () => {
                   Email address
                 </Label>
                 <div className="relative">
-                  <COMMON.MAIL className="text-muted-foreground absolute top-1/2 left-3.5 size-4 -translate-y-1/2" />
+                  <BASE.MAIL className="text-muted-foreground absolute top-1/2 left-3.5 size-4 -translate-y-1/2" />
                   <Input
                     id="email"
                     type="email"
@@ -234,7 +234,7 @@ export const LoginPage = () => {
                   </button>
                 </div>
                 <div className="relative">
-                  <COMMON.LOCK className="text-muted-foreground absolute top-1/2 left-3.5 size-4 -translate-y-1/2" />
+                  <BASE.LOCK className="text-muted-foreground absolute top-1/2 left-3.5 size-4 -translate-y-1/2" />
                   <Input
                     id="password"
                     type={showPassword ? 'text' : 'password'}
@@ -253,9 +253,9 @@ export const LoginPage = () => {
                     }
                   >
                     {showPassword ? (
-                      <COMMON.EYE_OFF className="size-4" />
+                      <BASE.EYE_OFF className="size-4" />
                     ) : (
-                      <COMMON.EYE className="size-4" />
+                      <BASE.EYE className="size-4" />
                     )}
                   </button>
                 </div>
@@ -286,9 +286,9 @@ export const LoginPage = () => {
                 disabled={isLoading}
               >
                 {isLoading ? (
-                  <COMMON.LOADER className="size-4 animate-spin" />
+                  <BASE.LOADER className="size-4 animate-spin" />
                 ) : (
-                  <COMMON.LOCK className="size-4" />
+                  <BASE.LOCK className="size-4" />
                 )}
                 {isLoading ? 'Signing in…' : 'Sign in'}
               </Button>

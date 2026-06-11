@@ -1,14 +1,14 @@
 import StatCard from '@/components/shared/StatCard';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { COMMON } from '@/lib/icons';
+import { STATS } from '@/lib/icons';
 
 const SchoolAdminStatCard = ({ stats, isLoading }) => {
   const items = [
     {
       label: 'Total Staff',
       value: stats.total,
-      Icon: COMMON.USERS_GROUP,
+      Icon: STATS.TOTAL_STAFF,
       subtext: 'Registered Staff',
       accentClassName: 'border-blue-500',
       iconChipClassName: 'bg-blue-500/10 text-blue-500',
@@ -16,7 +16,7 @@ const SchoolAdminStatCard = ({ stats, isLoading }) => {
     {
       label: 'Active Staff',
       value: stats.active,
-      Icon: COMMON.ACTIVITY,
+      Icon: STATS.ACTIVE_STAFF,
       subtext: 'Currently Active',
       accentClassName: 'border-emerald-500',
       iconChipClassName: 'bg-emerald-500/10 text-emerald-500',
@@ -24,7 +24,7 @@ const SchoolAdminStatCard = ({ stats, isLoading }) => {
     {
       label: 'Inactive Staff',
       value: stats.inactive,
-      Icon: COMMON.X,
+      Icon: STATS.INACTIVE_STAFF,
       subtext: 'Inactive Staff',
       accentClassName: 'border-purple-500',
       iconChipClassName: 'bg-purple-500/10 text-purple-500',
@@ -32,7 +32,7 @@ const SchoolAdminStatCard = ({ stats, isLoading }) => {
     {
       label: 'Departments',
       value: stats.departments,
-      Icon: COMMON.BUILDING,
+      Icon: STATS.TOTAL_DEPARTMENTS,
       subtext: 'Total Departments',
       accentClassName: 'border-emerald-500',
       iconChipClassName: 'bg-emerald-500/10 text-emerald-500',

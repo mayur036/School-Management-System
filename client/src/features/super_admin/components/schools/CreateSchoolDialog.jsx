@@ -15,7 +15,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { COMMON } from '@/lib/icons';
+import { BASE } from '@/lib/icons';
 import { createSchoolSchema } from '@/schemas/school.schema';
 
 import { useCreateSchoolMutation } from '../../schools.api';
@@ -176,7 +176,7 @@ const CreateSchoolDialog = ({ externalOpen = false, onExternalOpenChange }) => {
             className="cursor-pointer gap-2"
             disabled={isLoading}
           >
-            {isLoading && <COMMON.LOADER className="animate-spin" />}
+            {isLoading && <BASE.LOADER className="animate-spin" />}
             {isLoading ? 'Creating…' : 'Create School'}
           </Button>
         </DialogFooter>

@@ -22,7 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { SCHOOL_ADMIN, SUPER_ADMIN } from '@/lib/icons';
+import { BASE, EMPTY_STATE, SCHOOL_ADMIN } from '@/lib/icons';
 import { formatDate, formatStaffId, getInitials } from '@/lib/utils';
 
 import { getDeptBadgeClass } from '../../utils/departments.utils';
@@ -117,7 +117,7 @@ const StaffCard = ({ member, onViewDetails, onToggleStatus }) => {
               className="size-8 cursor-pointer"
               aria-label={`Actions for ${member.first_name} ${member.last_name}`}
             >
-              <SUPER_ADMIN.ACTIONS className="size-4" />
+              <BASE.MORE_V className="size-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
@@ -138,7 +138,7 @@ const StaffCard = ({ member, onViewDetails, onToggleStatus }) => {
                 className="cursor-pointer gap-2"
                 onClick={() => onToggleStatus(member)}
               >
-                <SUPER_ADMIN.POWER
+                <BASE.POWER
                   className="text-muted-foreground size-4"
                   data-icon="inline-start"
                 />
@@ -212,7 +212,7 @@ const StaffTable = ({
   if (!staff?.length) {
     return (
       <EmptyTableState
-        icon={SCHOOL_ADMIN.STAFF_LIST}
+        icon={EMPTY_STATE.NO_DATA}
         title="No staff members found"
         description="Try adjusting your filters, search terms, or register a new staff member."
       />
@@ -307,7 +307,7 @@ const StaffTable = ({
                           className="cursor-pointer"
                           aria-label={`Actions for ${member.first_name} ${member.last_name}`}
                         >
-                          <SUPER_ADMIN.ACTIONS />
+                          <BASE.MORE_V className="size-4" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
@@ -328,7 +328,7 @@ const StaffTable = ({
                             className="cursor-pointer gap-2"
                             onClick={() => onToggleStatus(member)}
                           >
-                            <SUPER_ADMIN.POWER
+                            <BASE.POWER
                               className="text-muted-foreground size-4"
                               data-icon="inline-start"
                             />

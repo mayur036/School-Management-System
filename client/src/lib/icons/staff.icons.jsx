@@ -1,20 +1,43 @@
+/**
+ * @file staff.icons.jsx
+ * @description Icons scoped to the Staff role.
+ * Staff sees their schedule, tasks, attendance, documents, and notifications.
+ */
+
 import {
   Bell,
-  Calendar,
+  BookMarked,
+  CalendarDays,
+  ClipboardCheck,
   ClipboardList,
+  Clock3,
+  FileText,
   Home,
   LogOut,
+  MessageSquare,
   Settings,
-  User,
+  UserRound,
 } from 'lucide-react';
 
 export const STAFF = {
-  CALENDAR: Calendar,
+  // Sidebar Navigation
   HOME: Home,
-  LOGOUT: LogOut,
-  NOTIFICATIONS: Bell,
-  PROFILE: User,
-  SETTINGS: Settings,
+  SCHEDULE: CalendarDays,
+  ATTENDANCE: ClipboardCheck,
   TASKS: ClipboardList,
+  DOCUMENTS: FileText,
+  NOTIFICATIONS: Bell,
+  MESSAGES: MessageSquare,
+  SETTINGS: Settings,
+  LOGOUT: LogOut,
+
+  // Profile
+  PROFILE: UserRound,
+
+  // Detail Views
+  LEAVE_REQUEST: CalendarDays,
+  TIME_LOG: Clock3,
+  SUBJECTS: BookMarked,
 };
+
 export default STAFF;

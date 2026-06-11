@@ -27,7 +27,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { useDataTable } from '@/hooks/useDataTable';
-import { COMMON } from '@/lib/icons';
+import { ACTIONS, BASE } from '@/lib/icons';
 import {
   formatDate,
   formatPhoneNumber,
@@ -150,7 +150,7 @@ const StaffPage = () => {
           className="bg-primary text-primary-foreground hover:bg-primary/95 cursor-pointer gap-2 shadow-sm transition-all"
         >
           <Link to="/school/staff/register">
-            <COMMON.PLUS data-icon="inline-start" />
+            <ACTIONS.CREATE data-icon="inline-start" />
             Register Staff
           </Link>
         </Button>
@@ -163,7 +163,7 @@ const StaffPage = () => {
       <div className="bg-card border-border flex flex-col gap-3 rounded-xl border p-4 sm:flex-row sm:items-center sm:justify-between">
         {/* Search */}
         <div className="relative max-w-md flex-1">
-          <COMMON.SEARCH className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
+          <BASE.SEARCH className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
           <Input
             className="bg-muted/40 border-border pl-9"
             placeholder="Search staff by name, email, or department..."
@@ -181,7 +181,7 @@ const StaffPage = () => {
                 variant="outline"
                 className="border-border bg-card cursor-pointer gap-2"
               >
-                <COMMON.FILTER data-icon="inline-start" />
+                <BASE.FILTER data-icon="inline-start" />
                 Filter
               </Button>
             </DropdownMenuTrigger>
@@ -236,7 +236,7 @@ const StaffPage = () => {
             className="border-border bg-card cursor-pointer gap-2"
             onClick={handleExport}
           >
-            <COMMON.EXPORT data-icon="inline-start" />
+            <BASE.DOWNLOAD data-icon="inline-start" />
             Export
           </Button>
 
@@ -249,7 +249,7 @@ const StaffPage = () => {
               onClick={() => setViewMode('list')}
               aria-label="List View"
             >
-              <COMMON.LIST_VIEW className="size-4" />
+              <BASE.LIST_VIEW className="size-4" />
             </Button>
             <Button
               variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
@@ -258,7 +258,7 @@ const StaffPage = () => {
               onClick={() => setViewMode('grid')}
               aria-label="Grid View"
             >
-              <COMMON.GRID_VIEW className="size-4" />
+              <BASE.GRID_VIEW className="size-4" />
             </Button>
           </div>
         </div>

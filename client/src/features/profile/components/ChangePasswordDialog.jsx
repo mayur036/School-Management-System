@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { COMMON } from '@/lib/icons';
+import { BASE } from '@/lib/icons';
 
 import { useChangePasswordMutation } from '../profile.api';
 
@@ -91,9 +91,9 @@ export const ChangePasswordDialog = ({ open, onOpenChange }) => {
                 className="text-muted-foreground/60 hover:text-foreground absolute inset-y-0 right-3 flex cursor-pointer items-center"
               >
                 {showCurrentPassword ? (
-                  <COMMON.EYE_OFF className="size-4" />
+                  <BASE.EYE_OFF className="size-4" />
                 ) : (
-                  <COMMON.EYE className="size-4" />
+                  <BASE.EYE className="size-4" />
                 )}
               </button>
             </div>
@@ -117,9 +117,9 @@ export const ChangePasswordDialog = ({ open, onOpenChange }) => {
                 className="text-muted-foreground/60 hover:text-foreground absolute inset-y-0 right-3 flex cursor-pointer items-center"
               >
                 {showNewPassword ? (
-                  <COMMON.EYE_OFF className="size-4" />
+                  <BASE.EYE_OFF className="size-4" />
                 ) : (
-                  <COMMON.EYE className="size-4" />
+                  <BASE.EYE className="size-4" />
                 )}
               </button>
             </div>
@@ -145,7 +145,7 @@ export const ChangePasswordDialog = ({ open, onOpenChange }) => {
               className="bg-primary text-primary-foreground hover:bg-primary/95 cursor-pointer rounded-xl text-xs sm:text-sm"
             >
               {isChangingPassword && (
-                <COMMON.LOADER className="mr-2 size-3 animate-spin" />
+                <BASE.LOADER className="mr-2 size-3 animate-spin" />
               )}
               Update Password
             </Button>
