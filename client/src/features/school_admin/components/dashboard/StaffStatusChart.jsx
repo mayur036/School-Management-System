@@ -61,7 +61,10 @@ const StaffStatusChart = ({ active = 0, inactive = 0, isLoading }) => {
                   <stop offset="100%" stopColor="#e11d48" />
                 </linearGradient>
               </defs>
-              <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent hideLabel />}
+              />
               <Pie
                 data={data}
                 dataKey="value"
@@ -73,9 +76,13 @@ const StaffStatusChart = ({ active = 0, inactive = 0, isLoading }) => {
                 cornerRadius={8}
               >
                 {data.map((entry, index) => (
-                  <Cell 
-                    key={index} 
-                    fill={entry.name === 'active' ? 'url(#activeGrad)' : 'url(#inactiveGrad)'} 
+                  <Cell
+                    key={index}
+                    fill={
+                      entry.name === 'active'
+                        ? 'url(#activeGrad)'
+                        : 'url(#inactiveGrad)'
+                    }
                   />
                 ))}
                 <Label
@@ -98,7 +105,7 @@ const StaffStatusChart = ({ active = 0, inactive = 0, isLoading }) => {
                         <tspan
                           x={viewBox.cx}
                           y={viewBox.cy + 24}
-                          className="fill-muted-foreground text-xs font-semibold uppercase tracking-widest"
+                          className="fill-muted-foreground text-xs font-semibold tracking-widest uppercase"
                         >
                           Total
                         </tspan>
@@ -107,8 +114,8 @@ const StaffStatusChart = ({ active = 0, inactive = 0, isLoading }) => {
                   }}
                 />
               </Pie>
-              <ChartLegend 
-                content={<ChartLegendContent nameKey="name" />} 
+              <ChartLegend
+                content={<ChartLegendContent nameKey="name" />}
                 className="-translate-y-2 flex-wrap justify-center gap-4"
               />
             </PieChart>

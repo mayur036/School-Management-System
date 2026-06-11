@@ -143,7 +143,10 @@ const SchoolsTable = ({ schools, isLoading, onToggleStatus, onAddAdmin }) => {
                         className="cursor-pointer gap-2"
                         onClick={() => onToggleStatus(school)}
                       >
-                        <BASE.POWER className="size-4 text-muted-foreground" data-icon="inline-start" />
+                        <BASE.POWER
+                          className="text-muted-foreground size-4"
+                          data-icon="inline-start"
+                        />
                         {school.status === 'active' ? 'Deactivate' : 'Activate'}
                       </DropdownMenuItem>
                     </DropdownMenuGroup>
