@@ -343,18 +343,21 @@ own `feature.api.js`. Cache coherence is driven by `tagTypes` + `providesTags` /
 - [ ] Verify tag invalidation matrix end-to-end (mutations refresh the right lists)
 - [x] Accessibility / responsive pass on the new pages (stats cards made mobile-friendly with shadcn components)
 - [x] UI Refactoring (ProfileView extracted to ProfileTabContent, standardized StatCard usage across School Admin and Super Admin dashboards)
+- [x] Enforced strict school-level inactive status blocking logins for all school users.
+- [x] Consolidated icons into a unified library (`lib/icons/common.icons.jsx`) for easier maintenance.
 
 - **Done when (Phase 7 overall):** full flow works in the browser end-to-end — super admin creates a school + admin; that admin logs in, adds a department, registers staff; staff logs in and views/edits their profile
 
 ### Phase 8 — Polish (optional)
 
-- [ ] Email credentials to new admins/staff (templates/)
+- [x] Email credentials to new admins/staff (templates/)
 - [x] Pagination/search on lists (implemented client-side filtering, searching, pagination, and CSV export on StaffPage, SchoolsPage, and AdminsPage)
 - [x] Code optimization (extracted `useDataTable` custom hook and `EmptyTableState` shared component)
 - [x] Strict Validation (enforced required fields and unique emails across all schemas and API routes)
-- [ ] Dashboard charts (recharts)
+- [x] Dashboard charts (recharts) (Implemented for Super Admin & School Admin dashboards)
 - [ ] Audit fields / soft delete
-- [ ] API docs (docs/)
+- [ ] Activity Logs & tracking (Upcoming on Profile page)
+- [x] API docs (docs/)
 
 ---
 

@@ -80,11 +80,10 @@ Below is the state of progress across all phases outlined in [PROJECT_PLAN.md](f
 *   **Phase 7.7 (Cross-cutting Polish)**: UI polish (shadcn components, mobile responsiveness for stats/status cards, schema extraction for forms).
 
 ### 🟡 In-Progress (Current State)
-*   **Phase 8 (Advanced Additions)**: Pagination/Search filters, credential emails, and Recharts statistics.
+*   **Phase 8 (Advanced Additions)**: Recharts statistics, Audit fields / soft delete.
 
 ### 🔴 Pending Implementations (To-Be-Built UI Pages)
 *   **Audit fields / soft delete**
-*   **API docs (docs/)**
 
 ---
 

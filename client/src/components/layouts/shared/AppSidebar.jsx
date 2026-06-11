@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 
+import StatusBadge from '@/components/shared/StatusBadge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   Sidebar,
@@ -73,7 +74,7 @@ const NavItem = ({ to, label, Icon, end }) => {
  */
 const AppSidebar = ({ groups, profilePath = '/', fallbackInitials = 'U' }) => {
   const { user } = useAuth();
-
+  console.log(user);
   const initials =
     `${user?.first_name?.[0] ?? ''}${user?.last_name?.[0] ?? ''}`.toUpperCase() ||
     fallbackInitials;
@@ -127,18 +128,26 @@ const AppSidebar = ({ groups, profilePath = '/', fallbackInitials = 'U' }) => {
               <COMMON.SHIELD className="size-4.5" />
             </div>
             <div className="flex min-w-0 flex-col leading-tight">
-              <span className="text-sidebar-foreground truncate text-xs font-bold capitalize">
+              <span className="text-sidebar-foreground line-clamp-2 text-xs font-bold capitalize">
                 {user?.role_name === 'super_admin'
                   ? 'super admin'
                   : user?.school_name}
               </span>
-              <span className="text-muted-foreground mt-0.5 text-[10px] leading-normal">
-                {user?.role_name === 'super_admin'
-                  ? 'Full system access & control.'
-                  : user?.role_name === 'school_admin'
-                    ? 'School & staff directory management.'
-                    : 'Access assigned department tools.'}
-              </span>
+              <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                {user?.role_name === 'school_admin' && user?.school_status && (
+                  <StatusBadge
+                    status={user.school_status}
+                    className="h-4 min-h-0 shrink-0 px-1.5 py-0 text-[9px]"
+                  />
+                )}
+                <span className="text-muted-foreground text-[10px] leading-normal">
+                  {user?.role_name === 'super_admin'
+                    ? 'Full system access & control.'
+                    : user?.role_name === 'school_admin'
+                      ? 'School & staff directory management.'
+                      : 'Access assigned department tools.'}
+                </span>
+              </div>
             </div>
           </div>
         </div>

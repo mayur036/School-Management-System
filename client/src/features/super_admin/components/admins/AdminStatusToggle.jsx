@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { COMMON } from '@/lib/icons';
 
-import { useUpdateSchoolAdminStatusMutation } from '../schoolAdmins.api';
+import { useUpdateSchoolAdminStatusMutation } from '../../schoolAdmins.api';
 
 const AdminStatusToggle = ({ admin, onClose }) => {
   const [updateStatus, { isLoading }] = useUpdateSchoolAdminStatusMutation();

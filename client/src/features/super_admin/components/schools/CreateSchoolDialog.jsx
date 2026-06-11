@@ -18,7 +18,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { COMMON } from '@/lib/icons';
 import { createSchoolSchema } from '@/schemas/school.schema';
 
-import { useCreateSchoolMutation } from '../schools.api';
+import { useCreateSchoolMutation } from '../../schools.api';
 
 const CreateSchoolDialog = ({ externalOpen = false, onExternalOpenChange }) => {
   const [internalOpen, setInternalOpen] = useState(false);

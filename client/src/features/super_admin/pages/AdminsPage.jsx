@@ -3,7 +3,6 @@ import { toast } from 'sonner';
 
 import AppBreadcrumb from '@/components/shared/AppBreadcrumb';
 import AppPagination from '@/components/shared/AppPagination';
-import StatCard from '@/components/shared/StatCard';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -15,11 +14,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { useDataTable } from '@/hooks/useDataTable';
-import { COMMON, SUPER_ADMIN } from '@/lib/icons';
+import { COMMON } from '@/lib/icons';
 
-import AdminsTable from '../components/AdminsTable';
-import AdminStatusToggle from '../components/AdminStatusToggle';
-import DeleteAdminAlert from '../components/DeleteAdminAlert';
+import AdminsTable from '../components/admins/AdminsTable';
+import AdminStatusToggle from '../components/admins/AdminStatusToggle';
+import DeleteAdminAlert from '../components/admins/DeleteAdminAlert';
+import SuperAdminsStatCards from '../components/admins/SuperAdminsStatCards';
 import { useGetSchoolAdminsQuery } from '../schoolAdmins.api';
 import { computeAdminStats, exportAdminsToCsv } from '../utils/admins.utils';
 
@@ -94,41 +94,7 @@ const AdminsPage = () => {
       </div>
 
       {/* ── Stats Summary Grid ────────────────────────────────── */}
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-        <StatCard
-          Icon={SUPER_ADMIN.USERS}
-          label="Total Admins"
-          value={stats.total}
-          subtext="Across all schools"
-          accentClassName="border-l-blue-500"
-          iconChipClassName="bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400"
-        />
-        <StatCard
-          Icon={COMMON.CHECK}
-          label="Active Admins"
-          value={stats.active}
-          subtext={`${stats.activePct}% of total`}
-          subtextClassName="font-semibold text-emerald-600 dark:text-emerald-400"
-          accentClassName="border-l-emerald-500"
-          iconChipClassName="bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400"
-        />
-        <StatCard
-          Icon={COMMON.X}
-          label="Inactive Admins"
-          value={stats.inactive}
-          subtext="Currently suspended"
-          accentClassName="border-l-amber-500"
-          iconChipClassName="bg-amber-500/10 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400"
-        />
-        <StatCard
-          Icon={SUPER_ADMIN.CREATE_ADMIN}
-          label="New This Month"
-          value={stats.joinedThisMonth}
-          subtext="Recently registered"
-          accentClassName="border-l-purple-500"
-          iconChipClassName="bg-purple-500/10 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400"
-        />
-      </div>
+      <SuperAdminsStatCards stats={stats} isLoading={isLoading} />
 
       {/* ── Controls & Actions Bar ────────────────────────────── */}
       <div className="bg-card border-border flex flex-col gap-3 rounded-xl border p-4 sm:flex-row sm:items-center sm:justify-between">

@@ -3,7 +3,6 @@ import { toast } from 'sonner';
 
 import AppBreadcrumb from '@/components/shared/AppBreadcrumb';
 import AppPagination from '@/components/shared/AppPagination';
-import StatCard from '@/components/shared/StatCard';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -15,12 +14,13 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { useDataTable } from '@/hooks/useDataTable';
-import { COMMON, SCHOOL_ADMIN } from '@/lib/icons';
+import { COMMON } from '@/lib/icons';
 
-import CreateSchoolAdminDialog from '../components/CreateSchoolAdminDialog';
-import CreateSchoolDialog from '../components/CreateSchoolDialog';
-import SchoolsTable from '../components/SchoolsTable';
-import SchoolStatusToggle from '../components/SchoolStatusToggle';
+import CreateSchoolAdminDialog from '../components/schools/CreateSchoolAdminDialog';
+import CreateSchoolDialog from '../components/schools/CreateSchoolDialog';
+import SchoolsTable from '../components/schools/SchoolsTable';
+import SchoolStatusToggle from '../components/schools/SchoolStatusToggle';
+import SuperAdminSchoolStatCards from '../components/schools/SuperAdminSchoolStatCards';
 import { useGetSchoolsQuery } from '../schools.api';
 import { computeSchoolStats, exportSchoolsToCsv } from '../utils/schools.utils';
 
@@ -72,10 +72,6 @@ const SchoolsPage = () => {
     }
   };
 
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
-  };
-
   return (
     <div className="animate-fade-in mx-auto flex w-full max-w-7xl flex-col gap-6">
       {/* Breadcrumbs */}
@@ -106,41 +102,7 @@ const SchoolsPage = () => {
       </div>
 
       {/* ── Stats Summary Grid ────────────────────────────────── */}
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-        <StatCard
-          Icon={COMMON.BUILDING}
-          label="Total Schools"
-          value={stats.total}
-          subtext="All registered schools"
-          accentClassName="border-l-blue-500"
-          iconChipClassName="bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400"
-        />
-        <StatCard
-          Icon={COMMON.CHECK}
-          label="Active Schools"
-          value={stats.active}
-          subtext={`${stats.activePct}% of total`}
-          subtextClassName="font-semibold text-emerald-600 dark:text-emerald-400"
-          accentClassName="border-l-emerald-500"
-          iconChipClassName="bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400"
-        />
-        <StatCard
-          Icon={COMMON.X}
-          label="Inactive Schools"
-          value={stats.inactive}
-          subtext="Currently suspended"
-          accentClassName="border-l-amber-500"
-          iconChipClassName="bg-amber-500/10 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400"
-        />
-        <StatCard
-          Icon={SCHOOL_ADMIN.REGISTER_STAFF}
-          label="New This Month"
-          value={stats.joinedThisMonth}
-          subtext="Recently onboarded"
-          accentClassName="border-l-purple-500"
-          iconChipClassName="bg-purple-500/10 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400"
-        />
-      </div>
+      <SuperAdminSchoolStatCards stats={stats} isLoading={isLoading} />
 
       {/* ── Controls & Actions Bar ────────────────────────────── */}
       <div className="bg-card border-border flex flex-col gap-3 rounded-xl border p-4 sm:flex-row sm:items-center sm:justify-between">
@@ -151,7 +113,7 @@ const SchoolsPage = () => {
             className="bg-muted/40 border-border pl-9"
             placeholder="Search schools by name or domain..."
             value={searchQuery}
-            onChange={handleSearchChange}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
 

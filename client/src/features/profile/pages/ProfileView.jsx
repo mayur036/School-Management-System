@@ -1,15 +1,11 @@
-import { useMemo, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 import AppBreadcrumb from '@/components/shared/AppBreadcrumb';
-import StatCard from '@/components/shared/StatCard';
+import StatusBadge from '@/components/shared/StatusBadge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useGetDepartmentsQuery } from '@/features/school_admin/departments.api';
-import { useGetStaffQuery } from '@/features/school_admin/staff.api';
-import { getMetrics } from '@/helper/getMatrics';
 import { useAuth } from '@/hooks/useAuth';
 import { COMMON } from '@/lib/icons';
 import { formatDate } from '@/lib/utils';
@@ -31,14 +27,6 @@ export const ProfileView = () => {
   const { user } = useAuth();
   const fileInputRef = useRef(null);
 
-  // Queries for dynamic metrics (skipped if not school_admin)
-  const { data: deptData } = useGetDepartmentsQuery(undefined, {
-    skip: user?.role_name !== 'school_admin',
-  });
-  const { data: staffData } = useGetStaffQuery(undefined, {
-    skip: user?.role_name !== 'school_admin',
-  });
-
   // Mutations
   const [uploadAvatar, { isLoading: isUploadingAvatar }] =
     useUploadAvatarMutation();
@@ -55,23 +43,6 @@ export const ProfileView = () => {
   const [bio, setBio] = useState('');
   const [timezone, setTimezone] = useState('');
   const [language, setLanguage] = useState('');
-
-  const schoolAdminMetrics = useMemo(() => {
-    if (user?.role_name !== 'school_admin') return {};
-    const departments = deptData?.data?.departments ?? [];
-    const staff = staffData?.data?.staff ?? [];
-    const activeStaffCount = staff.filter((s) => s.status === 'active').length;
-    return {
-      deptsCount: departments.length,
-      staffCount: staff.length,
-      activeStaffCount,
-    };
-  }, [user, deptData, staffData]);
-
-  const metrics = useMemo(
-    () => getMetrics(user, schoolAdminMetrics),
-    [user, schoolAdminMetrics]
-  );
 
   if (!user) {
     return (
@@ -196,15 +167,7 @@ export const ProfileView = () => {
                 <h2 className="text-foreground text-2xl font-bold tracking-tight">
                   {userFullName}
                 </h2>
-                <Badge
-                  className={`border-none capitalize shadow-none ${
-                    user.status === 'active'
-                      ? 'bg-green-500/10 text-green-600'
-                      : 'bg-red-500/10 text-red-600'
-                  }`}
-                >
-                  {user.status}
-                </Badge>
+                <StatusBadge status={user.status} />
               </div>
               <span className="text-muted-foreground mt-1 flex items-center justify-center gap-1.5 text-sm sm:justify-start">
                 <COMMON.SHIELD className="text-primary size-4" />
@@ -248,15 +211,6 @@ export const ProfileView = () => {
           </div>
         </div>
       </div>
-
-      {/* ── Dynamic Metrics Row (real data only) ──────────────── */}
-      {metrics.length > 0 && (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-          {metrics.map((metric) => (
-            <StatCard key={metric.label} {...metric} />
-          ))}
-        </div>
-      )}
 
       {/* ── Main Container (Adaptive Viewports) ───────────────── */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
@@ -315,34 +269,6 @@ export const ProfileView = () => {
                   {tab.label}
                 </button>
               ))}
-            </div>
-          </Card>
-
-          {/* Quick Actions Panel */}
-          <Card className="border-border bg-card hidden border lg:block">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-bold">Quick Actions</CardTitle>
-            </CardHeader>
-            <div className="flex flex-col space-y-1 px-2 pb-3">
-              <button
-                onClick={() => setIsChangePasswordOpen(true)}
-                className="hover:bg-muted/50 text-foreground flex cursor-pointer items-center justify-between rounded-lg px-2.5 py-2 text-xs font-semibold"
-              >
-                Change Password
-                <COMMON.CHEVRON_RIGHT className="text-muted-foreground size-3.5" />
-              </button>
-              <button className="hover:bg-muted/50 text-foreground flex cursor-pointer items-center justify-between rounded-lg px-2.5 py-2 text-xs font-semibold">
-                Export My Data
-                <COMMON.CHEVRON_RIGHT className="text-muted-foreground size-3.5" />
-              </button>
-              <button className="hover:bg-muted/50 text-foreground flex cursor-pointer items-center justify-between rounded-lg px-2.5 py-2 text-xs font-semibold">
-                Download Profile PDF
-                <COMMON.CHEVRON_RIGHT className="text-muted-foreground size-3.5" />
-              </button>
-              <button className="hover:bg-destructive/10 text-destructive flex cursor-pointer items-center justify-between rounded-lg px-2.5 py-2 text-xs font-semibold">
-                Logout All Devices
-                <COMMON.CHEVRON_RIGHT className="size-3.5" />
-              </button>
             </div>
           </Card>
         </div>
@@ -457,15 +383,17 @@ export const ProfileView = () => {
                     {user.status}
                   </span>
                 </div>
-                <Badge
-                  className={`border-none shadow-none ${
-                    user.status === 'active'
-                      ? 'bg-emerald-500/10 text-emerald-600'
-                      : 'bg-red-500/10 text-red-600'
-                  }`}
-                >
-                  {user.status}
-                </Badge>
+                <StatusBadge status={user.status} />
+              </div>
+              <div className="flex items-start justify-between gap-3 border-t pt-3">
+                <span className="text-foreground font-semibold">
+                  Last Updated
+                </span>
+                <span className="text-muted-foreground text-[10px]">
+                  {user.updated_at
+                    ? formatDate(user.updated_at, 'medium-time')
+                    : 'Never'}
+                </span>
               </div>
               <div className="flex items-start justify-between gap-3 border-t pt-3">
                 <span className="text-foreground font-semibold">

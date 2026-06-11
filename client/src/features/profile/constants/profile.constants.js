@@ -37,3 +37,36 @@ export const timezonePreference = [
     value: 'Europe/Berlin',
   },
 ];
+
+export const QUICK_ACTIONS = [
+  {
+    title: 'Edit Profile',
+    description: 'Update your profile information',
+    icon: COMMON.USER,
+    action: 'edit-profile',
+  },
+  {
+    title: 'Change Password',
+    description: 'Update your password',
+    icon: COMMON.SHIELD,
+    action: 'change-password',
+  },
+  {
+    title: 'Notification Preferences',
+    description: 'Update your notification preferences',
+    icon: COMMON.BELL,
+    action: 'notification-preferences',
+  },
+  {
+    title: 'Activity Logs',
+    description: 'View your activity logs',
+    icon: COMMON.CLOCK,
+    action: 'activity-logs',
+  },
+  {
+    title: 'Profile Preferences',
+    description: 'Update your profile preferences',
+    icon: COMMON.SETTINGS,
+    action: 'profile-preferences',
+  },
+];

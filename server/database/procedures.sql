@@ -27,7 +27,7 @@ DROP PROCEDURE IF EXISTS sp_login_get_user $$
 CREATE PROCEDURE sp_login_get_user(IN p_email VARCHAR(150))
 BEGIN
   SELECT
-    s.staff_id, s.role_id, r.role_name, s.school_id, sch.name AS school_name, s.department_id,
+    s.staff_id, s.role_id, r.role_name, s.school_id, sch.name AS school_name,sch.status AS school_status, s.department_id,
     s.first_name, s.last_name, s.email, s.password_hash, s.phone,
     s.avatar_url, s.status
   FROM staff s
@@ -222,7 +222,7 @@ DROP PROCEDURE IF EXISTS sp_list_staff $$
 CREATE PROCEDURE sp_list_staff(IN p_school_id INT)
 BEGIN
   SELECT
-    s.staff_id, s.role_id, r.role_name, s.school_id, sch.name AS school_name, s.department_id,
+    s.staff_id, s.role_id, r.role_name, s.school_id, sch.name AS school_name,sch.status AS school_status, s.department_id,
     d.name AS department_name, s.first_name, s.last_name, s.email,
     s.phone, s.avatar_url, s.status, s.created_at
   FROM staff s
@@ -238,7 +238,7 @@ DROP PROCEDURE IF EXISTS sp_get_staff $$
 CREATE PROCEDURE sp_get_staff(IN p_staff_id INT)
 BEGIN
   SELECT
-    s.staff_id, s.role_id, r.role_name, s.school_id, sch.name AS school_name, s.department_id,
+    s.staff_id, s.role_id, r.role_name, s.school_id, sch.name AS school_name, sch.status AS school_status, s.department_id,
     d.name AS department_name, s.first_name, s.last_name, s.email,
     s.phone, s.avatar_url, s.avatar_public_id, s.status,
     s.created_at, s.updated_at

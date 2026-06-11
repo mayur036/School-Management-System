@@ -27,7 +27,7 @@ import { COMMON } from '@/lib/icons';
 import { copyToClipboard } from '@/lib/utils';
 import { createSchoolAdminSchema } from '@/schemas/school.schema';
 
-import { useCreateSchoolAdminMutation } from '../schools.api';
+import { useCreateSchoolAdminMutation } from '../../schools.api';
 
 /**
  * Dialog to create a School Admin for a given school.

@@ -44,6 +44,14 @@ const login = asyncHandler(async (req, res) => {
     );
   }
 
+  // 3. Check school active status
+  if (user.role_name !== 'super_admin' && user.school_status === 'inactive') {
+    throw new ApiError(
+      403,
+      'Your school account is currently inactive. Please contact the system administrator.'
+    );
+  }
+
   // 3. Verify password
   const isMatch = await comparePassword(password, user.password_hash);
   if (!isMatch) {
@@ -93,6 +101,10 @@ const getMe = asyncHandler(async (req, res) => {
 
   if (user.status !== 'active') {
     throw new ApiError(403, 'Account is inactive');
+  }
+
+  if (user.role_name !== 'super_admin' && user.school_status === 'inactive') {
+    throw new ApiError(403, 'Your school account is currently inactive');
   }
 
   return ok(res, { user }, 'User details retrieved successfully');

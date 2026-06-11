@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { COMMON } from '@/lib/icons';
+import { formatPhoneNumber } from '@/lib/utils';
 
 import {
   languagePreference,
@@ -88,7 +89,7 @@ const ProfileTabContent = ({
                     Phone Number
                   </span>
                   <span className="text-foreground mt-1 text-sm font-medium">
-                    {user.phone || 'Not configured'}
+                    {formatPhoneNumber(user.phone) || 'Not configured'}
                   </span>
                 </div>
                 <div className="flex flex-col">

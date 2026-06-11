@@ -22,24 +22,6 @@ import {
 import { SUPER_ADMIN } from '@/lib/icons';
 import { formatDate } from '@/lib/utils';
 
-// ── Status badge ──────────────────────────────────────────────
-
-// const StatusBadge = ({ status }) => {
-//   const isActive = status === 'active';
-//   return (
-//     <Badge
-//       className={
-//         isActive
-//           ? 'bg-success text-success-foreground'
-//           : 'bg-destructive text-destructive-foreground'
-//       }
-//     >
-//       <span className="mr-1 inline-block size-1.5 rounded-full bg-current" />
-//       {isActive ? 'Active' : 'Inactive'}
-//     </Badge>
-//   );
-// };
-
 // ── Skeleton rows (loading state) ─────────────────────────────
 
 const SkeletonRows = ({ count = 5 }) =>
@@ -68,13 +50,7 @@ const SkeletonRows = ({ count = 5 }) =>
 
 // ── Main table ────────────────────────────────────────────────
 
-const SchoolsTable = ({
-  schools,
-  isLoading,
-
-  onToggleStatus,
-  onAddAdmin,
-}) => {
+const SchoolsTable = ({ schools, isLoading, onToggleStatus, onAddAdmin }) => {
   if (isLoading) {
     return (
       <div className="overflow-x-auto rounded-lg border">

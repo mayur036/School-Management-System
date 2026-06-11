@@ -12,15 +12,8 @@ import {
 } from '@/components/ui/alert-dialog';
 import { COMMON } from '@/lib/icons';
 
-import { useUpdateSchoolStatusMutation } from '../schools.api';
+import { useUpdateSchoolStatusMutation } from '../../schools.api';
 
-/**
- * Confirmation dialog before toggling a school between active ↔ inactive.
- *
- * Props:
- *   school   – the school object (null when closed)
- *   onClose  – callback to clear the selected school
- */
 const SchoolStatusToggle = ({ school, onClose }) => {
   const [updateStatus, { isLoading }] = useUpdateSchoolStatusMutation();
 

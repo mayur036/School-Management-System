@@ -61,6 +61,7 @@ Procedures also validate tenancy where relevant (e.g. staff must belong to the p
 - **Auth/guards**: `protect` (middleware/auth.js) reads the JWT from the `token` httpOnly cookie _or_ a `Bearer` header, verifies it, and attaches `req.user` (claims: `staff_id`, `role_name`, `school_id`, `department_id`, names, email). `authorize('super_admin' | 'school_admin' | ...)` guards by role.
 - **Tenant scoping is mandatory and never trusts the request body.** For school_admin/staff routes, the `school_id` comes from `req.user.school_id` (the token), never from params/body. Cross-school access returns 404.
 - **Validation**: `validate(zodSchema)` middleware runs zod schemas from `src/schema/*.schema.js`.
+- **School Status Enforcement**: If a school is marked as `inactive`, login and API access is actively blocked for all its staff (including school admins) via the auth controllers.
 - **Responses**: always use the envelope helpers in `utils/apiResponse.js` — `ok(res, data, message)`, `created(...)`, and wrap every async handler in `asyncHandler(...)` so throws reach the central handler. Throw `new ApiError(status, message)` for expected errors. `ER_DUP_ENTRY` is auto-mapped to 409 in `middleware/error.js`.
 - **Route ordering gotcha**: in `staff.routes.js`, `/me` and `/me/password` are declared _before_ the `router.use(protect, authorize('school_admin'))` guard and before `/:id`, so any authenticated user can hit them and `me` isn't captured as an `:id`. Preserve this ordering when editing.
 - Config comes from `src/config/env.js` (`env` object). Several keys are **`required()`** and the server throws on boot if any is missing: `JWT_SECRET`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`. Swagger docs are wired via `src/config/swagger.js` from JSDoc in `src/docs/*.swagger.js`.
@@ -81,6 +82,7 @@ All server state flows through **one** `baseApi` (`src/app/baseApi.js`) using a 
 - **Feature folders**: `src/features/<feature>/{<feature>.api.js, <feature>Slice.js?, pages/, components/}`. Pages are `lazy`-loaded in `App.jsx`.
 - **Forms**: `react-hook-form` + `zod` (`@hookform/resolvers`) with schemas separated in `src/schemas/`. Submit calls the RTK Query mutation and `.unwrap()`s. Feedback via `sonner` toasts; `Skeleton` while `isLoading`.
 - **UI**: shadcn/ui (`src/components/ui/`, configured via `components.json`) + Tailwind v4 + lucide. React 19 with the React Compiler enabled (babel preset in `vite.config.js`).
+- **Icons**: Icons are centralized in `src/lib/icons/`. Always use `COMMON` and role-specific icon dictionaries (e.g., `SUPER_ADMIN`, `SCHOOL_ADMIN`) rather than importing directly from `lucide-react`.
 - **Import alias**: `@/` → `src/` (set in both `vite.config.js` and `jsconfig.json`).
 
 ## Conventions

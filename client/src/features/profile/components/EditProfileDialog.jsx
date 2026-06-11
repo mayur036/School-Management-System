@@ -26,6 +26,10 @@ import { COMMON } from '@/lib/icons';
 import { cn } from '@/lib/utils';
 import { editProfileSchema } from '@/schemas/profile.schema';
 
+import {
+  languagePreference,
+  timezonePreference,
+} from '../constants/profile.constants';
 import { useUpdateProfileMutation } from '../profile.api';
 
 export const EditProfileDialog = ({
@@ -113,6 +117,7 @@ export const EditProfileDialog = ({
                   'rounded-lg text-xs',
                   errors.first_name && 'border-destructive'
                 )}
+                placeholder="First Name"
                 {...register('first_name')}
               />
               {errors.first_name && (
@@ -131,6 +136,7 @@ export const EditProfileDialog = ({
                   'rounded-lg text-xs',
                   errors.last_name && 'border-destructive'
                 )}
+                placeholder="Last Name"
                 {...register('last_name')}
               />
               {errors.last_name && (
@@ -202,15 +208,11 @@ export const EditProfileDialog = ({
                       <SelectValue placeholder="Select timezone" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="(GMT+05:30) Asia/Kolkata">
-                        (GMT+05:30) Kolkata
-                      </SelectItem>
-                      <SelectItem value="(GMT+00:00) UTC">
-                        (GMT+00:00) UTC
-                      </SelectItem>
-                      <SelectItem value="(GMT-05:00) EST">
-                        (GMT-05:00) EST
-                      </SelectItem>
+                      {timezonePreference.map((tz) => (
+                        <SelectItem key={tz.value} value={tz.value}>
+                          {tz.label}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 )}
@@ -241,9 +243,11 @@ export const EditProfileDialog = ({
                       <SelectValue placeholder="Select language" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="English">English</SelectItem>
-                      <SelectItem value="Spanish">Spanish</SelectItem>
-                      <SelectItem value="French">French</SelectItem>
+                      {languagePreference.map((lang) => (
+                        <SelectItem key={lang.value} value={lang.value}>
+                          {lang.label}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 )}

@@ -5,10 +5,6 @@ export function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
 
-/**
- * Build uppercase initials from a person-like object ({ first_name, last_name }).
- * Falls back to 'U' when no name parts are present.
- */
 export const getInitials = (person) => {
   if (!person) return 'U';
   const first = person.first_name?.[0] ?? '';
@@ -22,14 +18,35 @@ export const formatSchoolId = (id) => `sc-${String(id).padStart(4, '0')}`;
 
 export const formatPhoneNumber = (phoneNumber) => {
   if (!phoneNumber) return '-';
-  const nationalNumber = phoneNumber.replace(/^\+\d{1,3}/, '');
-  const match = nationalNumber.match(/^(\d{3})(\d{4})(\d{4})$/);
+
+  // Remove all non-digit characters to process raw numbers
+  const cleaned = phoneNumber.replace(/\D/g, '');
+
+  // 10-digit standard (e.g., US without country code: 1234567890 -> 123-456-7890)
+  let match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
   if (match) {
-    const area = match[1];
-    const prefix = match[2];
-    const line = match[3];
-    return `${area}-${prefix}-${line}`;
+    return `${match[1]}-${match[2]}-${match[3]}`;
   }
+
+  // 11-digit US with country code 1 (e.g., 11234567890 -> +1 123-456-7890)
+  match = cleaned.match(/^1(\d{3})(\d{3})(\d{4})$/);
+  if (match) {
+    return `+1 ${match[1]}-${match[2]}-${match[3]}`;
+  }
+
+  // 12-digit India with country code 91 (e.g., 919876543210 -> +91 98765-43210)
+  match = cleaned.match(/^91(\d{5})(\d{5})$/);
+  if (match) {
+    return `+91 ${match[1]}-${match[2]}`;
+  }
+
+  // 11-digit UK style or others
+  match = cleaned.match(/^(\d{4})(\d{3})(\d{4})$/);
+  if (match) {
+    return `${match[1]} ${match[2]} ${match[3]}`;
+  }
+
+  // Fallback to original if no pattern matched
   return phoneNumber;
 };
 
@@ -99,10 +116,6 @@ export const formatDate = (dateString, format = 'short', code = 'en-GB') => {
   }
 };
 
-/**
- * Robustly copies text to the clipboard, falling back to a textarea
- * approach if the Clipboard API is unavailable (e.g. non-secure local IP contexts).
- */
 export const copyToClipboard = async (text) => {
   if (navigator.clipboard && window.isSecureContext) {
     return navigator.clipboard.writeText(text);

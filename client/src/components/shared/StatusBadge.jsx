@@ -1,10 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
-/**
- * Active / inactive pill with a leading dot. Used in the staff directory
- * table, cards, drawer and the dashboard recent-staff list.
- */
 const StatusBadge = ({ status, className, pulse = false }) => {
   const isActive = status === 'active';
   return (
