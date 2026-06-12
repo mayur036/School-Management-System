@@ -1,17 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
-import { Badge } from '@/components/ui/badge';
+import AppBreadcrumb from '@/components/shared/AppBreadcrumb';
+import AppPagination from '@/components/shared/AppPagination';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -20,6 +14,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -28,27 +31,31 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Skeleton } from '@/components/ui/skeleton';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
 import {
   useListSchoolLeaveRequestsQuery,
   useReviewLeaveRequestMutation,
 } from '@/features/staff/staffActivity.api';
-import { EMPTY_STATE } from '@/lib/icons';
+import { useDataTable } from '@/hooks/useDataTable';
+import { BASE } from '@/lib/icons';
 import { formatDate } from '@/lib/utils';
 import { reviewLeaveSchema } from '@/schemas/staff.schema';
 
+import LeaveStatCard from '../components/leaves/LeaveStatCard';
+import LeaveTable from '../components/leaves/LeaveTable';
+import {
+  computeLeaveStats,
+  exportLeavesToCsv,
+  getLeaveTypes,
+} from '../utils/leaves.utils';
+
 export const LeavesPage = () => {
+  // Dialog state
   const [selectedLeave, setSelectedLeave] = useState(null);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isReviewOpen, setIsReviewOpen] = useState(false);
+
+  // Filter state
+  const [typeFilter, setTypeFilter] = useState('all');
 
   // Queries
   const { data: leavesData, isLoading: isLeavesLoading } =
@@ -57,6 +64,12 @@ export const LeavesPage = () => {
   // Mutations
   const [reviewLeave, { isLoading: isSubmitting }] =
     useReviewLeaveRequestMutation();
+
+  const leaves = useMemo(() => leavesData?.data?.leaves || [], [leavesData]);
+  const leaveTypes = useMemo(() => getLeaveTypes(leaves), [leaves]);
+
+  // Stats
+  const stats = useMemo(() => computeLeaveStats(leaves), [leaves]);
 
   // Form setup
   const {
@@ -76,6 +89,47 @@ export const LeavesPage = () => {
 
   const statusVal = watch('status');
 
+  // Use the custom useDataTable hook for search, filters, pagination
+  const {
+    searchQuery,
+    setSearchQuery,
+    statusFilter,
+    setStatusFilter,
+    currentPage,
+    setCurrentPage,
+    itemsPerPage,
+    handleItemsPerPageChange,
+    filteredData: filteredLeaves,
+    paginatedData: paginatedLeaves,
+  } = useDataTable({
+    data: leaves,
+    searchFilter: (leave, q) => {
+      // Department type filter
+      const matchesType =
+        typeFilter === 'all' || leave.leave_type === typeFilter;
+      if (!matchesType) return false;
+
+      const fullName = `${leave.first_name} ${leave.last_name}`.toLowerCase();
+      const emailStr = (leave.email ?? '').toLowerCase();
+      const deptStr = (leave.department_name ?? '').toLowerCase();
+      const typeStr = (leave.leave_type ?? '').toLowerCase();
+      const reasonStr = (leave.reason ?? '').toLowerCase();
+
+      return (
+        fullName.includes(q) ||
+        emailStr.includes(q) ||
+        deptStr.includes(q) ||
+        typeStr.includes(q) ||
+        reasonStr.includes(q)
+      );
+    },
+  });
+
+  // Reset page when typeFilter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [typeFilter, setCurrentPage]);
+
   const onReviewSubmit = async (values) => {
     if (!selectedLeave) return;
     try {
@@ -85,7 +139,7 @@ export const LeavesPage = () => {
         comments: values.comments,
       }).unwrap();
       toast.success(res.message || 'Leave request updated successfully');
-      setIsOpen(false);
+      setIsReviewOpen(false);
       setSelectedLeave(null);
       reset();
     } catch (err) {
@@ -99,183 +153,165 @@ export const LeavesPage = () => {
       status: 'approved',
       comments: leave.comments || '',
     });
-    setIsOpen(true);
+    setIsReviewOpen(true);
   };
 
-  const leaves = leavesData?.data?.leaves || [];
+  const handleExport = () => {
+    if (!filteredLeaves.length) {
+      toast.error('No leave records found to export');
+      return;
+    }
+    try {
+      exportLeavesToCsv(filteredLeaves);
+      toast.success('Leave records exported successfully');
+    } catch {
+      toast.error('Failed to export leave records');
+    }
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+    <div className="animate-fade-in mx-auto flex w-full max-w-7xl flex-col gap-6">
+      {/* Breadcrumbs */}
+      <AppBreadcrumb
+        items={[
+          { label: 'School Admin', to: '/school/dashboard' },
+          { label: 'Leave Requests' },
+        ]}
+      />
+
+      {/* Page Title */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-foreground text-2xl font-bold tracking-tight">
+          <h1 className="text-foreground text-3xl font-bold tracking-tight">
             Staff Leave Requests
           </h1>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-muted-foreground mt-1 text-sm">
             Review, approve, or reject absence requests submitted by staff
-            members
+            members.
           </p>
-        </div>
-        <div>
-          <Badge className="border-none bg-blue-500/10 px-2.5 py-1 text-xs font-medium text-blue-600 hover:bg-blue-500/10 dark:text-blue-400">
-            {leaves.filter((l) => l.status === 'pending').length} Pending
-            Requests
-          </Badge>
         </div>
       </div>
 
-      {/* Leaves Card */}
-      <Card className="border-border bg-card shadow-sm">
-        <CardHeader className="border-border border-b pb-3">
-          <CardTitle className="text-foreground text-base font-semibold">
-            Leave Application Log
-          </CardTitle>
-          <CardDescription>
-            View historical and pending absence requests
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pt-4">
-          {isLeavesLoading ? (
-            <div className="space-y-2">
-              {[...Array(3)].map((_, i) => (
-                <Skeleton key={i} className="h-8 w-full animate-pulse" />
-              ))}
-            </div>
-          ) : leaves.length > 0 ? (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader className="bg-muted/50">
-                  <TableRow>
-                    <TableHead className="text-muted-foreground text-xs font-semibold">
-                      Staff Member
-                    </TableHead>
-                    <TableHead className="text-muted-foreground text-xs font-semibold">
-                      Department
-                    </TableHead>
-                    <TableHead className="text-muted-foreground text-xs font-semibold">
-                      Leave Type
-                    </TableHead>
-                    <TableHead className="text-muted-foreground text-xs font-semibold">
-                      Duration
-                    </TableHead>
-                    <TableHead className="text-muted-foreground text-xs font-semibold">
-                      Reason
-                    </TableHead>
-                    <TableHead className="text-muted-foreground text-xs font-semibold">
-                      Status
-                    </TableHead>
-                    <TableHead className="text-muted-foreground text-xs font-semibold">
-                      Reviewed By
-                    </TableHead>
-                    <TableHead className="text-muted-foreground text-right text-xs font-semibold">
-                      Actions
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {leaves.map((leave) => (
-                    <TableRow
-                      key={leave.leave_id}
-                      className="hover:bg-muted/30"
-                    >
-                      <TableCell className="text-foreground text-xs font-semibold">
-                        {leave.first_name} {leave.last_name || ''}
-                        <div className="text-muted-foreground text-[10px] font-normal">
-                          {leave.email}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-muted-foreground text-xs">
-                        {leave.department_name || 'Staff'}
-                      </TableCell>
-                      <TableCell className="text-foreground text-xs font-medium">
-                        {leave.leave_type}
-                      </TableCell>
-                      <TableCell className="text-muted-foreground text-xs">
-                        <div>
-                          {formatDate(leave.start_date, 'medium')} -{' '}
-                          {formatDate(leave.end_date, 'medium')}
-                        </div>
-                        <div className="text-muted-foreground/80 mt-0.5 text-[10px] font-semibold">
-                          {leave.total_days}{' '}
-                          {leave.total_days === 1 ? 'day' : 'days'}
-                        </div>
-                      </TableCell>
-                      <TableCell
-                        className="text-muted-foreground max-w-40 truncate text-xs"
-                        title={leave.reason}
-                      >
-                        {leave.reason}
-                      </TableCell>
-                      <TableCell className="text-xs">
-                        <Badge
-                          className={`rounded-full border-none px-2 py-0.5 font-medium ${
-                            leave.status === 'approved'
-                              ? 'bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/10 dark:text-emerald-400'
-                              : leave.status === 'rejected'
-                                ? 'bg-rose-500/10 text-rose-600 hover:bg-rose-500/10 dark:text-rose-400'
-                                : 'bg-amber-500/10 text-amber-600 hover:bg-amber-500/10 dark:text-amber-400'
-                          }`}
-                        >
-                          {leave.status.charAt(0).toUpperCase() +
-                            leave.status.slice(1)}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-muted-foreground text-xs">
-                        {leave.reviewer_name ? (
-                          <div>
-                            <span className="text-foreground font-medium">
-                              {leave.reviewer_name}
-                            </span>
-                            {leave.comments && (
-                              <div
-                                className="text-muted-foreground max-w-32 truncate text-[10px]"
-                                title={leave.comments}
-                              >
-                                "{leave.comments}"
-                              </div>
-                            )}
-                          </div>
-                        ) : (
-                          '-'
-                        )}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {leave.status === 'pending' ? (
-                          <Button
-                            size="sm"
-                            className="h-7 px-3 text-[11px] font-semibold"
-                            onClick={() => handleOpenReview(leave)}
-                          >
-                            Review
-                          </Button>
-                        ) : (
-                          <span className="text-muted-foreground text-[11px] font-medium">
-                            Completed
-                          </span>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-16 text-center">
-              <EMPTY_STATE.NO_DATA className="text-muted-foreground/50 mb-2.5 h-10 w-10" />
-              <h3 className="text-foreground text-sm font-semibold">
-                No Leave Requests
-              </h3>
-              <p className="text-muted-foreground mt-0.5 max-w-65 text-xs">
-                Staff members have not submitted any leave applications yet.
-              </p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      {/* ── Stats Summary Grid ────────────────────────────────── */}
+      <LeaveStatCard stats={stats} isLoading={isLeavesLoading} />
 
-      {/* Review Dialog */}
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      {/* ── Controls & Actions Bar ────────────────────────────── */}
+      <div className="bg-card border-border flex flex-col gap-3 rounded-xl border p-4 sm:flex-row sm:items-center sm:justify-between">
+        {/* Search */}
+        <div className="relative max-w-md flex-1">
+          <BASE.SEARCH className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
+          <Input
+            className="bg-muted/40 border-border pl-9"
+            placeholder="Search by name, email, department, or type..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+          />
+        </div>
+
+        {/* Action Controls */}
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Filter Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                className="border-border bg-card cursor-pointer gap-2"
+              >
+                <BASE.FILTER data-icon="inline-start" />
+                Filter
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuLabel>Filter Status</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuCheckboxItem
+                checked={statusFilter === 'all'}
+                onCheckedChange={() => setStatusFilter('all')}
+              >
+                All Statuses
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={statusFilter === 'pending'}
+                onCheckedChange={() => setStatusFilter('pending')}
+              >
+                Pending Only
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={statusFilter === 'approved'}
+                onCheckedChange={() => setStatusFilter('approved')}
+              >
+                Approved Only
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={statusFilter === 'rejected'}
+                onCheckedChange={() => setStatusFilter('rejected')}
+              >
+                Rejected Only
+              </DropdownMenuCheckboxItem>
+
+              {leaveTypes.length > 0 && (
+                <>
+                  <DropdownMenuSeparator className="my-1" />
+                  <DropdownMenuLabel>Filter Leave Type</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuCheckboxItem
+                    checked={typeFilter === 'all'}
+                    onCheckedChange={() => setTypeFilter('all')}
+                  >
+                    All Types
+                  </DropdownMenuCheckboxItem>
+                  {leaveTypes.map((type) => (
+                    <DropdownMenuCheckboxItem
+                      key={type}
+                      checked={typeFilter === type}
+                      onCheckedChange={() => setTypeFilter(type)}
+                    >
+                      {type}
+                    </DropdownMenuCheckboxItem>
+                  ))}
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Export CSV */}
+          <Button
+            variant="outline"
+            className="border-border bg-card cursor-pointer gap-2"
+            onClick={handleExport}
+          >
+            <BASE.DOWNLOAD data-icon="inline-start" />
+            Export
+          </Button>
+        </div>
+      </div>
+
+      {/* ── Main Data View (Table) ────────────────────────────── */}
+      <div className="flex flex-col gap-4">
+        <LeaveTable
+          leaves={paginatedLeaves}
+          isLoading={isLeavesLoading}
+          onReview={handleOpenReview}
+        />
+
+        {!isLeavesLoading && (
+          <AppPagination
+            currentPage={currentPage}
+            totalItems={filteredLeaves.length}
+            itemsPerPage={itemsPerPage}
+            onPageChange={setCurrentPage}
+            onItemsPerPageChange={handleItemsPerPageChange}
+            itemsLabel="leave requests"
+          />
+        )}
+      </div>
+
+      {/* ── Review Dialog ─────────────────────────────────────── */}
+      <Dialog open={isReviewOpen} onOpenChange={setIsReviewOpen}>
         <DialogContent className="max-w-100 rounded-lg">
           <DialogHeader>
             <DialogTitle className="text-foreground text-base font-bold">
@@ -303,7 +339,7 @@ export const LeavesPage = () => {
                     Requested Period
                   </span>
                   <span className="text-foreground font-semibold">
-                    {formatDate(selectedLeave.start_date, 'medium')} -{' '}
+                    {formatDate(selectedLeave.start_date, 'medium')} –{' '}
                     {formatDate(selectedLeave.end_date, 'medium')} (
                     {selectedLeave.total_days}{' '}
                     {selectedLeave.total_days === 1 ? 'day' : 'days'})
@@ -315,7 +351,7 @@ export const LeavesPage = () => {
                   Reason Statement
                 </span>
                 <p className="text-muted-foreground leading-relaxed italic">
-                  "{selectedLeave.reason}"
+                  &quot;{selectedLeave.reason}&quot;
                 </p>
               </div>
             </div>
@@ -386,7 +422,7 @@ export const LeavesPage = () => {
                 variant="outline"
                 className="h-9 text-xs"
                 onClick={() => {
-                  setIsOpen(false);
+                  setIsReviewOpen(false);
                   setSelectedLeave(null);
                   reset();
                 }}

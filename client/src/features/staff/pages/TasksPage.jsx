@@ -174,31 +174,31 @@ export const TasksPage = () => {
         onValueChange={setActiveTab}
         className="space-y-4"
       >
-        <TabsList className="bg-muted rounded-lg p-1">
+        <TabsList className="border-border bg-muted/60 rounded-lg border p-1 shadow-sm">
           <TabsTrigger
             value="pending"
-            className="rounded-md text-xs font-medium"
+            className="group data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-md px-4 py-2 text-xs font-medium transition-all data-[state=active]:shadow-sm"
           >
             To Do
-            <span className="py-0.2 bg-background text-muted-foreground border-border ml-1.5 rounded-full border px-1.5 text-[10px] font-semibold">
+            <span className="ml-1.5 rounded-full bg-blue-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-blue-600 group-data-[state=active]:bg-white/20 group-data-[state=active]:text-white dark:text-blue-400">
               {todoTasks.length}
             </span>
           </TabsTrigger>
           <TabsTrigger
             value="in_progress"
-            className="rounded-md text-xs font-medium"
+            className="group data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-md px-4 py-2 text-xs font-medium transition-all data-[state=active]:shadow-sm"
           >
             In Progress
-            <span className="py-0.2 bg-background text-muted-foreground border-border ml-1.5 rounded-full border px-1.5 text-[10px] font-semibold">
+            <span className="ml-1.5 rounded-full bg-blue-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-blue-600 group-data-[state=active]:bg-white/20 group-data-[state=active]:text-white dark:text-blue-400">
               {inProgressTasks.length}
             </span>
           </TabsTrigger>
           <TabsTrigger
             value="completed"
-            className="rounded-md text-xs font-medium"
+            className="group data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-md px-4 py-2 text-xs font-medium transition-all data-[state=active]:shadow-sm"
           >
             Completed
-            <span className="py-0.2 bg-background text-muted-foreground border-border ml-1.5 rounded-full border px-1.5 text-[10px] font-semibold">
+            <span className="ml-1.5 rounded-full bg-blue-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-blue-600 group-data-[state=active]:bg-white/20 group-data-[state=active]:text-white dark:text-blue-400">
               {completedTasks.length}
             </span>
           </TabsTrigger>

@@ -79,17 +79,17 @@ export const DocumentsPage = () => {
       </div>
 
       <Tabs defaultValue="resources" className="space-y-4">
-        <TabsList className="bg-muted rounded-lg p-1">
+        <TabsList className="border-border bg-muted/60 rounded-lg border p-1 shadow-sm">
           <TabsTrigger
             value="resources"
-            className="rounded-md text-xs font-medium"
+            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-md px-4 py-2 text-xs font-medium transition-all data-[state=active]:shadow-sm"
           >
             <STAFF.DOCUMENTS className="mr-2 h-3.5 w-3.5" />
             School Resources
           </TabsTrigger>
           <TabsTrigger
             value="payslips"
-            className="rounded-md text-xs font-medium"
+            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-md px-4 py-2 text-xs font-medium transition-all data-[state=active]:shadow-sm"
           >
             <STAFF.TIME_LOG className="mr-2 h-3.5 w-3.5" />
             My Payslips

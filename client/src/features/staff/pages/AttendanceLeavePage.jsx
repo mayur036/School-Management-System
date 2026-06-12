@@ -114,20 +114,26 @@ export const AttendanceLeavePage = () => {
         onValueChange={setActiveTab}
         className="space-y-4"
       >
-        <TabsList className="bg-muted grid w-full grid-cols-2 rounded-lg p-1 sm:inline-flex sm:w-fit">
+        <TabsList className="border-border bg-muted/60 rounded-lg border p-1 shadow-sm">
           <TabsTrigger
             value="attendance"
-            className="rounded-md text-xs font-medium"
+            className="group data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-md px-4 py-2 text-xs font-medium transition-all data-[state=active]:shadow-sm"
           >
             <STAFF.ATTENDANCE className="mr-2 h-3.5 w-3.5" />
-            Attendance History
+            Attendance
+            <span className="ml-1.5 rounded-full bg-blue-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-blue-600 group-data-[state=active]:bg-white/20 group-data-[state=active]:text-white dark:text-blue-400">
+              {attendance.length}
+            </span>
           </TabsTrigger>
           <TabsTrigger
             value="leaves"
-            className="rounded-md text-xs font-medium"
+            className="group data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-md px-4 py-2 text-xs font-medium transition-all data-[state=active]:shadow-sm"
           >
             <STAFF.LEAVE_REQUEST className="mr-2 h-3.5 w-3.5" />
             Leave Requests
+            <span className="ml-1.5 rounded-full bg-blue-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-blue-600 group-data-[state=active]:bg-white/20 group-data-[state=active]:text-white dark:text-blue-400">
+              {leaves.length}
+            </span>
           </TabsTrigger>
         </TabsList>
 
