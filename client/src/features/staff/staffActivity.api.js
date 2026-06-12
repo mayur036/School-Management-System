@@ -5,12 +5,7 @@ export const staffActivityApi = baseApi.injectEndpoints({
     // --- Staff Portal Queries/Mutations ---
     getStaffDashboardStats: builder.query({
       query: () => ({ url: '/staff/me/dashboard-stats', method: 'GET' }),
-      providesTags: [
-        'StaffSchedule',
-        'StaffAttendance',
-        'StaffLeave',
-        'StaffTask',
-      ],
+      providesTags: ['StaffSchedule', 'StaffAttendance', 'StaffLeave'],
     }),
 
     getStaffSchedule: builder.query({
@@ -77,64 +72,7 @@ export const staffActivityApi = baseApi.injectEndpoints({
       invalidatesTags: [{ type: 'StaffLeave', id: 'LIST' }],
     }),
 
-    getStaffTasks: builder.query({
-      query: () => ({ url: '/staff/me/tasks', method: 'GET' }),
-      providesTags: (result) =>
-        result?.data?.tasks
-          ? [
-              ...result.data.tasks.map((t) => ({
-                type: 'StaffTask',
-                id: t.task_id,
-              })),
-              { type: 'StaffTask', id: 'LIST' },
-            ]
-          : [{ type: 'StaffTask', id: 'LIST' }],
-    }),
-
-    updateTaskStatus: builder.mutation({
-      query: ({ id, status }) => ({
-        url: `/staff/me/tasks/${id}/status`,
-        method: 'PATCH',
-        data: { status },
-      }),
-      invalidatesTags: (result, error, { id }) => [
-        { type: 'StaffTask', id },
-        { type: 'StaffTask', id: 'LIST' },
-      ],
-    }),
-
     // --- School Admin Staff Management Queries/Mutations ---
-    assignTask: builder.mutation({
-      query: (data) => ({
-        url: '/school-admin/tasks',
-        method: 'POST',
-        data,
-      }),
-      invalidatesTags: [{ type: 'StaffTask', id: 'LIST' }],
-    }),
-
-    listSchoolTasks: builder.query({
-      query: () => ({ url: '/school-admin/tasks', method: 'GET' }),
-      providesTags: (result) =>
-        result?.data?.tasks
-          ? [
-              ...result.data.tasks.map((t) => ({
-                type: 'StaffTask',
-                id: t.task_id,
-              })),
-              { type: 'StaffTask', id: 'LIST' },
-            ]
-          : [{ type: 'StaffTask', id: 'LIST' }],
-    }),
-
-    deleteStaffTask: builder.mutation({
-      query: (id) => ({
-        url: `/school-admin/tasks/${id}`,
-        method: 'DELETE',
-      }),
-      invalidatesTags: [{ type: 'StaffTask', id: 'LIST' }],
-    }),
-
     listSchoolLeaveRequests: builder.query({
       query: () => ({ url: '/school-admin/leaves', method: 'GET' }),
       providesTags: (result) =>
@@ -202,13 +140,8 @@ export const {
   useClockInOutMutation,
   useGetStaffLeavesQuery,
   useRequestLeaveMutation,
-  useGetStaffTasksQuery,
-  useUpdateTaskStatusMutation,
 
   // School Admin Management
-  useAssignTaskMutation,
-  useListSchoolTasksQuery,
-  useDeleteStaffTaskMutation,
   useListSchoolLeaveRequestsQuery,
   useReviewLeaveRequestMutation,
   useCreateStaffScheduleMutation,
