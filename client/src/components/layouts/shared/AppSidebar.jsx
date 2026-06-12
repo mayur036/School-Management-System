@@ -13,7 +13,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarSeparator,
   useSidebar,
 } from '@/components/ui/sidebar';
 import { useAuth } from '@/hooks/useAuth';
@@ -134,12 +133,14 @@ const AppSidebar = ({ groups, profilePath = '/', fallbackInitials = 'U' }) => {
                   : user?.school_name}
               </span>
               <div className="mt-1 flex flex-wrap items-center gap-1.5">
-                {user?.role_name === 'school_admin' && user?.school_status && (
-                  <StatusBadge
-                    status={user.school_status}
-                    className="h-4 min-h-0 shrink-0 px-1.5 py-0 text-[9px]"
-                  />
-                )}
+                {(user?.role_name === 'school_admin' ||
+                  user?.role_name === 'staff') &&
+                  user?.school_status && (
+                    <StatusBadge
+                      status={user.school_status}
+                      className="h-4 min-h-0 shrink-0 px-1.5 py-0 text-[9px]"
+                    />
+                  )}
                 <span className="text-muted-foreground text-[10px] leading-normal">
                   {user?.role_name === 'super_admin'
                     ? 'Full system access & control.'
@@ -154,8 +155,7 @@ const AppSidebar = ({ groups, profilePath = '/', fallbackInitials = 'U' }) => {
       </div>
 
       {/* Footer with user info */}
-      <SidebarSeparator />
-      <SidebarFooter className="p-3">
+      <SidebarFooter className="border-t border-gray-200 p-3">
         {user && (
           <Link
             to={profilePath}

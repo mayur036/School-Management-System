@@ -82,16 +82,52 @@ export const clockInOutSchema = z.object({
 });
 
 export const leaveRequestSchema = z.object({
-  body: z.object({
-    leave_type: z.string().trim().min(1, 'Leave type is required').max(50),
-    start_date: z
-      .string()
-      .regex(/^\d{4}-\d{2}-\d{2}$/, 'Start date must be in YYYY-MM-DD format'),
-    end_date: z
-      .string()
-      .regex(/^\d{4}-\d{2}-\d{2}$/, 'End date must be in YYYY-MM-DD format'),
-    reason: z.string().trim().min(1, 'Reason is required'),
-  }),
+  body: z
+    .object({
+      leave_type: z.string().trim().min(1, 'Leave type is required').max(50),
+      start_date: z
+        .string()
+        .regex(
+          /^\d{4}-\d{2}-\d{2}$/,
+          'Start date must be in YYYY-MM-DD format'
+        ),
+      end_date: z
+        .string()
+        .regex(/^\d{4}-\d{2}-\d{2}$/, 'End date must be in YYYY-MM-DD format'),
+      reason: z.string().trim().min(1, 'Reason is required'),
+    })
+    .refine(
+      (data) => {
+        const [year, month, day] = data.start_date.split('-').map(Number);
+        const start = new Date(year, month - 1, day);
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const tomorrow = new Date(today);
+        tomorrow.setDate(today.getDate() + 1);
+
+        return start >= tomorrow;
+      },
+      {
+        message:
+          'Start date must be at least 1 day in advance (tomorrow or later)',
+        path: ['start_date'],
+      }
+    )
+    .refine(
+      (data) => {
+        const [sYear, sMonth, sDay] = data.start_date.split('-').map(Number);
+        const [eYear, eMonth, eDay] = data.end_date.split('-').map(Number);
+        const start = new Date(sYear, sMonth - 1, sDay);
+        const end = new Date(eYear, eMonth - 1, eDay);
+        return end >= start;
+      },
+      {
+        message: 'End date must be on or after start date',
+        path: ['end_date'],
+      }
+    ),
 });
 
 export const updateTaskStatusSchema = z.object({

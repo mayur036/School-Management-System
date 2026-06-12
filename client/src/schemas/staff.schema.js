@@ -75,12 +75,45 @@ export const batchRegisterStaffSchema = z.object({
 });
 
 // Staff Activities
-export const leaveRequestSchema = z.object({
-  leave_type: z.string().min(1, 'Please select a leave type'),
-  start_date: z.string().min(1, 'Start date is required'),
-  end_date: z.string().min(1, 'End date is required'),
-  reason: z.string().trim().min(5, 'Reason must be at least 5 characters'),
-});
+export const leaveRequestSchema = z
+  .object({
+    leave_type: z.string().min(1, 'Please select a leave type'),
+    start_date: z.string().min(1, 'Start date is required'),
+    end_date: z.string().min(1, 'End date is required'),
+    reason: z.string().trim().min(5, 'Reason must be at least 5 characters'),
+  })
+  .refine(
+    (data) => {
+      const [year, month, day] = data.start_date.split('-').map(Number);
+      const start = new Date(year, month - 1, day);
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const tomorrow = new Date(today);
+      tomorrow.setDate(today.getDate() + 1);
+
+      return start >= tomorrow;
+    },
+    {
+      message:
+        'Start date must be at least 1 day in advance (tomorrow or later)',
+      path: ['start_date'],
+    }
+  )
+  .refine(
+    (data) => {
+      const [sYear, sMonth, sDay] = data.start_date.split('-').map(Number);
+      const [eYear, eMonth, eDay] = data.end_date.split('-').map(Number);
+      const start = new Date(sYear, sMonth - 1, sDay);
+      const end = new Date(eYear, eMonth - 1, eDay);
+      return end >= start;
+    },
+    {
+      message: 'End date must be on or after start date',
+      path: ['end_date'],
+    }
+  );
 
 export const assignTaskSchema = z.object({
   staff_id: z.union([z.string(), z.number()]).transform((val) => Number(val)),

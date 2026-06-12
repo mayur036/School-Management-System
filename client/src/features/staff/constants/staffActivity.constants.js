@@ -28,3 +28,21 @@ export const LEAVE_TYPES = [
   'Study Leave',
   'Unpaid Leave',
 ];
+
+export const LEAVE_COLUMNS = [
+  { label: 'Type' },
+  { label: 'Start Date' },
+  { label: 'End Date' },
+  { label: 'Total Days' },
+  { label: 'Reason' },
+  { label: 'Status' },
+  { label: 'Admin Comments' },
+];
+
+export const ATTENDANCE_COLUMNS = [
+  { label: 'Date' },
+  { label: 'Clock In' },
+  { label: 'Clock Out' },
+  { label: 'Duration' },
+  { label: 'Status' },
+];

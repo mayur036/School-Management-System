@@ -398,6 +398,7 @@ BEGIN
   DECLARE v_pending_tasks INT DEFAULT 0;
   DECLARE v_present_days INT DEFAULT 0;
   DECLARE v_leave_days INT DEFAULT 0;
+  DECLARE v_total_work_seconds INT DEFAULT 0;
 
   SELECT COUNT(*) INTO v_today_classes
   FROM staff_schedules
@@ -409,7 +410,7 @@ BEGIN
 
   SELECT COUNT(*) INTO v_present_days
   FROM staff_attendance
-  WHERE staff_id = p_staff_id AND status IN ('present', 'late')
+  WHERE staff_id = p_staff_id AND status IN ('present', 'late', 'half_day')
     AND MONTH(date) = MONTH(CURDATE()) AND YEAR(date) = YEAR(CURDATE());
 
   SELECT COALESCE(SUM(total_days), 0) INTO v_leave_days
@@ -417,11 +418,17 @@ BEGIN
   WHERE staff_id = p_staff_id AND status = 'approved'
     AND (MONTH(start_date) = MONTH(CURDATE()) OR MONTH(end_date) = MONTH(CURDATE()));
 
+  SELECT COALESCE(SUM(TIME_TO_SEC(TIMEDIFF(clock_out, clock_in))), 0) INTO v_total_work_seconds
+  FROM staff_attendance
+  WHERE staff_id = p_staff_id
+    AND MONTH(date) = MONTH(CURDATE()) AND YEAR(date) = YEAR(CURDATE());
+
   SELECT
     v_today_classes AS today_classes,
     v_pending_tasks AS pending_tasks,
     v_present_days AS present_days,
-    v_leave_days AS leave_days;
+    v_leave_days AS leave_days,
+    ROUND(v_total_work_seconds / 3600, 1) AS total_work_hours;
 END $$
 
 -- sp_get_staff_schedule : get staff weekly schedule
@@ -451,7 +458,9 @@ CREATE PROCEDURE sp_get_staff_attendance(
   IN p_end_date   DATE
 )
 BEGIN
-  SELECT * FROM staff_attendance
+  SELECT *,
+         TIMEDIFF(clock_out, clock_in) AS work_duration
+  FROM staff_attendance
   WHERE staff_id = p_staff_id
     AND date BETWEEN p_start_date AND p_end_date
   ORDER BY date DESC;
@@ -467,8 +476,9 @@ CREATE PROCEDURE sp_clock_in_out(
 BEGIN
   DECLARE v_exists INT;
   DECLARE v_clock_out TIME;
+  DECLARE v_clock_in TIME;
 
-  SELECT COUNT(*), MAX(clock_out) INTO v_exists, v_clock_out
+  SELECT COUNT(*), MAX(clock_out), MAX(clock_in) INTO v_exists, v_clock_out, v_clock_in
   FROM staff_attendance
   WHERE staff_id = p_staff_id AND date = p_date;
 
@@ -483,9 +493,10 @@ BEGIN
       IF(p_time > '10:30:00', 'late', 'present')
     );
   ELSEIF v_clock_out IS NULL THEN
-    -- Clock out
+    -- Clock out. Status becomes half_day if total hours worked < 4 hours (14400 seconds)
     UPDATE staff_attendance
-    SET clock_out = p_time
+    SET clock_out = p_time,
+        status = IF(TIME_TO_SEC(TIMEDIFF(p_time, v_clock_in)) < 14400, 'half_day', status)
     WHERE staff_id = p_staff_id AND date = p_date;
   END IF;
 
@@ -503,6 +514,14 @@ CREATE PROCEDURE sp_create_leave_request(
   IN p_reason     TEXT
 )
 BEGIN
+  IF p_start_date <= CURDATE() THEN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Validation error: Leave requests must be submitted at least 1 day in advance (tomorrow or later).';
+  ELSEIF p_end_date < p_start_date THEN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Validation error: End date must be on or after start date.';
+  END IF;
+
   INSERT INTO leave_requests (staff_id, leave_type, start_date, end_date, total_days, reason, status)
   VALUES (p_staff_id, p_leave_type, p_start_date, p_end_date, DATEDIFF(p_end_date, p_start_date) + 1, p_reason, 'pending');
 
@@ -584,7 +603,7 @@ DROP PROCEDURE IF EXISTS sp_list_school_leave_requests $$
 CREATE PROCEDURE sp_list_school_leave_requests(IN p_school_id INT)
 BEGIN
   SELECT l.*,
-         s.first_name, s.last_name, s.email, d.name AS department_name,
+         s.first_name, s.last_name, s.avatar_url, s.email, d.name AS department_name,
          CONCAT(r.first_name, ' ', r.last_name) AS reviewer_name
   FROM leave_requests l
   JOIN staff s ON s.staff_id = l.staff_id

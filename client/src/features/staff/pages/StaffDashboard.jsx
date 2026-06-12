@@ -208,7 +208,7 @@ export const StaffDashboard = () => {
         </Card>
 
         {/* Dashboard Stats */}
-        <div className="grid grid-cols-2 gap-4 md:col-span-2">
+        <div className="grid grid-cols-2 gap-4 md:col-span-2 lg:grid-cols-3">
           {/* Today's classes */}
           <Card className="border-border bg-card shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -281,7 +281,31 @@ export const StaffDashboard = () => {
             </CardContent>
           </Card>
 
-          {/* Approved Leaves */}
+          {/* Working Hours */}
+          <Card className="border-border bg-card shadow-sm">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
+                Working Hours
+              </CardTitle>
+              <div className="rounded-full bg-indigo-500/10 p-2">
+                <STAFF.TIME_LOG className="h-4 w-4 text-indigo-500" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              {isStatsLoading ? (
+                <Skeleton className="h-8 w-12" />
+              ) : (
+                <div className="text-foreground text-2xl font-bold">
+                  {statsData?.data?.stats?.total_work_hours ?? 0} hrs
+                </div>
+              )}
+              <p className="text-muted-foreground mt-1 text-[10px]">
+                This current month
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* Leaves Taken */}
           <Card className="border-border bg-card shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">

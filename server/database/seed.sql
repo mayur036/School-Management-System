@@ -103,3 +103,26 @@ VALUES
   (2, 6, CURDATE() - INTERVAL 2 DAY, '09:20:00', '16:05:00', 'late'),
   (3, 6, CURDATE() - INTERVAL 1 DAY, '08:50:00', '15:55:00', 'present');
 
+-- ============================================================
+-- Test Stored Procedure Calls (for Manual Verification)
+-- ============================================================
+-- Note: You can run these in MySQL Workbench to test the attendance flow.
+
+-- 1. Test Clock In (Staff 6 clocks in today at 8:30 AM - should be 'present')
+CALL sp_clock_in_out(6, CURDATE(), '08:30:00');
+
+-- 2. Test Clock Out (Staff 6 clocks out today at 11:30 AM - worked 3 hours, should update status to 'half_day')
+CALL sp_clock_in_out(6, CURDATE(), '10:30:00');
+
+-- 3. Test Clock In/Out on another day with full shift (worked 8 hours - should keep status 'present' or 'late')
+CALL sp_clock_in_out(6, CURDATE() - INTERVAL 3 DAY, '09:00:00');
+CALL sp_clock_in_out(6, CURDATE() - INTERVAL 3 DAY, '12:00:00');
+
+-- 4. Test Fetch Attendance History (includes work_duration)
+CALL sp_get_staff_attendance(6, CURDATE() - INTERVAL 5 DAY, CURDATE());
+
+-- 5. Test Fetch Dashboard Stats (includes total_work_hours)
+CALL sp_get_staff_dashboard_stats(6);
+
+-- Delete all attendance records for staff_id 6
+DELETE FROM staff_attendance WHERE attendance_id = 1;

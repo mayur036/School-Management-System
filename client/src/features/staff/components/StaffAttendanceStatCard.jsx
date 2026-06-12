@@ -1,49 +1,64 @@
 import StatCard from '@/components/shared/StatCard';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { STATS } from '@/lib/icons';
+import { STAFF, STATS } from '@/lib/icons';
 
 const StaffAttendanceStatCard = ({ stats, isLoading }) => {
   const items = [
     {
-      label: 'Total Attendance',
-      value: stats.total,
-      Icon: STATS.TOTAL_ATTENDANCE,
-      subtext: 'All attendance records',
-      accentClassName: 'border-blue-500',
-      iconChipClassName: 'bg-blue-500/10 text-blue-500',
+      label: 'Working Hours',
+      value: `${stats.totalHours ?? 0} hrs`,
+      Icon: STAFF.TIME_LOG,
+      subtext: 'This selected month',
+      accentClassName: 'border-indigo-500',
+      iconChipClassName: 'bg-indigo-500/10 text-indigo-500',
     },
     {
       label: 'Present',
       value: stats.present,
       Icon: STATS.PRESENT,
-      subtext: '80% of total',
-      subtextClassName: 'font-semibold text-emerald-500',
+      subtext: 'Days logged present',
       accentClassName: 'border-emerald-500',
       iconChipClassName: 'bg-emerald-500/10 text-emerald-500',
     },
     {
-      label: 'Absent',
-      value: stats.absent,
-      Icon: STATS.ABSENT,
-      subtext: 'Currently suspended',
-      accentClassName: 'border-amber-500',
-      iconChipClassName: 'bg-amber-500/10 text-amber-500',
+      label: 'Half Day',
+      value: stats.half_day,
+      Icon: STAFF.TIME_LOG,
+      subtext: 'Days logged half day',
+      accentClassName: 'border-blue-500',
+      iconChipClassName: 'bg-blue-500/10 text-blue-500',
     },
     {
       label: 'Late',
       value: stats.late,
       Icon: STATS.LATE,
-      subtext: 'Recently onboarded',
-      accentClassName: 'border-red-500',
-      iconChipClassName: 'bg-red-500/10 text-red-500',
+      subtext: 'Days logged late',
+      accentClassName: 'border-amber-500',
+      iconChipClassName: 'bg-amber-500/10 text-amber-500',
+    },
+    {
+      label: 'Absent',
+      value: stats.absent,
+      Icon: STATS.ABSENT,
+      subtext: 'Days logged absent',
+      accentClassName: 'border-rose-500',
+      iconChipClassName: 'bg-rose-500/10 text-rose-500',
+    },
+    {
+      label: 'On Leave',
+      value: stats.leave,
+      Icon: STATS.TOTAL_LEAVES,
+      subtext: 'Days absent on leave',
+      accentClassName: 'border-purple-500',
+      iconChipClassName: 'bg-purple-500/10 text-purple-500',
     },
   ];
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {[1, 2, 3, 4].map((i) => (
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+        {[1, 2, 3, 4, 5, 6].map((i) => (
           <Card
             key={i}
             className="border-border bg-card border-l-muted border border-l-4"
@@ -63,7 +78,7 @@ const StaffAttendanceStatCard = ({ stats, isLoading }) => {
   }
 
   return (
-    <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+    <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-6">
       {items.map((item) => (
         <StatCard key={item.label} {...item} />
       ))}

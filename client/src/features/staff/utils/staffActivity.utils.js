@@ -39,11 +39,29 @@ export const computeStaffAttendanceStats = (attendance = []) => {
   const late = attendance.filter((a) => a.status === 'late').length;
   const half_day = attendance.filter((a) => a.status === 'half_day').length;
 
+  let totalWorkSeconds = 0;
+  attendance.forEach((a) => {
+    if (a.work_duration) {
+      const parts = a.work_duration.split(':');
+      if (parts.length >= 2) {
+        const h = parseInt(parts[0], 10);
+        const m = parseInt(parts[1], 10);
+        const s = parts[2] ? parseInt(parts[2], 10) : 0;
+        totalWorkSeconds += h * 3600 + m * 60 + s;
+      }
+    }
+  });
+  const totalHours = (totalWorkSeconds / 3600).toFixed(1);
+
+  const leave = attendance.filter((a) => a.status === 'leave').length;
+
   return {
     total,
     present,
     absent,
     late,
     half_day,
+    leave,
+    totalHours: Number(totalHours),
   };
 };

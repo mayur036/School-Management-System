@@ -38,11 +38,27 @@ import { formatDate } from '@/lib/utils';
 import LeaveRequestDialog from '../components/LeaveRequestDialog';
 import StaffAttendanceStatCard from '../components/StaffAttendanceStatCard';
 import StaffLeaveStatCard from '../components/StaffLeaveStatCard';
-import { MONTHS } from '../constants/staffActivity.constants';
+import {
+  ATTENDANCE_COLUMNS,
+  LEAVE_COLUMNS,
+  MONTHS,
+} from '../constants/staffActivity.constants';
 import {
   computeStaffAttendanceStats,
   computeStaffLeavesStats,
 } from '../utils/staffActivity.utils';
+
+const formatDuration = (durationStr) => {
+  if (!durationStr) return '-';
+  const parts = durationStr.split(':');
+  if (parts.length < 2) return durationStr;
+  const hours = parseInt(parts[0], 10);
+  const minutes = parseInt(parts[1], 10);
+  if (hours === 0 && minutes === 0) return '-';
+  if (hours === 0) return `${minutes}m`;
+  if (minutes === 0) return `${hours}h`;
+  return `${hours}h ${minutes}m`;
+};
 
 export const AttendanceLeavePage = () => {
   const [activeTab, setActiveTab] = useState('attendance');
@@ -114,10 +130,10 @@ export const AttendanceLeavePage = () => {
         onValueChange={setActiveTab}
         className="space-y-4"
       >
-        <TabsList className="border-border bg-muted/60 rounded-lg border p-1 shadow-sm">
+        <TabsList className="border-border bg-muted/60 rounded-md border p-1 shadow-sm">
           <TabsTrigger
             value="attendance"
-            className="group data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-md px-4 py-2 text-xs font-medium transition-all data-[state=active]:shadow-sm"
+            className="group data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-sm px-4 py-2 text-xs font-medium transition-all data-[state=active]:shadow-sm"
           >
             <STAFF.ATTENDANCE className="mr-2 h-3.5 w-3.5" />
             Attendance
@@ -127,7 +143,7 @@ export const AttendanceLeavePage = () => {
           </TabsTrigger>
           <TabsTrigger
             value="leaves"
-            className="group data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-md px-4 py-2 text-xs font-medium transition-all data-[state=active]:shadow-sm"
+            className="group data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-sm px-4 py-2 text-xs font-medium transition-all data-[state=active]:shadow-sm"
           >
             <STAFF.LEAVE_REQUEST className="mr-2 h-3.5 w-3.5" />
             Leave Requests
@@ -206,18 +222,14 @@ export const AttendanceLeavePage = () => {
                   <Table>
                     <TableHeader className="bg-muted/50">
                       <TableRow>
-                        <TableHead className="text-muted-foreground text-xs font-semibold">
-                          Date
-                        </TableHead>
-                        <TableHead className="text-muted-foreground text-xs font-semibold">
-                          Clock In
-                        </TableHead>
-                        <TableHead className="text-muted-foreground text-xs font-semibold">
-                          Clock Out
-                        </TableHead>
-                        <TableHead className="text-muted-foreground text-xs font-semibold">
-                          Status
-                        </TableHead>
+                        {ATTENDANCE_COLUMNS.map((col) => (
+                          <TableHead
+                            key={col.label}
+                            className="text-muted-foreground text-xs font-semibold"
+                          >
+                            {col.label}
+                          </TableHead>
+                        ))}
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -237,6 +249,9 @@ export const AttendanceLeavePage = () => {
                               ? row.clock_out.substring(0, 5)
                               : '-'}
                           </TableCell>
+                          <TableCell className="text-muted-foreground text-xs">
+                            {formatDuration(row.work_duration)}
+                          </TableCell>
                           <TableCell className="text-xs">
                             <Badge
                               className={`rounded-full border-none px-2 py-0.5 font-medium ${
@@ -244,13 +259,17 @@ export const AttendanceLeavePage = () => {
                                   ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
                                   : row.status === 'late'
                                     ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
-                                    : row.status === 'leave'
+                                    : row.status === 'half_day'
                                       ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
-                                      : 'bg-rose-500/10 text-rose-600 dark:text-rose-400'
+                                      : row.status === 'leave'
+                                        ? 'bg-purple-500/10 text-purple-600 dark:text-purple-400'
+                                        : 'bg-rose-500/10 text-rose-600 dark:text-rose-400'
                               }`}
                             >
-                              {row.status.charAt(0).toUpperCase() +
-                                row.status.slice(1)}
+                              {row.status === 'half_day'
+                                ? 'Half Day'
+                                : row.status.charAt(0).toUpperCase() +
+                                  row.status.slice(1)}
                             </Badge>
                           </TableCell>
                         </TableRow>
@@ -306,27 +325,14 @@ export const AttendanceLeavePage = () => {
                   <Table>
                     <TableHeader className="bg-muted/50">
                       <TableRow>
-                        <TableHead className="text-muted-foreground text-xs font-semibold">
-                          Type
-                        </TableHead>
-                        <TableHead className="text-muted-foreground text-xs font-semibold">
-                          Start Date
-                        </TableHead>
-                        <TableHead className="text-muted-foreground text-xs font-semibold">
-                          End Date
-                        </TableHead>
-                        <TableHead className="text-muted-foreground text-xs font-semibold">
-                          Total Days
-                        </TableHead>
-                        <TableHead className="text-muted-foreground text-xs font-semibold">
-                          Reason
-                        </TableHead>
-                        <TableHead className="text-muted-foreground text-xs font-semibold">
-                          Status
-                        </TableHead>
-                        <TableHead className="text-muted-foreground text-xs font-semibold">
-                          Admin Comments
-                        </TableHead>
+                        {LEAVE_COLUMNS.map((col) => (
+                          <TableHead
+                            key={col.label}
+                            className="text-muted-foreground text-xs font-semibold"
+                          >
+                            {col.label}
+                          </TableHead>
+                        ))}
                       </TableRow>
                     </TableHeader>
                     <TableBody>

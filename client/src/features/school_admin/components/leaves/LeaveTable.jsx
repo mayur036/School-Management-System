@@ -1,5 +1,5 @@
 import EmptyTableState from '@/components/shared/EmptyTableState';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -131,6 +131,7 @@ const LeaveTable = ({ leaves, isLoading, onReview }) => {
                 {/* Staff Member */}
                 <TableCell className="flex items-center gap-3">
                   <Avatar className="border-border size-9 border">
+                    <AvatarImage src={leave.avatar_url} />
                     <AvatarFallback className="bg-muted text-muted-foreground text-xs font-semibold">
                       {initials || 'ST'}
                     </AvatarFallback>

@@ -141,7 +141,7 @@ CREATE TABLE staff_attendance (
   date          DATE NOT NULL,
   clock_in      TIME NULL,
   clock_out     TIME NULL,
-  status        ENUM('present', 'absent', 'late', 'leave') NOT NULL DEFAULT 'present',
+  status        ENUM('present', 'absent', 'late', 'leave', 'half_day') NOT NULL DEFAULT 'present',
   created_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_att_staff
     FOREIGN KEY (staff_id) REFERENCES staff(staff_id)
