@@ -39,7 +39,6 @@ export const baseApi = createApi({
     'StaffSchedule',
     'StaffAttendance',
     'StaffLeave',
-    'StaffTask',
   ],
   endpoints: () => ({}),
 });
