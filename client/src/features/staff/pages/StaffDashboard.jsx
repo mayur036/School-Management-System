@@ -25,9 +25,32 @@ import { useAuth } from '@/hooks/useAuth';
 import { EMPTY_STATE, STAFF, STATUS } from '@/lib/icons';
 import { getInitials } from '@/lib/utils';
 
+const DynamicClock = () => {
+  const [time, setTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div className="space-y-1 text-center">
+      <div className="text-foreground font-mono text-4xl font-bold tracking-tight">
+        {time.toLocaleTimeString('en-US', { hour12: true })}
+      </div>
+      <div className="text-muted-foreground text-xs font-medium">
+        {time.toLocaleDateString('en-US', {
+          weekday: 'long',
+          month: 'short',
+          day: 'numeric',
+        })}
+      </div>
+    </div>
+  );
+};
+
 export const StaffDashboard = () => {
   const { user } = useAuth();
-  const [time, setTime] = useState(new Date());
 
   const todayStr = new Date().toISOString().split('T')[0];
   const dayName = new Date().toLocaleDateString('en-US', { weekday: 'long' });
@@ -49,16 +72,14 @@ export const StaffDashboard = () => {
   const [clockInOut, { isLoading: isClocking }] = useClockInOutMutation();
   const [updateTaskStatus] = useUpdateTaskStatusMutation();
 
-  // Dynamic Clock
-  useEffect(() => {
-    const timer = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
+  // Dynamic clock has been isolated to prevent parent re-renders every second
 
   // Compute Clock Status
   const todayAttendance = attendanceData?.data?.attendance?.[0];
   const isClockedIn = !!todayAttendance?.clock_in;
   const isClockedOut = !!todayAttendance?.clock_out;
+
+  console.log({ statsData, scheduleData, tasksData, attendanceData });
 
   const handleClockAction = async () => {
     try {
@@ -130,18 +151,7 @@ export const StaffDashboard = () => {
             <CardDescription>Log your daily working hours</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-1 flex-col justify-center space-y-6 py-4">
-            <div className="space-y-1 text-center">
-              <div className="text-foreground font-mono text-4xl font-bold tracking-tight">
-                {time.toLocaleTimeString('en-US', { hour12: true })}
-              </div>
-              <div className="text-muted-foreground text-xs font-medium">
-                {time.toLocaleDateString('en-US', {
-                  weekday: 'long',
-                  month: 'short',
-                  day: 'numeric',
-                })}
-              </div>
-            </div>
+            <DynamicClock />
 
             <div className="border-border bg-muted/40 space-y-1 rounded-lg border p-3.5 text-center">
               {isAttendanceLoading ? (

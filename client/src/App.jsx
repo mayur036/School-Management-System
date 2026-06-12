@@ -70,9 +70,6 @@ const StaffAttendanceLeavePage = lazy(
   () => import('./features/staff/pages/AttendanceLeavePage')
 );
 const StaffTasksPage = lazy(() => import('./features/staff/pages/TasksPage'));
-const StaffDocumentsPage = lazy(
-  () => import('./features/staff/pages/DocumentsPage')
-);
 
 const router = createBrowserRouter([
   {
@@ -140,7 +137,6 @@ const router = createBrowserRouter([
               { path: 'schedule', element: <StaffSchedulePage /> },
               { path: 'attendance', element: <StaffAttendanceLeavePage /> },
               { path: 'tasks', element: <StaffTasksPage /> },
-              { path: 'documents', element: <StaffDocumentsPage /> },
               { path: 'profile', element: <ProfileView /> },
             ],
           },

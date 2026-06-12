@@ -21,7 +21,6 @@ const config = {
           Icon: STAFF.ATTENDANCE,
         },
         { to: '/staff/tasks', label: 'My Tasks', Icon: STAFF.TASKS },
-        { to: '/staff/documents', label: 'Documents', Icon: STAFF.DOCUMENTS },
       ],
     },
     {
