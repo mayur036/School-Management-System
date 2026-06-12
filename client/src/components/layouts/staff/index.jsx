@@ -12,7 +12,17 @@ const config = {
   groups: [
     {
       label: 'Overview',
-      items: [{ to: '/staff/dashboard', label: 'Dashboard', Icon: STAFF.HOME }],
+      items: [
+        { to: '/staff/dashboard', label: 'Dashboard', Icon: STAFF.HOME },
+        { to: '/staff/schedule', label: 'My Schedule', Icon: STAFF.SCHEDULE },
+        {
+          to: '/staff/attendance',
+          label: 'Attendance & Leaves',
+          Icon: STAFF.ATTENDANCE,
+        },
+        { to: '/staff/tasks', label: 'My Tasks', Icon: STAFF.TASKS },
+        { to: '/staff/documents', label: 'Documents', Icon: STAFF.DOCUMENTS },
+      ],
     },
     {
       label: 'Account',

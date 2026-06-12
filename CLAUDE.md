@@ -4,7 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-A multi-tenant **CampusCore** School Management System. A Super Admin onboards schools and creates each school's admin; each School Admin manages departments and staff for their own school only. Three roles — `super_admin`, `school_admin`, `staff` — all live in one `staff` table distinguished by `role_id`.
+A multi-tenant **CampusCore** School Management System. Roles live in a single `staff` table:
+- **Super Admin (`super_admin`)**: Manages schools and school admins.
+- **School Admin (`school_admin`)**: Tenant admin. Manages departments/staff, creates schedules, assigns duties/tasks, reviews leaves.
+- **Staff (`staff`)**: School/departmental employees. Can clock in/out, view weekly schedule, request leave, update assigned tasks, view policies/payslips.
+
 It's a two-package repo (no workspace tooling): `client/` (React + Vite) and `server/` (Express). The root only holds shared Prettier config and docs. **`PROJECT_PLAN.md` is the source of truth** for the data model, the full stored-procedure list, the API endpoint map, and the phase-by-phase roadmap — read it before adding features.
 
 The package manager is **Bun** (`bun.lock` in each package), though npm scripts work too.
@@ -94,4 +98,9 @@ All server state flows through **one** `baseApi` (`src/app/baseApi.js`) using a 
 
 ## API surface
 
-See PROJECT_PLAN.md §8 for the full endpoint map. Shape: `/api/auth/*` (all roles, including login, logout, forgot-password, reset-password), `/api/schools/*` (super_admin, incl. `POST /:id/admins`), `/api/departments` (school_admin, tenant-scoped), `/api/staff/*` (school_admin, plus `/me`, `/me/password`, and `/me/avatar` for everyone).
+See PROJECT_PLAN.md §8 for the full endpoint map. Shape:
+- `/api/auth/*` (all roles, including login, logout, forgot-password, reset-password)
+- `/api/schools/*` (super_admin only)
+- `/api/departments` (school_admin only)
+- `/api/staff/*` (school_admin only; plus `/me`, `/me/password`, `/me/avatar` for all, and `/me/dashboard-stats`, `/me/schedule`, `/me/attendance/*`, `/me/leaves`, `/me/tasks/*` for staff)
+- `/api/school-admin/*` (school_admin management for tasks, leaves, and schedules)

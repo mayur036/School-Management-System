@@ -64,3 +64,95 @@ export const updateProfileSchema = z.object({
     phone: z.string().trim().max(20).optional().nullable(),
   }),
 });
+
+// Staff Activities Schemas
+export const clockInOutSchema = z.object({
+  body: z
+    .object({
+      date: z
+        .string()
+        .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
+        .optional(),
+      time: z
+        .string()
+        .regex(/^\d{2}:\d{2}:\d{2}$/, 'Time must be in HH:MM:SS format')
+        .optional(),
+    })
+    .optional(),
+});
+
+export const leaveRequestSchema = z.object({
+  body: z.object({
+    leave_type: z.string().trim().min(1, 'Leave type is required').max(50),
+    start_date: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, 'Start date must be in YYYY-MM-DD format'),
+    end_date: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, 'End date must be in YYYY-MM-DD format'),
+    reason: z.string().trim().min(1, 'Reason is required'),
+  }),
+});
+
+export const updateTaskStatusSchema = z.object({
+  params: z.object({ id: idParam }),
+  body: z.object({
+    status: z.enum(['pending', 'in_progress', 'completed'], {
+      errorMap: () => ({
+        message: "Status must be 'pending', 'in_progress', or 'completed'",
+      }),
+    }),
+  }),
+});
+
+// School Admin Management of Staff Schemas
+export const assignTaskSchema = z.object({
+  body: z.object({
+    staff_id: idParam,
+    title: z.string().trim().min(1, 'Title is required').max(150),
+    description: z.string().trim().optional(),
+    due_date: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, 'Due date must be in YYYY-MM-DD format')
+      .optional(),
+  }),
+});
+
+export const reviewLeaveSchema = z.object({
+  params: z.object({ id: idParam }),
+  body: z.object({
+    status: z.enum(['approved', 'rejected'], {
+      errorMap: () => ({ message: "Status must be 'approved' or 'rejected'" }),
+    }),
+    comments: z.string().trim().optional().nullable(),
+  }),
+});
+
+export const createScheduleSchema = z.object({
+  body: z.object({
+    staff_id: idParam,
+    subject_name: z.string().trim().min(1, 'Subject name is required').max(100),
+    class_name: z.string().trim().min(1, 'Class name is required').max(50),
+    day_of_week: z.enum(
+      [
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+        'Sunday',
+      ],
+      {
+        errorMap: () => ({ message: 'Invalid day of the week' }),
+      }
+    ),
+    start_time: z
+      .string()
+      .regex(/^\d{2}:\d{2}(:\d{2})?$/, 'Start time must be HH:MM or HH:MM:SS'),
+    end_time: z
+      .string()
+      .regex(/^\d{2}:\d{2}(:\d{2})?$/, 'End time must be HH:MM or HH:MM:SS'),
+    room: z.string().trim().max(50).optional().nullable(),
+  }),
+});

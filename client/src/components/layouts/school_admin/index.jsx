@@ -39,6 +39,21 @@ const config = {
           label: 'Register Staff',
           Icon: SCHOOL_ADMIN.REGISTER_STAFF,
         },
+        {
+          to: '/school/schedules',
+          label: 'Staff Timetable',
+          Icon: SCHOOL_ADMIN.ATTENDANCE,
+        },
+        {
+          to: '/school/tasks',
+          label: 'Assign Tasks',
+          Icon: SCHOOL_ADMIN.SUBJECTS,
+        },
+        {
+          to: '/school/leaves',
+          label: 'Staff Leaves',
+          Icon: SCHOOL_ADMIN.STAFF_MANAGE,
+        },
       ],
     },
     {

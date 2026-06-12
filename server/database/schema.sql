@@ -13,6 +13,10 @@ USE school_management_system;
 -- Drop for clean re-runs. FK checks are disabled because schools and
 -- staff reference each other (circular FK), so no drop order is valid.
 SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS staff_tasks;
+DROP TABLE IF EXISTS leave_requests;
+DROP TABLE IF EXISTS staff_attendance;
+DROP TABLE IF EXISTS staff_schedules;
 DROP TABLE IF EXISTS staff;
 DROP TABLE IF EXISTS departments;
 DROP TABLE IF EXISTS schools;
@@ -109,3 +113,88 @@ CREATE INDEX idx_staff_school     ON staff(school_id);
 CREATE INDEX idx_staff_role       ON staff(role_id);
 CREATE INDEX idx_staff_department ON staff(department_id);
 CREATE INDEX idx_dept_school      ON departments(school_id);
+
+-- ------------------------------------------------------------
+-- staff_schedules : weekly teaching/work schedules
+-- ------------------------------------------------------------
+CREATE TABLE staff_schedules (
+  schedule_id   INT AUTO_INCREMENT PRIMARY KEY,
+  staff_id      INT NOT NULL,
+  subject_name  VARCHAR(100) NOT NULL,
+  class_name    VARCHAR(50) NOT NULL,
+  day_of_week   ENUM('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday') NOT NULL,
+  start_time    TIME NOT NULL,
+  end_time      TIME NOT NULL,
+  room          VARCHAR(50) NULL,
+  created_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_sched_staff
+    FOREIGN KEY (staff_id) REFERENCES staff(staff_id)
+    ON DELETE CASCADE
+) ENGINE = InnoDB;
+
+-- ------------------------------------------------------------
+-- staff_attendance : daily time logs
+-- ------------------------------------------------------------
+CREATE TABLE staff_attendance (
+  attendance_id INT AUTO_INCREMENT PRIMARY KEY,
+  staff_id      INT NOT NULL,
+  date          DATE NOT NULL,
+  clock_in      TIME NULL,
+  clock_out     TIME NULL,
+  status        ENUM('present', 'absent', 'late', 'leave') NOT NULL DEFAULT 'present',
+  created_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_att_staff
+    FOREIGN KEY (staff_id) REFERENCES staff(staff_id)
+    ON DELETE CASCADE,
+  CONSTRAINT uq_staff_date UNIQUE (staff_id, date)
+) ENGINE = InnoDB;
+
+-- ------------------------------------------------------------
+-- leave_requests : staff leave requests
+-- ------------------------------------------------------------
+CREATE TABLE leave_requests (
+  leave_id      INT AUTO_INCREMENT PRIMARY KEY,
+  staff_id      INT NOT NULL,
+  leave_type    VARCHAR(50) NOT NULL, -- 'Sick', 'Casual', 'Annual', 'Maternity', etc.
+  start_date    DATE NOT NULL,
+  end_date      DATE NOT NULL,
+  total_days    INT NOT NULL,
+  reason        TEXT NOT NULL,
+  status        ENUM('pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending',
+  reviewed_by   INT NULL,
+  reviewed_at   TIMESTAMP NULL,
+  comments      TEXT NULL,
+  created_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_leave_staff
+    FOREIGN KEY (staff_id) REFERENCES staff(staff_id)
+    ON DELETE CASCADE,
+  CONSTRAINT fk_leave_reviewer
+    FOREIGN KEY (reviewed_by) REFERENCES staff(staff_id)
+    ON DELETE SET NULL
+) ENGINE = InnoDB;
+
+-- ------------------------------------------------------------
+-- staff_tasks : tasks assigned to staff members
+-- ------------------------------------------------------------
+CREATE TABLE staff_tasks (
+  task_id       INT AUTO_INCREMENT PRIMARY KEY,
+  staff_id      INT NOT NULL,
+  title         VARCHAR(150) NOT NULL,
+  description   TEXT NULL,
+  due_date      DATE NULL,
+  status        ENUM('pending', 'in_progress', 'completed') NOT NULL DEFAULT 'pending',
+  created_by    INT NOT NULL,
+  created_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_task_staff
+    FOREIGN KEY (staff_id) REFERENCES staff(staff_id)
+    ON DELETE CASCADE,
+  CONSTRAINT fk_task_creator
+    FOREIGN KEY (created_by) REFERENCES staff(staff_id)
+    ON DELETE CASCADE
+) ENGINE = InnoDB;
+
+-- Helpful indexes for staff portal features.
+CREATE INDEX idx_schedule_staff ON staff_schedules(staff_id);
+CREATE INDEX idx_attendance_staff_date ON staff_attendance(staff_id, date);
+CREATE INDEX idx_leave_staff ON leave_requests(staff_id);
+CREATE INDEX idx_task_staff ON staff_tasks(staff_id);

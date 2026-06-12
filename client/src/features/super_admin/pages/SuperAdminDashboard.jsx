@@ -42,7 +42,7 @@ export const SuperAdminDashboard = () => {
       {/* Greeting header */}
       <div>
         <h1 className="text-foreground text-2xl font-bold tracking-tight sm:text-3xl">
-          Welcome back{user?.first_name ? `, ${user.first_name}` : ''} 🚀
+          Welcome back{user?.first_name ? `, ${user.first_name}` : ''}
         </h1>
         <p className="text-muted-foreground mt-1 text-sm">
           Here's an overview of the platform's schools and admins.

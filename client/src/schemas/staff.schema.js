@@ -73,3 +73,48 @@ export const batchRegisterStaffSchema = z.object({
     .transform((val) => Number(val)),
   members: z.array(staffMemberSchema).min(1, 'At least one member is required'),
 });
+
+// Staff Activities
+export const leaveRequestSchema = z.object({
+  leave_type: z.string().min(1, 'Please select a leave type'),
+  start_date: z.string().min(1, 'Start date is required'),
+  end_date: z.string().min(1, 'End date is required'),
+  reason: z.string().trim().min(5, 'Reason must be at least 5 characters'),
+});
+
+export const assignTaskSchema = z.object({
+  staff_id: z.union([z.string(), z.number()]).transform((val) => Number(val)),
+  title: z.string().trim().min(1, 'Title is required').max(150),
+  description: z.string().trim().optional(),
+  due_date: z.string().min(1, 'Due date is required'),
+});
+
+export const createScheduleSchema = z.object({
+  staff_id: z.union([z.string(), z.number()]).transform((val) => Number(val)),
+  subject_name: z.string().trim().min(1, 'Subject is required').max(100),
+  class_name: z.string().trim().min(1, 'Class is required').max(50),
+  day_of_week: z.enum([
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+    'Sunday',
+  ]),
+  start_time: z.string().min(1, 'Start time is required'),
+  end_time: z.string().min(1, 'End time is required'),
+  room: z.string().trim().max(50).optional().or(z.literal('')),
+});
+
+export const reviewLeaveSchema = z.object({
+  status: z.enum(['approved', 'rejected'], {
+    errorMap: () => ({ message: "Status must be 'approved' or 'rejected'" }),
+  }),
+  comments: z
+    .string()
+    .trim()
+    .max(255, 'Comments must be 255 characters or fewer')
+    .optional()
+    .or(z.literal('')),
+});

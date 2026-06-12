@@ -43,7 +43,7 @@ const StatCard = ({
         {subtext != null && (
           <span
             className={cn(
-              'mt-0.5 hidden truncate text-[9px] sm:block sm:text-[10px]',
+              'mt-0.5 truncate text-[9px] sm:text-[10px]',
               subtextClassName
             )}
           >

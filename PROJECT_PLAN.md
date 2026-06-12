@@ -55,17 +55,25 @@ A multi-tenant School Management System where:
 
 ## 3. Roles & Permission Matrix
 
-| Action                         | Super Admin | School Admin |   Staff   |
-| ------------------------------ | :---------: | :----------: | :-------: |
-| Create / list schools          |     ✅      |      ❌      |    ❌     |
-| Create school admin            |     ✅      |      ❌      |    ❌     |
-| Log in                         |     ✅      |      ✅      |    ✅     |
-| Create department (own school) |     ❌      |      ✅      |    ❌     |
-| Register staff (own school)    |     ❌      |      ✅      |    ❌     |
-| List staff (own school)        |     ❌      |      ✅      | view self |
-| View own profile               |     ✅      |      ✅      |    ✅     |
+| Action                                | Super Admin | School Admin |   Staff   |
+| ------------------------------------ | :---------: | :----------: | :-------: |
+| Create / list schools                |     ✅      |      ❌      |    ❌     |
+| Create school admin                  |     ✅      |      ❌      |    ❌     |
+| Log in                               |     ✅      |      ✅      |    ✅     |
+| Create department (own school)       |     ❌      |      ✅      |    ❌     |
+| Register staff (own school)          |     ❌      |      ✅      |    ❌     |
+| List staff (own school)              |     ❌      |      ✅      | view self |
+| View own profile                     |     ✅      |      ✅      |    ✅     |
+| View own schedule / classes          |     ❌      |      ❌      |    ✅     |
+| Clock in / Clock out (Time logs)     |     ❌      |      ❌      |    ✅     |
+| Request leave / View own leaves      |     ❌      |      ❌      |    ✅     |
+| View / update own tasks              |     ❌      |      ❌      |    ✅     |
+| View school policies & payslips      |     ❌      |      ❌      |    ✅     |
+| Assign staff tasks (own school)      |     ❌      |      ✅      |    ❌     |
+| Manage staff schedules (own school)  |     ❌      |      ✅      |    ❌     |
+| Review staff leaves (own school)     |     ❌      |      ✅      |    ❌     |
 
-Enforced by an **`authorize(...roles)` middleware** + **tenant scoping** (a school_admin can only touch rows where `school_id` matches their token).
+Enforced by an **`authorize(...roles)` middleware** + **tenant scoping** (a school_admin or staff member can only touch rows scoped to their own `school_id` derived from their token).
 
 ---
 
@@ -161,6 +169,18 @@ staff (1) ────< (N) schools        created_by
 | `sp_set_reset_token(email, token, expiry)`                      | Set reset token and expiry date       | auth         |
 | `sp_get_user_by_reset_token(token)`                             | Get user details by active token      | auth         |
 | `sp_reset_password_by_token(token, hash)`                       | Reset password and clear token fields  | auth         |
+| `sp_get_staff_dashboard_stats(staff_id)`                        | Get staff dashboard metrics           | staff        |
+| `sp_get_staff_schedule(staff_id)`                               | Get staff weekly schedule             | staff        |
+| `sp_get_staff_attendance(staff_id, start_date, end_date)`       | List attendance logs                  | staff        |
+| `sp_clock_in_out(staff_id, date, time)`                         | Daily clock-in/out                    | staff        |
+| `sp_create_leave_request(staff_id, type, start, end, reason)`   | Submit new leave request              | staff        |
+| `sp_get_staff_leaves(staff_id)`                                 | View own leave history                | staff        |
+| `sp_get_staff_tasks(staff_id)`                                  | List assigned tasks                   | staff        |
+| `sp_update_task_status(task_id, staff_id, status)`              | Set task completion status            | staff        |
+| `sp_assign_staff_task(staff_id, title, desc, due, created_by)`  | Assign task to a staff                | school admin |
+| `sp_list_school_leave_requests(school_id)`                      | List leaves for approval              | school admin |
+| `sp_review_leave_request(leave_id, status, comments, reviewer)` | Approve or reject leave               | school admin |
+| `sp_create_staff_schedule(staff_id, sub, class, day, start, ...)`| Set timetable schedule for staff      | school admin |
 
 > Each proc validates tenancy where relevant (e.g. staff must belong to the school_id passed in). App layer also re-checks via JWT claims.
 
@@ -359,6 +379,47 @@ own `feature.api.js`. Cache coherence is driven by `tagTypes` + `providesTags` /
 - [ ] Activity Logs & tracking (Upcoming on Profile page)
 - [x] API docs (docs/)
 
+### Phase 9 — Staff Portal & Activities
+
+Implementation of the dedicated portal for departmental staff members, including schedule management, time log clocking, leave requests, tasks board, and payslips view.
+
+#### Phase 9.1 — Schema & Database Migration
+- [ ] Add `staff_schedules`, `staff_attendance`, `leave_requests`, and `staff_tasks` tables to `schema.sql`.
+- [ ] Create the new stored procedures listed in section 4.4 in `procedures.sql`.
+- [ ] Write seed records in `seed.sql` for testing staff workflows.
+- [ ] Re-run migration scripts in MySQL Workbench.
+
+#### Phase 9.2 — Backend Models & API Routes
+- [ ] Create Zod schemas in `schema/staff.schema.js` for leaves, clock-in, task status, and schedules.
+- [ ] Create thin model wrapper functions in a new `models/staffActivity.model.js` invoking procedures via `callProcedure`.
+- [ ] Implement controllers and routers under `/api/staff/me/*` in `controllers/staff.controller.js` and `routes/staff.routes.js`.
+- [ ] Implement School Admin management endpoints in `routes/staffManager.routes.js` to assign tasks, view/review leaves, and add schedules.
+
+#### Phase 9.3 — Frontend RTK Query & Sidebar
+- [ ] Create `features/staff/staff.api.js` with RTK Query endpoints and tag invalidations (`StaffStats`, `StaffSchedule`, `StaffAttendance`, `StaffLeaves`, `StaffTasks`).
+- [ ] Register new routes inside `/staff/*` in `client/src/App.jsx`.
+- [ ] Update sidebar navigation items in `client/src/components/layouts/staff/index.jsx` using `STAFF` icons.
+
+#### Phase 9.4 — Dashboard & Time Clocking
+- [ ] Replace `StaffDashboard.jsx` placeholder with a dashboard layout.
+- [ ] Build a Clock In/Out panel with real-time digital clock and status toggle.
+- [ ] Design interactive timeline widget for today's teaching/work schedule.
+- [ ] Design quick checklist widget for pending high-priority tasks.
+
+#### Phase 9.5 — Schedule & Tasks Board
+- [ ] Build `SchedulePage.jsx` displaying a weekly timetable grid.
+- [ ] Build `TasksPage.jsx` separating assigned duties into To-Do, In Progress, and Completed tabs/cards, with quick status toggles.
+
+#### Phase 9.6 — Attendance & Leaves Tabs
+- [ ] Build `AttendanceLeavePage.jsx` with a dual-tab layout.
+- [ ] Tab 1 (Attendance): Monthly calendar log showing daily status marks.
+- [ ] Tab 2 (Leaves): Displays leave balances, "Apply for Leave" modal form, and a request history table with status badges.
+
+#### Phase 9.7 — Documents & Payslips
+- [ ] Build `DocumentsPage.jsx` listing downloadable school policies/materials and a table displaying simulated payslip records with a download action.
+
+**Done when:** A staff member logs in and can clock in/out, submit leave requests, update tasks, and view their weekly schedule; a school admin can assign tasks, view/approve leaves, and assign schedule items.
+
 ---
 
 ## 8. API Endpoint Map
@@ -385,6 +446,19 @@ PATCH  /api/staff/:id/status           school     enable/disable
 GET    /api/staff/me                   all        own profile
 PATCH  /api/staff/me/password          all        change own password
 PATCH  /api/staff/me/avatar            all        upload / replace avatar (Cloudinary)
+GET    /api/staff/me/dashboard-stats   staff      get dashboard statistics
+GET    /api/staff/me/schedule          staff      get weekly schedule
+GET    /api/staff/me/attendance        staff      list attendance records
+POST   /api/staff/me/attendance/clock  staff      perform clock-in/out
+GET    /api/staff/me/leaves            staff      list own leave requests
+POST   /api/staff/me/leaves            staff      apply for a new leave
+GET    /api/staff/me/tasks             staff      list own assigned tasks
+PATCH  /api/staff/me/tasks/:id/status  staff      update task status
+
+POST   /api/school-admin/tasks         school     assign task to staff member
+GET    /api/school-admin/leaves        school     list staff leaves for review
+PATCH  /api/school-admin/leaves/:id    school     approve/reject leave request
+POST   /api/school-admin/schedules     school     create staff schedule entry
 ```
 
 ---
@@ -395,7 +469,10 @@ PATCH  /api/staff/me/avatar            all        upload / replace avatar (Cloud
 2. **Backend plumbing** (db pool → auth → middleware)
 3. **Super Admin** APIs (schools + school admins)
 4. **School Admin** APIs (departments + staff)
-5. **Frontend** (RTK Query) in sub-phases: state foundation → auth/shell → schools → school admins → departments → staff → profile/password → polish
-6. **Polish** (email, search, dashboards)
+5. **Staff Portal** Database Schema additions + Stored Procedures
+6. **Staff Portal** Backend APIs (clock-in, leaves, tasks, schedules)
+7. **School Admin** Management APIs (assign tasks, review leaves, set schedules)
+8. **Staff Portal** Frontend Pages (dashboard, schedule, attendance/leaves, tasks, documents)
+9. **Polish** (email notifications, charts, PDF downloads)
 
 > Principle: every DB read/write goes through a **stored procedure**; the Node layer only orchestrates, validates, and authorizes.

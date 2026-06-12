@@ -4,18 +4,7 @@ import { toast } from 'sonner';
 
 import AppBreadcrumb from '@/components/shared/AppBreadcrumb';
 import AppPagination from '@/components/shared/AppPagination';
-import StatusBadge from '@/components/shared/StatusBadge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-} from '@/components/ui/drawer';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -25,16 +14,11 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
-import { Separator } from '@/components/ui/separator';
 import { useDataTable } from '@/hooks/useDataTable';
 import { ACTIONS, BASE } from '@/lib/icons';
-import {
-  formatDate,
-  formatPhoneNumber,
-  formatStaffId,
-  getInitials,
-} from '@/lib/utils';
+import { formatStaffId } from '@/lib/utils';
 
+import StaffDetailDrawer from '../components/staffs/StaffDetailDrawer';
 import StaffStatCard from '../components/staffs/StaffStatCard';
 import StaffStatusToggle from '../components/staffs/StaffStatusToggle';
 import StaffTable from '../components/staffs/StaffTable';
@@ -301,104 +285,11 @@ const StaffPage = () => {
       />
 
       {/* Staff Profile Detail Drawer */}
-      <Drawer
+      <StaffDetailDrawer
+        member={detailMember}
         open={!!detailMember}
-        onOpenChange={(open) => !open && setDetailMember(null)}
-      >
-        <DrawerContent className="mx-auto max-w-lg pb-6">
-          <DrawerHeader className="border-b pb-3">
-            <DrawerTitle className="text-xl font-semibold tracking-tight">
-              Staff Profile
-            </DrawerTitle>
-            <DrawerDescription className="text-muted-foreground text-sm">
-              Detailed information for this staff member account.
-            </DrawerDescription>
-          </DrawerHeader>
-
-          {detailMember && (
-            <div className="flex flex-col gap-6 p-6">
-              {/* Profile Card Header */}
-              <div className="flex flex-col items-center gap-3 text-center sm:flex-row sm:gap-4 sm:text-left">
-                <Avatar className="border-border size-20 border">
-                  <AvatarImage
-                    src={detailMember.avatar_url}
-                    alt={`${detailMember.first_name} ${detailMember.last_name}`}
-                  />
-                  <AvatarFallback className="bg-muted text-muted-foreground text-xl font-bold">
-                    {getInitials(detailMember)}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex flex-col gap-1">
-                  <h3 className="text-foreground text-lg font-semibold">
-                    {detailMember.first_name} {detailMember.last_name}
-                  </h3>
-                  <div className="mt-1 flex flex-wrap items-center gap-2">
-                    <Badge variant="outline">
-                      {detailMember.department_name || 'Unassigned'}
-                    </Badge>
-                    <StatusBadge status={detailMember.status} />
-                  </div>
-                  <p className="text-muted-foreground mt-1.5 font-mono text-xs">
-                    Staff ID: {formatStaffId(detailMember.staff_id)}
-                  </p>
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Profile Info Details List */}
-              <div className="flex flex-col gap-4">
-                <h4 className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
-                  Account Details
-                </h4>
-
-                <dl className="grid gap-3 text-sm">
-                  <div className="grid grid-cols-3 gap-2">
-                    <dt className="text-muted-foreground">First Name</dt>
-                    <dd className="text-foreground col-span-2 font-medium">
-                      {detailMember.first_name}
-                    </dd>
-                  </div>
-                  <div className="grid grid-cols-3 gap-2">
-                    <dt className="text-muted-foreground">Last Name</dt>
-                    <dd className="text-foreground col-span-2 font-medium">
-                      {detailMember.last_name}
-                    </dd>
-                  </div>
-                  <div className="grid grid-cols-3 gap-2">
-                    <dt className="text-muted-foreground">Email</dt>
-                    <dd className="text-foreground col-span-2 font-mono font-medium break-all">
-                      {detailMember.email}
-                    </dd>
-                  </div>
-                  <div className="grid grid-cols-3 gap-2">
-                    <dt className="text-muted-foreground">Phone</dt>
-                    <dd className="text-foreground col-span-2 font-medium">
-                      {detailMember.phone
-                        ? formatPhoneNumber(detailMember.phone)
-                        : '—'}
-                    </dd>
-                  </div>
-                  <div className="grid grid-cols-3 gap-2">
-                    <dt className="text-muted-foreground">Registered</dt>
-                    <dd className="text-foreground col-span-2 font-medium">
-                      {formatDate(detailMember.created_at, 'medium-time')}
-                    </dd>
-                  </div>
-                </dl>
-              </div>
-
-              <div className="mt-4 flex justify-end gap-3">
-                <DrawerClose asChild>
-                  <Button variant="outline" className="cursor-pointer">
-                    Close
-                  </Button>
-                </DrawerClose>
-              </div>
-            </div>
-          )}
-        </DrawerContent>
-      </Drawer>
+        onClose={() => setDetailMember(null)}
+      />
     </div>
   );
 };

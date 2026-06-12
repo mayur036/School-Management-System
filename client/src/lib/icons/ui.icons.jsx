@@ -8,6 +8,11 @@
 import {
   BadgeCheck,
   Building2,
+  Calendar,
+  CalendarCheck,
+  CalendarClock,
+  CalendarDays,
+  CalendarX,
   ChartColumnIncreasing,
   CircleCheck,
   CircleOff,
@@ -56,6 +61,17 @@ export const STATS = {
   INACTIVE_STAFF: UserX,
   AVG_STAFF_PER_SCHOOL: ChartColumnIncreasing,
   TOTAL_DEPARTMENTS: Building2,
+  TOTAL_LEAVES: Calendar,
+  APPROVED_LEAVES: CalendarCheck,
+  PENDING_LEAVES: CalendarClock,
+  REJECTED_LEAVES: CalendarX,
+  ANNUAL_LEAVES: CalendarDays,
+  CASUAL_LEAVES: Calendar,
+  SICK_LEAVES: CalendarX,
+  TOTAL_ATTENDANCE: Users,
+  PRESENT: CircleCheck,
+  ABSENT: CircleOff,
+  LATE: TriangleAlert,
 };
 
 /**

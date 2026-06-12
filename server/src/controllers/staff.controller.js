@@ -4,6 +4,7 @@ import { ApiError } from '../middleware/error.js';
 import authModel from '../models/auth.model.js';
 import departmentModel from '../models/department.model.js';
 import staffModel from '../models/staff.model.js';
+import staffActivityModel from '../models/staffActivity.model.js';
 import { welcomeEmailTemplate } from '../templates/welcomeEmailTemplate.js';
 import { asyncHandler, created, ok } from '../utils/apiResponse.js';
 import { destroyImage, uploadAvatar } from '../utils/cloudinary.js';
@@ -285,13 +286,282 @@ const updateMyProfile = asyncHandler(async (req, res) => {
   return ok(res, { staff }, 'Profile updated successfully');
 });
 
+// --- Staff Activities (Staff Role) ---
+
+/**
+ * @desc    Get dashboard metrics for staff
+ * @route   GET /api/staff/me/dashboard-stats
+ * @access  Private (staff)
+ */
+const getStaffDashboardStats = asyncHandler(async (req, res) => {
+  const stats = await staffActivityModel.getDashboardStats(req.user.staff_id);
+  return ok(res, { stats }, 'Dashboard statistics retrieved successfully');
+});
+
+/**
+ * @desc    Get staff weekly schedule
+ * @route   GET /api/staff/me/schedule
+ * @access  Private (staff)
+ */
+const getStaffSchedule = asyncHandler(async (req, res) => {
+  const schedule = await staffActivityModel.getSchedule(req.user.staff_id);
+  return ok(res, { schedule }, 'Weekly schedule retrieved successfully');
+});
+
+/**
+ * @desc    Get staff attendance records
+ * @route   GET /api/staff/me/attendance
+ * @access  Private (staff)
+ */
+const getStaffAttendance = asyncHandler(async (req, res) => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth();
+
+  const startDefault = new Date(year, month, 1).toISOString().split('T')[0];
+  const endDefault = new Date(year, month + 1, 0).toISOString().split('T')[0];
+
+  const startDate = req.query.startDate || startDefault;
+  const endDate = req.query.endDate || endDefault;
+
+  const attendance = await staffActivityModel.getAttendance(
+    req.user.staff_id,
+    startDate,
+    endDate
+  );
+  return ok(res, { attendance }, 'Attendance records retrieved successfully');
+});
+
+/**
+ * @desc    Toggle clock-in / clock-out status for the day
+ * @route   POST /api/staff/me/attendance/clock
+ * @access  Private (staff)
+ */
+const toggleClockStatus = asyncHandler(async (req, res) => {
+  const now = new Date();
+  const date = now.toISOString().split('T')[0];
+  const time = now.toTimeString().split(' ')[0];
+
+  console.log({ date, time });
+
+  const log = await staffActivityModel.clockInOut(
+    req.user.staff_id,
+    date,
+    time
+  );
+
+  console.log(log);
+  return ok(
+    res,
+    { log },
+    log.clock_out ? 'Clocked out successfully' : 'Clocked in successfully'
+  );
+});
+
+/**
+ * @desc    Get staff leave requests history
+ * @route   GET /api/staff/me/leaves
+ * @access  Private (staff)
+ */
+const getStaffLeaves = asyncHandler(async (req, res) => {
+  const leaves = await staffActivityModel.getLeaves(req.user.staff_id);
+  return ok(res, { leaves }, 'Leave history retrieved successfully');
+});
+
+/**
+ * @desc    Submit a new leave request
+ * @route   POST /api/staff/me/leaves
+ * @access  Private (staff)
+ */
+const requestLeave = asyncHandler(async (req, res) => {
+  const { leave_type, start_date, end_date, reason } = req.body;
+  const leave = await staffActivityModel.createLeaveRequest(
+    req.user.staff_id,
+    leave_type,
+    start_date,
+    end_date,
+    reason
+  );
+  return created(res, { leave }, 'Leave request submitted successfully');
+});
+
+/**
+ * @desc    Get staff assigned tasks
+ * @route   GET /api/staff/me/tasks
+ * @access  Private (staff)
+ */
+const getStaffTasks = asyncHandler(async (req, res) => {
+  const tasks = await staffActivityModel.getTasks(req.user.staff_id);
+  return ok(res, { tasks }, 'Assigned tasks retrieved successfully');
+});
+
+/**
+ * @desc    Update status of an assigned task
+ * @route   PATCH /api/staff/me/tasks/:id/status
+ * @access  Private (staff)
+ */
+const updateTaskStatus = asyncHandler(async (req, res) => {
+  const taskId = req.params.id;
+  const { status } = req.body;
+  const task = await staffActivityModel.updateTaskStatus(
+    taskId,
+    req.user.staff_id,
+    status
+  );
+  if (!task) {
+    throw new ApiError(404, 'Task not found or not assigned to you');
+  }
+  return ok(res, { task }, 'Task status updated successfully');
+});
+
+// --- School Admin Staff Management Methods ---
+
+/**
+ * @desc    Assign a task to a staff member
+ * @route   POST /api/school-admin/tasks
+ * @access  Private (school_admin)
+ */
+const assignTaskToStaff = asyncHandler(async (req, res) => {
+  const { staff_id, title, description, due_date } = req.body;
+  const task = await staffActivityModel.assignTask(
+    staff_id,
+    title,
+    description || null,
+    due_date || null,
+    req.user.staff_id
+  );
+  return created(res, { task }, 'Task assigned successfully');
+});
+
+/**
+ * @desc    List all leave requests of the school staff
+ * @route   GET /api/school-admin/leaves
+ * @access  Private (school_admin)
+ */
+const listSchoolLeaveRequests = asyncHandler(async (req, res) => {
+  const leaves = await staffActivityModel.listSchoolLeaveRequests(
+    req.user.school_id
+  );
+  return ok(res, { leaves }, 'Leave requests retrieved successfully');
+});
+
+/**
+ * @desc    Review (approve/reject) a staff leave request
+ * @route   PATCH /api/school-admin/leaves/:id
+ * @access  Private (school_admin)
+ */
+const reviewLeaveRequest = asyncHandler(async (req, res) => {
+  const leaveId = req.params.id;
+  const { status, comments } = req.body;
+  const leave = await staffActivityModel.reviewLeaveRequest(
+    leaveId,
+    status,
+    comments || null,
+    req.user.staff_id
+  );
+  return ok(res, { leave }, `Leave request ${status} successfully`);
+});
+
+/**
+ * @desc    Create a timetable schedule entry for a staff member
+ * @route   POST /api/school-admin/schedules
+ * @access  Private (school_admin)
+ */
+const createStaffSchedule = asyncHandler(async (req, res) => {
+  const {
+    staff_id,
+    subject_name,
+    class_name,
+    day_of_week,
+    start_time,
+    end_time,
+    room,
+  } = req.body;
+
+  const schedule = await staffActivityModel.createStaffSchedule(
+    req.user.school_id,
+    staff_id,
+    subject_name,
+    class_name,
+    day_of_week,
+    start_time,
+    end_time,
+    room || null
+  );
+  return created(res, { schedule }, 'Schedule entry created successfully');
+});
+
+/**
+ * @desc    List all staff tasks in the school
+ * @route   GET /api/school-admin/tasks
+ * @access  Private (school_admin)
+ */
+const listSchoolTasks = asyncHandler(async (req, res) => {
+  const tasks = await staffActivityModel.listSchoolTasks(req.user.school_id);
+  return ok(res, { tasks }, 'School staff tasks retrieved successfully');
+});
+
+/**
+ * @desc    List all staff schedules in the school
+ * @route   GET /api/school-admin/schedules
+ * @access  Private (school_admin)
+ */
+const listSchoolSchedules = asyncHandler(async (req, res) => {
+  const schedules = await staffActivityModel.listSchoolSchedules(
+    req.user.school_id
+  );
+  return ok(
+    res,
+    { schedules },
+    'School staff schedules retrieved successfully'
+  );
+});
+
+/**
+ * @desc    Delete a staff schedule entry
+ * @route   DELETE /api/school-admin/schedules/:id
+ * @access  Private (school_admin)
+ */
+const deleteStaffSchedule = asyncHandler(async (req, res) => {
+  const scheduleId = req.params.id;
+  await staffActivityModel.deleteStaffSchedule(scheduleId, req.user.school_id);
+  return ok(res, null, 'Schedule entry deleted successfully');
+});
+
+/**
+ * @desc    Delete an assigned staff task
+ * @route   DELETE /api/school-admin/tasks/:id
+ * @access  Private (school_admin)
+ */
+const deleteStaffTask = asyncHandler(async (req, res) => {
+  const taskId = req.params.id;
+  await staffActivityModel.deleteStaffTask(taskId, req.user.school_id);
+  return ok(res, null, 'Task deleted successfully');
+});
+
 export {
+  assignTaskToStaff,
   changeMyPassword,
   createStaff,
+  createStaffSchedule,
+  deleteStaffSchedule,
+  deleteStaffTask,
   getMyProfile,
   getStaff,
+  getStaffAttendance,
+  getStaffDashboardStats,
+  getStaffLeaves,
+  getStaffSchedule,
+  getStaffTasks,
+  listSchoolLeaveRequests,
+  listSchoolSchedules,
+  listSchoolTasks,
   listStaff,
+  requestLeave,
+  reviewLeaveRequest,
+  toggleClockStatus,
   updateMyAvatar,
   updateMyProfile,
   updateStaffStatus,
+  updateTaskStatus,
 };

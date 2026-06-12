@@ -49,10 +49,29 @@ const StaffPage = lazy(() => import('./features/school_admin/pages/StaffPage'));
 const RegisterStaffPage = lazy(
   () => import('./features/school_admin/pages/RegisterStaffPage')
 );
+const SchoolAdminSchedulesPage = lazy(
+  () => import('./features/school_admin/pages/SchedulesPage')
+);
+const SchoolAdminTasksPage = lazy(
+  () => import('./features/school_admin/pages/TasksPage')
+);
+const SchoolAdminLeavesPage = lazy(
+  () => import('./features/school_admin/pages/LeavesPage')
+);
 
 // Staff
 const StaffDashboard = lazy(
   () => import('./features/staff/pages/StaffDashboard')
+);
+const StaffSchedulePage = lazy(
+  () => import('./features/staff/pages/SchedulePage')
+);
+const StaffAttendanceLeavePage = lazy(
+  () => import('./features/staff/pages/AttendanceLeavePage')
+);
+const StaffTasksPage = lazy(() => import('./features/staff/pages/TasksPage'));
+const StaffDocumentsPage = lazy(
+  () => import('./features/staff/pages/DocumentsPage')
 );
 
 const router = createBrowserRouter([
@@ -99,6 +118,9 @@ const router = createBrowserRouter([
               { path: 'departments', element: <DepartmentsPage /> },
               { path: 'staff', element: <StaffPage /> },
               { path: 'staff/register', element: <RegisterStaffPage /> },
+              { path: 'schedules', element: <SchoolAdminSchedulesPage /> },
+              { path: 'tasks', element: <SchoolAdminTasksPage /> },
+              { path: 'leaves', element: <SchoolAdminLeavesPage /> },
               { path: 'profile', element: <ProfileView /> },
             ],
           },
@@ -115,6 +137,10 @@ const router = createBrowserRouter([
             children: [
               { index: true, element: <Navigate to="profile" replace /> },
               { path: 'dashboard', element: <StaffDashboard /> },
+              { path: 'schedule', element: <StaffSchedulePage /> },
+              { path: 'attendance', element: <StaffAttendanceLeavePage /> },
+              { path: 'tasks', element: <StaffTasksPage /> },
+              { path: 'documents', element: <StaffDocumentsPage /> },
               { path: 'profile', element: <ProfileView /> },
             ],
           },
