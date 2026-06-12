@@ -8,6 +8,14 @@ const departmentModel = {
   /** List departments of one school. */
   listDepartments: (schoolId) =>
     callProcedure('sp_list_departments', [schoolId]),
+
+  /** Activate/deactivate a department. */
+  updateDepartmentStatus: (schoolId, departmentId, status) =>
+    callProcedureOne('sp_update_department_status', [
+      schoolId,
+      departmentId,
+      status,
+    ]),
 };
 
 export default departmentModel;

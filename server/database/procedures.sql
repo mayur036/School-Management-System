@@ -751,5 +751,20 @@ BEGIN
   END IF;
 END $$
 
+-- sp_update_department_status : activate/deactivate a department
+DROP PROCEDURE IF EXISTS sp_update_department_status $$
+CREATE PROCEDURE sp_update_department_status(
+  IN p_school_id     INT,
+  IN p_department_id INT,
+  IN p_status        ENUM('active','inactive')
+)
+BEGIN
+  UPDATE departments
+  SET status = p_status
+  WHERE department_id = p_department_id AND school_id = p_school_id;
+
+  SELECT * FROM departments WHERE department_id = p_department_id AND school_id = p_school_id;
+END $$
+
 DELIMITER ;
 

@@ -4,7 +4,6 @@ import {
   DEPARTMENT_DESCRIPTIONS,
   DEPARTMENT_GRADIENTS,
   DEPARTMENT_ICONS,
-  NEW_DEPT_CUTOFF_DAYS,
 } from '../constants/departments.constants';
 
 /**
@@ -76,21 +75,6 @@ export const getDeptBadgeClass = (deptName) => {
     return 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20';
   }
   return 'bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-500/20';
-};
-
-/**
- * Status dot + label for a department row/card. Active departments created
- * within NEW_DEPT_CUTOFF_DAYS are surfaced as "New".
- */
-export const getDeptStatusMeta = (dept) => {
-  const cutoff = Date.now() - NEW_DEPT_CUTOFF_DAYS * 24 * 60 * 60 * 1000;
-  const isNew = new Date(dept.created_at).getTime() > cutoff;
-  if (dept.status !== 'active') {
-    return { dotClass: 'bg-red-500', label: 'inactive' };
-  }
-  return isNew
-    ? { dotClass: 'bg-blue-500', label: 'New' }
-    : { dotClass: 'bg-green-500', label: 'active' };
 };
 
 export const computeDepartmentStats = (departments = [], staff = []) => {

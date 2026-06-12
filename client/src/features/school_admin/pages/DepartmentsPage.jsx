@@ -20,6 +20,7 @@ import CreateDepartmentDialog from '../components/departments/CreateDepartmentDi
 import DepartmentsGrid from '../components/departments/DepartmentsGrid';
 import DepartmentsStatCard from '../components/departments/DepartmentsStatCard';
 import DepartmentsTable from '../components/departments/DepartmentsTable';
+import DepartmentStatusToggle from '../components/departments/DepartmentStatusToggle';
 import {
   DEPARTMENT_SORT_OPTIONS,
   DEPARTMENT_STATUS_FILTERS,
@@ -49,6 +50,7 @@ const DepartmentsPage = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [sortFilter, setSortFilter] = useState('newest');
   const [viewMode, setViewMode] = useState('list'); // 'list' or 'grid'
+  const [statusToggleDept, setStatusToggleDept] = useState(null);
 
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
@@ -60,8 +62,6 @@ const DepartmentsPage = () => {
     () => computeDepartmentStats(departments, staff),
     [departments, staff]
   );
-
-  console.log(stats);
 
   // Filter and Sort Logic
   const processedDepartments = useMemo(() => {
@@ -271,6 +271,7 @@ const DepartmentsPage = () => {
             isLoading={deptLoading}
             onEdit={handleEditDepartment}
             onDelete={handleDeleteDepartment}
+            onToggleStatus={setStatusToggleDept}
           />
         ) : (
           <DepartmentsGrid
@@ -278,6 +279,7 @@ const DepartmentsPage = () => {
             staffCounts={staffCounts}
             onEdit={handleEditDepartment}
             onDelete={handleDeleteDepartment}
+            onToggleStatus={setStatusToggleDept}
           />
         )}
 
@@ -293,6 +295,12 @@ const DepartmentsPage = () => {
           />
         )}
       </div>
+
+      {/* Status Toggle Dialog */}
+      <DepartmentStatusToggle
+        department={statusToggleDept}
+        onClose={() => setStatusToggleDept(null)}
+      />
     </div>
   );
 };

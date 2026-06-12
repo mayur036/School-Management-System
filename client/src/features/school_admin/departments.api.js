@@ -24,8 +24,23 @@ export const departmentsApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [{ type: 'Department', id: 'LIST' }],
     }),
+
+    updateDepartmentStatus: builder.mutation({
+      query: ({ id, status }) => ({
+        url: `/departments/${id}/status`,
+        method: 'PATCH',
+        data: { status },
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: 'Department', id },
+        { type: 'Department', id: 'LIST' },
+      ],
+    }),
   }),
 });
 
-export const { useGetDepartmentsQuery, useCreateDepartmentMutation } =
-  departmentsApi;
+export const {
+  useGetDepartmentsQuery,
+  useCreateDepartmentMutation,
+  useUpdateDepartmentStatusMutation,
+} = departmentsApi;

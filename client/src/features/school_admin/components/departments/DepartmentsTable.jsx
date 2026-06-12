@@ -1,3 +1,4 @@
+import StatusBadge from '@/components/shared/StatusBadge';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -14,14 +15,13 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { ACTIONS, BASE } from '@/lib/icons';
+import { ACTIONS, BASE, STATUS } from '@/lib/icons';
 import { cn, formatDate } from '@/lib/utils';
 
 import {
   getDeptDescription,
   getDeptGradient,
   getDeptIcon,
-  getDeptStatusMeta,
 } from '../../utils/departments.utils';
 
 // Skeleton rows (loading state)
@@ -58,6 +58,7 @@ const DepartmentsTable = ({
   isLoading,
   onEdit,
   onDelete,
+  onToggleStatus,
 }) => {
   if (isLoading) {
     return (
@@ -102,7 +103,6 @@ const DepartmentsTable = ({
             const IconComponent = getDeptIcon(dept.name);
             const description = getDeptDescription(dept.name);
             const staffCount = staffCounts[dept.department_id] || 0;
-            const status = getDeptStatusMeta(dept);
 
             return (
               <TableRow
@@ -138,14 +138,7 @@ const DepartmentsTable = ({
 
                 {/* Status */}
                 <TableCell className="py-3.5 text-xs">
-                  <div className="flex items-center gap-1.5">
-                    <span
-                      className={cn('size-1.5 rounded-full', status.dotClass)}
-                    />
-                    <span className="text-foreground/80 text-[11px] font-semibold capitalize">
-                      {status.label}
-                    </span>
-                  </div>
+                  <StatusBadge status={dept.status} />
                 </TableCell>
 
                 {/* Created Date */}
@@ -178,20 +171,40 @@ const DepartmentsTable = ({
                           <BASE.MORE_V className="size-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="text-xs">
+                      <DropdownMenuContent align="end" className="w-32">
+                        <DropdownMenuItem
+                          onClick={() => onToggleStatus?.(dept)}
+                          className="flex cursor-pointer items-center gap-2 px-2.5 py-1.5 text-xs"
+                        >
+                          {dept.status === 'active' ? (
+                            <>
+                              <STATUS.INACTIVE className="text-destructive size-3.5" />
+                              <span className="text-destructive font-medium">
+                                Deactivate
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <STATUS.ACTIVE className="text-success size-3.5" />
+                              <span className="text-success font-medium">
+                                Activate
+                              </span>
+                            </>
+                          )}
+                        </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => onEdit?.(dept)}
-                          className="cursor-pointer gap-2"
+                          className="flex cursor-pointer items-center gap-2 px-2.5 py-1.5 text-xs"
                         >
-                          <ACTIONS.EDIT className="size-3.5" />
-                          <span>Edit Department</span>
+                          <ACTIONS.EDIT className="text-muted-foreground size-3.5" />
+                          <span className="font-medium">Edit</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => onDelete?.(dept)}
-                          className="text-destructive focus:text-destructive cursor-pointer gap-2"
+                          className="text-destructive focus:text-destructive flex cursor-pointer items-center gap-2 px-2.5 py-1.5 text-xs"
                         >
-                          <ACTIONS.DELETE className="size-3.5" />
-                          <span>Delete Department</span>
+                          <ACTIONS.DELETE className="text-destructive/80 size-3.5" />
+                          <span className="font-medium">Delete</span>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
