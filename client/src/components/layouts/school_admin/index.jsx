@@ -45,11 +45,6 @@ const config = {
           Icon: SCHOOL_ADMIN.ATTENDANCE,
         },
         {
-          to: '/school/tasks',
-          label: 'Assign Tasks',
-          Icon: SCHOOL_ADMIN.SUBJECTS,
-        },
-        {
           to: '/school/leaves',
           label: 'Staff Leaves',
           Icon: SCHOOL_ADMIN.STAFF_MANAGE,

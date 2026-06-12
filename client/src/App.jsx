@@ -52,9 +52,6 @@ const RegisterStaffPage = lazy(
 const SchoolAdminSchedulesPage = lazy(
   () => import('./features/school_admin/pages/SchedulesPage')
 );
-const SchoolAdminTasksPage = lazy(
-  () => import('./features/school_admin/pages/TasksPage')
-);
 const SchoolAdminLeavesPage = lazy(
   () => import('./features/school_admin/pages/LeavesPage')
 );
@@ -69,7 +66,6 @@ const StaffSchedulePage = lazy(
 const StaffAttendanceLeavePage = lazy(
   () => import('./features/staff/pages/AttendanceLeavePage')
 );
-const StaffTasksPage = lazy(() => import('./features/staff/pages/TasksPage'));
 
 const router = createBrowserRouter([
   {
@@ -116,7 +112,6 @@ const router = createBrowserRouter([
               { path: 'staff', element: <StaffPage /> },
               { path: 'staff/register', element: <RegisterStaffPage /> },
               { path: 'schedules', element: <SchoolAdminSchedulesPage /> },
-              { path: 'tasks', element: <SchoolAdminTasksPage /> },
               { path: 'leaves', element: <SchoolAdminLeavesPage /> },
               { path: 'profile', element: <ProfileView /> },
             ],
@@ -136,7 +131,6 @@ const router = createBrowserRouter([
               { path: 'dashboard', element: <StaffDashboard /> },
               { path: 'schedule', element: <StaffSchedulePage /> },
               { path: 'attendance', element: <StaffAttendanceLeavePage /> },
-              { path: 'tasks', element: <StaffTasksPage /> },
               { path: 'profile', element: <ProfileView /> },
             ],
           },

@@ -11,15 +11,12 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   useClockInOutMutation,
   useGetStaffAttendanceQuery,
   useGetStaffDashboardStatsQuery,
   useGetStaffScheduleQuery,
-  useGetStaffTasksQuery,
-  useUpdateTaskStatusMutation,
 } from '@/features/staff/staffActivity.api';
 import { useAuth } from '@/hooks/useAuth';
 import { EMPTY_STATE, STAFF, STATUS } from '@/lib/icons';
@@ -60,8 +57,6 @@ export const StaffDashboard = () => {
     useGetStaffDashboardStatsQuery();
   const { data: scheduleData, isLoading: isScheduleLoading } =
     useGetStaffScheduleQuery();
-  const { data: tasksData, isLoading: isTasksLoading } =
-    useGetStaffTasksQuery();
   const { data: attendanceData, isLoading: isAttendanceLoading } =
     useGetStaffAttendanceQuery({
       startDate: todayStr,
@@ -70,7 +65,6 @@ export const StaffDashboard = () => {
 
   // API Mutations
   const [clockInOut, { isLoading: isClocking }] = useClockInOutMutation();
-  const [updateTaskStatus] = useUpdateTaskStatusMutation();
 
   // Dynamic clock has been isolated to prevent parent re-renders every second
 
@@ -79,7 +73,7 @@ export const StaffDashboard = () => {
   const isClockedIn = !!todayAttendance?.clock_in;
   const isClockedOut = !!todayAttendance?.clock_out;
 
-  console.log({ statsData, scheduleData, tasksData, attendanceData });
+  console.log({ statsData, scheduleData, attendanceData });
 
   const handleClockAction = async () => {
     try {
@@ -90,24 +84,10 @@ export const StaffDashboard = () => {
     }
   };
 
-  const handleTaskToggle = async (taskId, checked) => {
-    try {
-      const status = checked ? 'completed' : 'in_progress';
-      await updateTaskStatus({ id: taskId, status }).unwrap();
-      toast.success('Task updated successfully');
-    } catch (err) {
-      toast.error(err?.data?.message || 'Failed to update task');
-    }
-  };
-
   // Filter schedule for today
   const todayClasses =
     scheduleData?.data?.schedule?.filter((s) => s.day_of_week === dayName) ||
     [];
-
-  // Filter pending tasks
-  const pendingTasks =
-    tasksData?.data?.tasks?.filter((t) => t.status !== 'completed') || [];
 
   return (
     <div className="space-y-6">
@@ -218,7 +198,7 @@ export const StaffDashboard = () => {
         </Card>
 
         {/* Dashboard Stats */}
-        <div className="grid grid-cols-2 gap-4 md:col-span-2 lg:grid-cols-3">
+        <div className="grid grid-cols-2 gap-4 md:col-span-2 lg:grid-cols-4">
           {/* Today's classes */}
           <Card className="border-border bg-card shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -239,30 +219,6 @@ export const StaffDashboard = () => {
               )}
               <p className="text-muted-foreground mt-1 text-[10px]">
                 Scheduled for {dayName}
-              </p>
-            </CardContent>
-          </Card>
-
-          {/* Pending Tasks */}
-          <Card className="border-border bg-card shadow-sm">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
-                Pending Tasks
-              </CardTitle>
-              <div className="rounded-full bg-amber-500/10 p-2">
-                <STAFF.TASKS className="h-4 w-4 text-amber-500" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              {isStatsLoading ? (
-                <Skeleton className="h-8 w-12" />
-              ) : (
-                <div className="text-foreground text-2xl font-bold">
-                  {statsData?.data?.stats?.pending_tasks ?? 0}
-                </div>
-              )}
-              <p className="text-muted-foreground mt-1 text-[10px]">
-                Assigned school duties
               </p>
             </CardContent>
           </Card>
@@ -341,7 +297,7 @@ export const StaffDashboard = () => {
         </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="max-w-3xl">
         {/* Today's Timetable */}
         <Card className="border-border bg-card shadow-sm">
           <CardHeader className="border-border border-b pb-3">
@@ -400,79 +356,6 @@ export const StaffDashboard = () => {
                 <p className="text-muted-foreground mt-0.5 max-w-65 text-xs">
                   You have no teaching or duty sessions scheduled for today.
                   Enjoy!
-                </p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Pending Tasks Checklist */}
-        <Card className="border-border bg-card shadow-sm">
-          <CardHeader className="border-border border-b pb-3">
-            <CardTitle className="flex items-center justify-between text-base font-semibold">
-              <span className="flex items-center gap-2">
-                <STAFF.TASKS className="h-4 w-4 text-amber-500" />
-                Assigned Duties
-              </span>
-              <Badge className="border-none bg-amber-500/10 text-xs font-normal text-amber-600 hover:bg-amber-500/20 dark:text-amber-400">
-                {pendingTasks.length} pending
-              </Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-4">
-            {isTasksLoading ? (
-              <div className="space-y-3">
-                <Skeleton className="h-10 w-full" />
-                <Skeleton className="h-10 w-full" />
-              </div>
-            ) : pendingTasks.length > 0 ? (
-              <div className="space-y-3">
-                {pendingTasks.slice(0, 4).map((task) => (
-                  <div
-                    key={task.task_id}
-                    className="border-border hover:bg-muted/30 flex items-start gap-3 rounded-lg border p-3 transition-colors"
-                  >
-                    <Checkbox
-                      id={`task-${task.task_id}`}
-                      checked={task.status === 'completed'}
-                      onCheckedChange={(checked) =>
-                        handleTaskToggle(task.task_id, checked)
-                      }
-                      className="border-border mt-0.5"
-                    />
-                    <div className="min-w-0 flex-1 space-y-0.5">
-                      <label
-                        htmlFor={`task-${task.task_id}`}
-                        className="text-foreground block cursor-pointer truncate text-sm font-medium select-none"
-                      >
-                        {task.title}
-                      </label>
-                      <p className="text-muted-foreground truncate text-xs">
-                        {task.description || 'No description provided.'}
-                      </p>
-                      {task.due_date && (
-                        <div className="text-muted-foreground mt-1 flex items-center text-[10px] font-medium">
-                          <span className="text-amber-600 dark:text-amber-400">
-                            Due:{' '}
-                            {new Date(task.due_date).toLocaleDateString(
-                              'en-GB',
-                              { dateStyle: 'medium' }
-                            )}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center py-8 text-center">
-                <EMPTY_STATE.NO_DATA className="mb-2.5 h-10 w-10 text-slate-300" />
-                <h3 className="text-foreground text-sm font-semibold">
-                  All Duties Caught Up
-                </h3>
-                <p className="text-muted-foreground mt-0.5 max-w-65 text-xs">
-                  No pending duties or assignments. Good job!
                 </p>
               </div>
             )}

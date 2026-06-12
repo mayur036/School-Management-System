@@ -20,7 +20,6 @@ const config = {
           label: 'Attendance & Leaves',
           Icon: STAFF.ATTENDANCE,
         },
-        { to: '/staff/tasks', label: 'My Tasks', Icon: STAFF.TASKS },
       ],
     },
     {
