@@ -20,6 +20,7 @@ import {
 } from '../controllers/staff.controller.js';
 import { protect } from '../middleware/auth.js';
 import { authorize } from '../middleware/authorize.js';
+import { uploadLimiter } from '../middleware/rateLimiter.js';
 import { uploadAvatar } from '../middleware/upload.js';
 import { validate } from '../middleware/validate.js';
 import {
@@ -43,7 +44,13 @@ router.patch(
   validate(changePasswordSchema),
   changeMyPassword
 );
-router.patch('/me/avatar', protect, uploadAvatar, updateMyAvatar);
+router.patch(
+  '/me/avatar',
+  protect,
+  uploadLimiter,
+  uploadAvatar,
+  updateMyAvatar
+);
 
 // Staff Portal endpoints (accessible to staff role only)
 router.get(

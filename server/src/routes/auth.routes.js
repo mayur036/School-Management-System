@@ -8,6 +8,7 @@ import {
   resetPassword,
 } from '../controllers/auth.controller.js';
 import { protect } from '../middleware/auth.js';
+import { authLimiter } from '../middleware/rateLimiter.js';
 import { validate } from '../middleware/validate.js';
 import {
   forgotPasswordSchema,
@@ -17,10 +18,16 @@ import {
 
 const router = Router();
 
-router.post('/login', validate(loginSchema), login);
+// Auth rate limiter: 10 attempts per 15 minutes per IP
+router.post('/login', authLimiter, validate(loginSchema), login);
 router.post('/logout', logout);
 router.get('/me', protect, getMe);
-router.post('/forgot-password', validate(forgotPasswordSchema), forgotPassword);
+router.post(
+  '/forgot-password',
+  authLimiter,
+  validate(forgotPasswordSchema),
+  forgotPassword
+);
 router.post('/reset-password', validate(resetPasswordSchema), resetPassword);
 
 export default router;
