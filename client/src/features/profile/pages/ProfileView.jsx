@@ -124,9 +124,9 @@ export const ProfileView = () => {
       {/* ── Hero Profile Header Card ────────────────────────── */}
       <div className="border-border bg-card border-l-primary relative overflow-hidden rounded-2xl border border-l-4 shadow-sm">
         {/* Neutral Header Background Accent */}
-        <div className="bg-muted/30 absolute top-0 left-0 h-32 w-full border-b" />
+        <div className="bg-muted/30 absolute top-0 left-0 h-24 w-full" />
 
-        <div className="relative flex flex-col gap-6 px-6 pt-16 pb-6 sm:flex-row sm:items-end sm:justify-between">
+        <div className="relative flex flex-col gap-6 px-6 pt-8 pb-6 sm:flex-row sm:items-end sm:justify-between sm:pt-10">
           <div className="flex flex-col items-center gap-4 text-center sm:flex-row sm:text-left">
             {/* Avatar block with camera upload button */}
             <div className="group relative">

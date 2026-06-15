@@ -12,11 +12,17 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useForgotPasswordMutation } from '@/features/auth/auth.api';
+import { useAuth } from '@/hooks/useAuth';
 import { BASE } from '@/lib/icons';
 
 import { useChangePasswordMutation } from '../profile.api';
 
 export const ChangePasswordDialog = ({ open, onOpenChange }) => {
+  const { user } = useAuth();
+  const [forgotPassword] = useForgotPasswordMutation();
+  const [isSendingForgotLink, setIsSendingForgotLink] = useState(false);
+
   const [changePassword, { isLoading: isChangingPassword }] =
     useChangePasswordMutation();
 
@@ -25,6 +31,22 @@ export const ChangePasswordDialog = ({ open, onOpenChange }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
+
+  const handleForgotPassword = async () => {
+    if (!user?.email) {
+      toast.error('User email not found');
+      return;
+    }
+    setIsSendingForgotLink(true);
+    try {
+      await forgotPassword({ email: user.email }).unwrap();
+      toast.success('A password reset link has been sent to your email.');
+    } catch (err) {
+      toast.error(err?.data?.message ?? 'Failed to send password reset email');
+    } finally {
+      setIsSendingForgotLink(false);
+    }
+  };
 
   useEffect(() => {
     if (open) {
@@ -74,9 +96,19 @@ export const ChangePasswordDialog = ({ open, onOpenChange }) => {
         </DialogHeader>
         <form onSubmit={handleSavePassword} className="space-y-4 py-2">
           <div className="space-y-1.5">
-            <Label htmlFor="currentPass" className="text-xs font-semibold">
-              Current Password
-            </Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="currentPass" className="text-xs font-semibold">
+                Current Password
+              </Label>
+              <button
+                type="button"
+                onClick={handleForgotPassword}
+                disabled={isSendingForgotLink}
+                className="text-primary cursor-pointer text-[11px] font-medium hover:underline"
+              >
+                {isSendingForgotLink ? 'Sending link...' : 'Forgot password?'}
+              </button>
+            </div>
             <div className="relative">
               <Input
                 id="currentPass"
