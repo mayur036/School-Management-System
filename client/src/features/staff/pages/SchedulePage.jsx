@@ -11,7 +11,6 @@ const DAYS = [
   'Thursday',
   'Friday',
   'Saturday',
-  'Sunday',
 ];
 
 const calculateTotalHours = (sessions) => {
@@ -107,7 +106,7 @@ export const SchedulePage = () => {
             return (
               <Card
                 key={day}
-                className={`flex flex-col justify-between shadow-sm transition-all duration-300 ${
+                className={`flex flex-col justify-between p-0 shadow-sm transition-all duration-300 ${
                   isToday
                     ? 'border-primary bg-primary/2 dark:bg-primary/2 ring-primary/20 scale-[1.01] ring-1'
                     : 'border-border bg-card'
@@ -115,7 +114,7 @@ export const SchedulePage = () => {
               >
                 <div>
                   <CardHeader
-                    className={`rounded-t-lg border-b pb-3 ${
+                    className={`rounded-t-lg border-b py-3 ${
                       isToday
                         ? 'bg-primary/5 border-primary/20'
                         : 'bg-muted/30 border-border'
@@ -143,20 +142,22 @@ export const SchedulePage = () => {
                       </div>
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-4 pt-4">
+                  <CardContent className="space-y-4 py-4">
                     {sessions.length > 0 ? (
                       sessions.map((session) => {
                         const status = getSessionStatus(session, day);
-
+                        console.log(status);
                         return (
                           <div
                             key={session.schedule_id}
-                            className={`group relative space-y-1 rounded-r-md border-l-2 py-1.5 pl-3 transition-colors ${
+                            className={`group relative space-y-1 rounded-r-md border-l-2 py-1.5 px-2 transition-colors ${
                               status === 'current'
-                                ? 'border-green-500 bg-green-500/5 dark:bg-green-950/10'
+                                ? 'border-red-500 bg-red-500/5 dark:bg-red-950/10'
                                 : status === 'upcoming'
                                   ? 'border-primary/50 bg-primary/2'
-                                  : 'hover:bg-muted/30 border-slate-300 dark:border-slate-700'
+                                  : status === 'completed'
+                                    ? 'border-green-500 bg-green-500/5 dark:bg-green-950/10'
+                                    : 'hover:bg-muted/30 border-slate-300 dark:border-slate-700'
                             }`}
                           >
                             <div className="flex items-start justify-between gap-2">
@@ -174,7 +175,7 @@ export const SchedulePage = () => {
                                   {session.end_time.substring(0, 5)}
                                 </span>
                                 {status === 'current' ? (
-                                  <Badge className="h-4 animate-pulse border-none bg-green-500 px-1 py-0 text-[8px] font-bold tracking-wider text-white uppercase">
+                                  <Badge className="h-4 animate-pulse border-none bg-red-500 px-1 py-0 text-[8px] font-bold tracking-wider text-white uppercase">
                                     Live Now
                                   </Badge>
                                 ) : status === 'upcoming' ? (
@@ -183,6 +184,13 @@ export const SchedulePage = () => {
                                     className="h-4 px-1 py-0 text-[8px] font-bold tracking-wider uppercase"
                                   >
                                     Next
+                                  </Badge>
+                                ) : status === 'completed' ? (
+                                  <Badge
+                                    variant="secondary"
+                                    className="h-4 px-1 py-0 text-[8px] font-bold tracking-wider uppercase"
+                                  >
+                                    Completed
                                   </Badge>
                                 ) : null}
                               </div>
