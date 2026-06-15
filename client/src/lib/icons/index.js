@@ -26,3 +26,6 @@ export { SUPER_ADMIN } from './superAdmin.icons';
 
 // Semantic UI pattern icon maps
 export { ACTIONS, EMPTY_STATE, STATS, STATUS } from './ui.icons';
+
+//Guest Icon
+export { GUEST } from './guest.icons';

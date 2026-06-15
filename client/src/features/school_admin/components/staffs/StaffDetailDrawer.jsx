@@ -1,5 +1,3 @@
-import { Calendar, Mail, Phone, School, User, X } from 'lucide-react';
-
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -12,6 +10,7 @@ import {
   DrawerTitle,
 } from '@/components/ui/drawer';
 import { Separator } from '@/components/ui/separator';
+import { BASE, SCHOOL_ADMIN } from '@/lib/icons';
 import {
   formatDate,
   formatPhoneNumber,
@@ -32,7 +31,7 @@ const StaffDetailDrawer = ({ member, open, onClose }) => {
               className="bg-muted/60 hover:bg-muted text-muted-foreground absolute top-4 right-4 z-50 size-8 cursor-pointer rounded-full sm:top-5 sm:right-5"
               aria-label="Close details"
             >
-              <X className="size-4" />
+              <BASE.X className="size-4" />
             </Button>
           </DrawerClose>
 
@@ -77,7 +76,7 @@ const StaffDetailDrawer = ({ member, open, onClose }) => {
                   </h3>
                   <div className="mt-0.5 flex flex-wrap items-center gap-1.5 sm:gap-2">
                     <Badge className="flex items-center gap-1 rounded-full border-none bg-purple-100 px-2 py-0.5 text-[10px] font-semibold text-purple-700 hover:bg-purple-100 sm:gap-1.5 sm:text-xs dark:bg-purple-950/40 dark:text-purple-300">
-                      <School className="size-3 text-purple-700 sm:size-3.5 dark:text-purple-300" />
+                      <SCHOOL_ADMIN.SCHOOL_PROFILE className="size-3 text-purple-700 sm:size-3.5 dark:text-purple-300" />
                       {member.department_name || 'Unassigned'}
                     </Badge>
                     <Badge
@@ -116,7 +115,7 @@ const StaffDetailDrawer = ({ member, open, onClose }) => {
                   <div className="bg-card border-border/50 hover:border-border flex w-full items-center rounded-xl border p-2 shadow-xs transition-colors sm:p-3.5">
                     <div className="grid w-full grid-cols-[100px_1fr] items-center gap-2 text-xs sm:grid-cols-[170px_1fr] sm:gap-4 sm:text-sm">
                       <div className="text-muted-foreground/80 flex items-center gap-2 font-normal sm:gap-3">
-                        <User className="size-3.5 shrink-0 text-indigo-500 sm:size-4" />
+                        <BASE.USER className="size-3.5 shrink-0 text-indigo-500 sm:size-4" />
                         <span>First Name</span>
                       </div>
                       <span className="text-foreground truncate font-medium">
@@ -129,7 +128,7 @@ const StaffDetailDrawer = ({ member, open, onClose }) => {
                   <div className="bg-card border-border/50 hover:border-border flex w-full items-center rounded-xl border p-2 shadow-xs transition-colors sm:p-3.5">
                     <div className="grid w-full grid-cols-[100px_1fr] items-center gap-2 text-xs sm:grid-cols-[170px_1fr] sm:gap-4 sm:text-sm">
                       <div className="text-muted-foreground/80 flex items-center gap-2 font-normal sm:gap-3">
-                        <User className="size-3.5 shrink-0 text-indigo-500 sm:size-4" />
+                        <BASE.USER className="size-3.5 shrink-0 text-indigo-500 sm:size-4" />
                         <span>Last Name</span>
                       </div>
                       <span className="text-foreground truncate font-medium">
@@ -142,7 +141,7 @@ const StaffDetailDrawer = ({ member, open, onClose }) => {
                   <div className="bg-card border-border/50 hover:border-border flex w-full items-center rounded-xl border p-2 shadow-xs transition-colors sm:p-3.5">
                     <div className="grid w-full grid-cols-[100px_1fr] items-center gap-2 text-xs sm:grid-cols-[170px_1fr] sm:gap-4 sm:text-sm">
                       <div className="text-muted-foreground/80 flex items-center gap-2 font-normal sm:gap-3">
-                        <Mail className="size-3.5 shrink-0 text-indigo-500 sm:size-4" />
+                        <BASE.MAIL className="size-3.5 shrink-0 text-indigo-500 sm:size-4" />
                         <span>Email</span>
                       </div>
                       <span className="text-foreground truncate font-mono font-medium">
@@ -155,7 +154,7 @@ const StaffDetailDrawer = ({ member, open, onClose }) => {
                   <div className="bg-card border-border/50 hover:border-border flex w-full items-center rounded-xl border p-2 shadow-xs transition-colors sm:p-3.5">
                     <div className="grid w-full grid-cols-[100px_1fr] items-center gap-2 text-xs sm:grid-cols-[170px_1fr] sm:gap-4 sm:text-sm">
                       <div className="text-muted-foreground/80 flex items-center gap-2 font-normal sm:gap-3">
-                        <Phone className="size-3.5 shrink-0 text-indigo-500 sm:size-4" />
+                        <BASE.PHONE className="size-3.5 shrink-0 text-indigo-500 sm:size-4" />
                         <span>Phone</span>
                       </div>
                       <span className="text-foreground truncate font-medium">
@@ -168,7 +167,7 @@ const StaffDetailDrawer = ({ member, open, onClose }) => {
                   <div className="bg-card border-border/50 hover:border-border flex w-full items-center rounded-xl border p-2 shadow-xs transition-colors sm:p-3.5">
                     <div className="grid w-full grid-cols-[100px_1fr] items-center gap-2 text-xs sm:grid-cols-[170px_1fr] sm:gap-4 sm:text-sm">
                       <div className="text-muted-foreground/80 flex items-center gap-2 font-normal sm:gap-3">
-                        <Calendar className="size-3.5 shrink-0 text-indigo-500 sm:size-4" />
+                        <BASE.CALENDAR className="size-3.5 shrink-0 text-indigo-500 sm:size-4" />
                         <span>Registered</span>
                       </div>
                       <span className="text-foreground truncate font-medium">

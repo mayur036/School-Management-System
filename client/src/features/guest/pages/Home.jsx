@@ -1,7 +1,7 @@
-import { Building2, ShieldCheck, UserCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
+import { GUEST } from '@/lib/icons';
 
 export const Home = () => {
   return (
@@ -10,7 +10,7 @@ export const Home = () => {
       <header className="border-border/40 bg-background/80 sticky top-0 z-50 w-full border-b backdrop-blur-md">
         <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6">
           <div className="flex items-center gap-2">
-            <Building2 className="text-primary h-5 w-5" />
+            <GUEST.BUILDING className="text-primary h-5 w-5" />
             <span className="text-foreground text-base font-bold tracking-tight">
               CampusCore
             </span>
@@ -41,17 +41,17 @@ export const Home = () => {
           {/* Features Grid */}
           <div className="mt-16 grid gap-6 text-left sm:grid-cols-3">
             <CardFeature
-              icon={ShieldCheck}
+              icon={GUEST.SECURITY}
               title="Multi-Tenant Isolation"
               desc="Ensures strict data scoping per school tenant. Super admins oversee platform health while school admins manage their own records."
             />
             <CardFeature
-              icon={Building2}
+              icon={GUEST.BUILDING}
               title="Institution Control"
               desc="Super administrators can spin up new school templates and configure primary administrators with full role isolation."
             />
             <CardFeature
-              icon={UserCheck}
+              icon={GUEST.USER_CHECK}
               title="Employee Directory"
               desc="Register academic or support staff under custom departments, toggle active status, and maintain secure system authorizations."
             />

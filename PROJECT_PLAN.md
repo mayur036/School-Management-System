@@ -620,7 +620,7 @@ Features that complete existing gaps and polish the current product.
 | N3 | **Audit Fields / Soft Delete** | Add `deleted_at` timestamp column to key tables (`staff`, `schools`, `departments`) for soft-delete instead of hard-delete. Update stored procedures to filter deleted rows. | `server/database/schema.sql`, `procedures.sql`, all models |
 | N4 | **Tag Invalidation Verification** | End-to-end verify tag invalidation matrix — ensure every mutation refetches the correct lists (e.g., schedule creation invalidates both staff and admin schedule views). | `client/features/*/api.js` |
 | N5 | **School Admin Tasks Page** | Complete the school admin tasks management UI — list assigned tasks with filtering, view task details, and task deletion confirmation. | `client/features/school_admin/pages/` |
-| N6 | **Department Status Toggle** | Wire the `sp_update_department_status` stored procedure (already exists) to the frontend UI. Add activate/deactivate toggle on the Departments page. | `client/features/school_admin/`, `server/routes/department.routes.js` |
+| N6 | **Department Status Toggle (Completed)** | Wired the `sp_update_department_status` stored procedure to the frontend UI. Toggles are fully operational on the Departments list/grid views. | `client/features/school_admin/`, `server/routes/department.routes.js` |
 | N7 | **Swagger Docs for Staff Portal** | Extend Swagger/OpenAPI annotations to cover the new staff portal and school-admin management endpoints. | `server/src/docs/` |
 
 ### 🟡 Medium-Term (3–6 months) — Feature Expansion
