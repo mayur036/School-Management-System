@@ -9,8 +9,6 @@ import {
 } from '@/components/ui/card';
 import {
   ChartContainer,
-  ChartLegend,
-  ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart';
@@ -18,15 +16,18 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { BASE } from '@/lib/icons';
 
 const chartConfig = {
-  active: { label: 'Active Staff', color: '#10b981' },
-  inactive: { label: 'Inactive Staff', color: '#f43f5e' },
+  active: { label: 'Active Staff', color: 'var(--color-success)' },
+  inactive: { label: 'Inactive Staff', color: 'var(--color-neutral)' },
 };
 
 const StaffStatusChart = ({ active = 0, inactive = 0, isLoading }) => {
   const total = active + inactive;
+  const activePercent = total > 0 ? Math.round((active / total) * 100) : 0;
+  const inactivePercent = total > 0 ? 100 - activePercent : 0;
+
   const data = [
-    { name: 'active', value: active, fill: 'url(#activeGrad)' },
-    { name: 'inactive', value: inactive, fill: 'url(#inactiveGrad)' },
+    { name: 'active', value: active, fill: 'var(--color-success)' },
+    { name: 'inactive', value: inactive, fill: 'var(--color-neutral)' },
   ];
 
   return (
@@ -35,7 +36,7 @@ const StaffStatusChart = ({ active = 0, inactive = 0, isLoading }) => {
         <CardTitle className="text-base font-bold">Account Status</CardTitle>
         <CardDescription>Active vs inactive members</CardDescription>
       </CardHeader>
-      <CardContent className="flex-1 pb-4">
+      <CardContent className="flex grow flex-col justify-between pb-4">
         {isLoading ? (
           <Skeleton className="mx-auto mt-4 h-56 w-full rounded-full" />
         ) : total === 0 ? (
@@ -46,80 +47,88 @@ const StaffStatusChart = ({ active = 0, inactive = 0, isLoading }) => {
             <p>No staff yet</p>
           </div>
         ) : (
-          <ChartContainer
-            config={chartConfig}
-            className="mx-auto aspect-square h-65"
-          >
-            <PieChart>
-              <defs>
-                <linearGradient id="activeGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#34d399" />
-                  <stop offset="100%" stopColor="#059669" />
-                </linearGradient>
-                <linearGradient id="inactiveGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#fb7185" />
-                  <stop offset="100%" stopColor="#e11d48" />
-                </linearGradient>
-              </defs>
-              <ChartTooltip
-                cursor={false}
-                content={<ChartTooltipContent hideLabel />}
-              />
-              <Pie
-                data={data}
-                dataKey="value"
-                nameKey="name"
-                innerRadius={65}
-                outerRadius={85}
-                paddingAngle={5}
-                strokeWidth={0}
-                cornerRadius={8}
-              >
-                {data.map((entry, index) => (
-                  <Cell
-                    key={index}
-                    fill={
-                      entry.name === 'active'
-                        ? 'url(#activeGrad)'
-                        : 'url(#inactiveGrad)'
-                    }
-                  />
-                ))}
-                <Label
-                  content={({ viewBox }) => {
-                    if (!viewBox || !('cx' in viewBox)) return null;
-                    return (
-                      <text
-                        x={viewBox.cx}
-                        y={viewBox.cy}
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                      >
-                        <tspan
-                          x={viewBox.cx}
-                          y={viewBox.cy - 4}
-                          className="fill-foreground text-4xl font-black tracking-tighter"
-                        >
-                          {total}
-                        </tspan>
-                        <tspan
-                          x={viewBox.cx}
-                          y={viewBox.cy + 24}
-                          className="fill-muted-foreground text-xs font-semibold tracking-widest uppercase"
-                        >
-                          Total
-                        </tspan>
-                      </text>
-                    );
-                  }}
+          <div className="flex flex-1 flex-col justify-between">
+            <ChartContainer
+              config={chartConfig}
+              className="mx-auto aspect-square h-56"
+            >
+              <PieChart>
+                <ChartTooltip
+                  cursor={false}
+                  content={<ChartTooltipContent hideLabel />}
                 />
-              </Pie>
-              <ChartLegend
-                content={<ChartLegendContent nameKey="name" />}
-                className="-translate-y-2 flex-wrap justify-center gap-4"
-              />
-            </PieChart>
-          </ChartContainer>
+                <Pie
+                  data={data}
+                  dataKey="value"
+                  nameKey="name"
+                  innerRadius={60}
+                  outerRadius={78}
+                  paddingAngle={4}
+                  strokeWidth={0}
+                  cornerRadius={6}
+                >
+                  {data.map((entry, index) => (
+                    <Cell
+                      key={index}
+                      fill={
+                        entry.name === 'active'
+                          ? 'var(--color-success)'
+                          : 'var(--color-neutral)'
+                      }
+                    />
+                  ))}
+                  <Label
+                    content={({ viewBox }) => {
+                      if (!viewBox || !('cx' in viewBox)) return null;
+                      return (
+                        <text
+                          x={viewBox.cx}
+                          y={viewBox.cy}
+                          textAnchor="middle"
+                          dominantBaseline="middle"
+                        >
+                          <tspan
+                            x={viewBox.cx}
+                            y={viewBox.cy - 4}
+                            className="fill-foreground text-3xl font-black tracking-tighter"
+                          >
+                            {total}
+                          </tspan>
+                          <tspan
+                            x={viewBox.cx}
+                            y={viewBox.cy + 20}
+                            className="fill-muted-foreground text-[10px] font-semibold tracking-widest uppercase"
+                          >
+                            Total
+                          </tspan>
+                        </text>
+                      );
+                    }}
+                  />
+                </Pie>
+              </PieChart>
+            </ChartContainer>
+
+            {/* Custom Legend showing exact percentage and counts */}
+            <div className="border-border/50 flex items-center justify-center gap-6 border-t pt-3 text-xs">
+              <div className="flex items-center gap-2">
+                <span className="bg-success inline-block h-2.5 w-2.5 shrink-0 rounded-full" />
+                <span className="text-muted-foreground">Active</span>
+                <span className="text-foreground font-bold">{active}</span>
+                <span className="text-muted-foreground text-[10px]">
+                  ({activePercent}%)
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="bg-neutral inline-block h-2.5 w-2.5 shrink-0 rounded-full" />
+                <span className="text-muted-foreground">Inactive</span>
+                <span className="text-foreground font-bold">{inactive}</span>
+                <span className="text-muted-foreground text-[10px]">
+                  ({inactivePercent}%)
+                </span>
+              </div>
+            </div>
+          </div>
         )}
       </CardContent>
     </Card>

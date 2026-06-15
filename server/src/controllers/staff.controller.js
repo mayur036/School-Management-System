@@ -342,15 +342,12 @@ const toggleClockStatus = asyncHandler(async (req, res) => {
   const date = now.toISOString().split('T')[0];
   const time = now.toTimeString().split(' ')[0];
 
-  console.log({ date, time });
-
   const log = await staffActivityModel.clockInOut(
     req.user.staff_id,
     date,
     time
   );
 
-  console.log(log);
   return ok(
     res,
     { log },
@@ -463,35 +460,6 @@ const reviewLeaveRequest = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc    Create a timetable schedule entry for a staff member
- * @route   POST /api/school-admin/schedules
- * @access  Private (school_admin)
- */
-const createStaffSchedule = asyncHandler(async (req, res) => {
-  const {
-    staff_id,
-    subject_name,
-    class_name,
-    day_of_week,
-    start_time,
-    end_time,
-    room,
-  } = req.body;
-
-  const schedule = await staffActivityModel.createStaffSchedule(
-    req.user.school_id,
-    staff_id,
-    subject_name,
-    class_name,
-    day_of_week,
-    start_time,
-    end_time,
-    room || null
-  );
-  return created(res, { schedule }, 'Schedule entry created successfully');
-});
-
-/**
  * @desc    List all staff tasks in the school
  * @route   GET /api/school-admin/tasks
  * @access  Private (school_admin)
@@ -499,33 +467,6 @@ const createStaffSchedule = asyncHandler(async (req, res) => {
 const listSchoolTasks = asyncHandler(async (req, res) => {
   const tasks = await staffActivityModel.listSchoolTasks(req.user.school_id);
   return ok(res, { tasks }, 'School staff tasks retrieved successfully');
-});
-
-/**
- * @desc    List all staff schedules in the school
- * @route   GET /api/school-admin/schedules
- * @access  Private (school_admin)
- */
-const listSchoolSchedules = asyncHandler(async (req, res) => {
-  const schedules = await staffActivityModel.listSchoolSchedules(
-    req.user.school_id
-  );
-  return ok(
-    res,
-    { schedules },
-    'School staff schedules retrieved successfully'
-  );
-});
-
-/**
- * @desc    Delete a staff schedule entry
- * @route   DELETE /api/school-admin/schedules/:id
- * @access  Private (school_admin)
- */
-const deleteStaffSchedule = asyncHandler(async (req, res) => {
-  const scheduleId = req.params.id;
-  await staffActivityModel.deleteStaffSchedule(scheduleId, req.user.school_id);
-  return ok(res, null, 'Schedule entry deleted successfully');
 });
 
 /**
@@ -543,8 +484,6 @@ export {
   assignTaskToStaff,
   changeMyPassword,
   createStaff,
-  createStaffSchedule,
-  deleteStaffSchedule,
   deleteStaffTask,
   getMyProfile,
   getStaff,
@@ -554,7 +493,6 @@ export {
   getStaffSchedule,
   getStaffTasks,
   listSchoolLeaveRequests,
-  listSchoolSchedules,
   listSchoolTasks,
   listStaff,
   requestLeave,

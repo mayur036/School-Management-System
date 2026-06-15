@@ -102,8 +102,25 @@ const SchoolsTable = ({ schools, isLoading, onToggleStatus, onAddAdmin }) => {
         </TableHeader>
         <TableBody>
           {schools.map((school) => (
-            <TableRow key={school.school_id}>
-              <TableCell className="font-medium">{school.name}</TableCell>
+            <TableRow
+              key={school.school_id}
+              className="hover:bg-muted/50 group cursor-pointer transition-colors"
+            >
+              <TableCell>
+                <div className="flex items-center gap-3">
+                  <div className="bg-primary/10 text-primary border-primary/20 flex size-9 shrink-0 items-center justify-center rounded-xl border">
+                    <BASE.BUILDING className="size-4.5" />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="group-hover:text-primary font-medium transition-colors">
+                      {school.name}
+                    </span>
+                    <span className="text-muted-foreground text-xs">
+                      {school.domain || '—'}
+                    </span>
+                  </div>
+                </div>
+              </TableCell>
               <TableCell className="text-muted-foreground tabular-nums">
                 {school.code || '—'}
               </TableCell>

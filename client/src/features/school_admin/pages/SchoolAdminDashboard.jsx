@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { useAuth } from '@/hooks/useAuth';
+import WelcomeBanner from '@/components/shared/WelcomeBanner';
 
 import QuickActions from '../components/dashboard/QuickActions';
 import RecentStaff from '../components/dashboard/RecentStaff';
@@ -16,8 +16,6 @@ import {
 } from '../utils/staff.utils';
 
 export const SchoolAdminDashboard = () => {
-  const { user } = useAuth();
-
   const { data: staffData, isLoading: staffLoading } = useGetStaffQuery();
   const { data: deptData, isLoading: deptLoading } = useGetDepartmentsQuery();
   const isLoading = staffLoading || deptLoading;
@@ -40,15 +38,8 @@ export const SchoolAdminDashboard = () => {
 
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
-      {/* Greeting header */}
-      <div>
-        <h1 className="text-foreground text-2xl font-bold tracking-tight sm:text-3xl">
-          Welcome back{user?.first_name ? `, ${user.first_name}` : ''} 👋
-        </h1>
-        <p className="text-muted-foreground mt-1 text-sm">
-          Here's an overview of your school's staff and departments.
-        </p>
-      </div>
+      {/* Welcome Banner */}
+      <WelcomeBanner />
 
       {/* KPI cards */}
       <SchoolAdminStatCard stats={stats} isLoading={isLoading} />

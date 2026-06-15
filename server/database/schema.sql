@@ -17,6 +17,7 @@ DROP TABLE IF EXISTS staff_tasks;
 DROP TABLE IF EXISTS leave_requests;
 DROP TABLE IF EXISTS staff_attendance;
 DROP TABLE IF EXISTS staff_schedules;
+DROP TABLE IF EXISTS school_periods;
 DROP TABLE IF EXISTS staff;
 DROP TABLE IF EXISTS departments;
 DROP TABLE IF EXISTS schools;
@@ -37,15 +38,16 @@ CREATE TABLE roles (
 -- created_by -> staff.staff_id is added AFTER staff exists (circular FK)
 -- ------------------------------------------------------------
 CREATE TABLE schools (
-  school_id   INT AUTO_INCREMENT PRIMARY KEY,
-  name        VARCHAR(150) NOT NULL,
-  code        VARCHAR(30) UNIQUE,
-  email       VARCHAR(150),
-  phone       VARCHAR(20),
-  address     VARCHAR(255),
-  status      ENUM('active','inactive') NOT NULL DEFAULT 'active',
-  created_by  INT NULL,
-  created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+  school_id    INT AUTO_INCREMENT PRIMARY KEY,
+  name         VARCHAR(150) NOT NULL,
+  code         VARCHAR(30) UNIQUE,
+  email        VARCHAR(150),
+  phone        VARCHAR(20),
+  address      VARCHAR(255),
+  working_days VARCHAR(255) NOT NULL DEFAULT 'Monday,Tuesday,Wednesday,Thursday,Friday,Saturday',
+  status       ENUM('active','inactive') NOT NULL DEFAULT 'active',
+  created_by   INT NULL,
+  created_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE = InnoDB;
 
 -- ------------------------------------------------------------
@@ -115,21 +117,48 @@ CREATE INDEX idx_staff_department ON staff(department_id);
 CREATE INDEX idx_dept_school      ON departments(school_id);
 
 -- ------------------------------------------------------------
+-- school_periods : configurable bell schedule per school
+-- Admins define fixed periods (Period 1, Break, Period 2, etc.)
+-- and schedules reference these instead of free-form times.
+-- ------------------------------------------------------------
+CREATE TABLE school_periods (
+  period_id     INT AUTO_INCREMENT PRIMARY KEY,
+  school_id     INT NOT NULL,
+  period_name   VARCHAR(50) NOT NULL,
+  period_order  SMALLINT NOT NULL,
+  start_time    TIME NOT NULL,
+  end_time      TIME NOT NULL,
+  is_break      BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_period_school
+    FOREIGN KEY (school_id) REFERENCES schools(school_id)
+    ON DELETE CASCADE,
+  CONSTRAINT uq_period_school_order UNIQUE (school_id, period_order),
+  CONSTRAINT uq_period_school_name  UNIQUE (school_id, period_name)
+) ENGINE = InnoDB;
+
+-- ------------------------------------------------------------
 -- staff_schedules : weekly teaching/work schedules
+-- Now references school_periods for time slots. Unique constraint
+-- prevents a teacher being double-booked on the same period+day.
 -- ------------------------------------------------------------
 CREATE TABLE staff_schedules (
   schedule_id   INT AUTO_INCREMENT PRIMARY KEY,
   staff_id      INT NOT NULL,
+  period_id     INT NOT NULL,
   subject_name  VARCHAR(100) NOT NULL,
   class_name    VARCHAR(50) NOT NULL,
   day_of_week   ENUM('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday') NOT NULL,
-  start_time    TIME NOT NULL,
-  end_time      TIME NOT NULL,
   room          VARCHAR(50) NULL,
   created_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   CONSTRAINT fk_sched_staff
     FOREIGN KEY (staff_id) REFERENCES staff(staff_id)
-    ON DELETE CASCADE
+    ON DELETE CASCADE,
+  CONSTRAINT fk_sched_period
+    FOREIGN KEY (period_id) REFERENCES school_periods(period_id)
+    ON DELETE RESTRICT,
+  CONSTRAINT uq_staff_day_period UNIQUE (staff_id, day_of_week, period_id)
 ) ENGINE = InnoDB;
 
 -- ------------------------------------------------------------
@@ -194,7 +223,10 @@ CREATE TABLE staff_tasks (
 ) ENGINE = InnoDB;
 
 -- Helpful indexes for staff portal features.
-CREATE INDEX idx_schedule_staff ON staff_schedules(staff_id);
+CREATE INDEX idx_period_school     ON school_periods(school_id);
+CREATE INDEX idx_schedule_staff    ON staff_schedules(staff_id);
+CREATE INDEX idx_schedule_period   ON staff_schedules(period_id);
+CREATE INDEX idx_schedule_room_day ON staff_schedules(room, day_of_week, period_id);
 CREATE INDEX idx_attendance_staff_date ON staff_attendance(staff_id, date);
 CREATE INDEX idx_leave_staff ON leave_requests(staff_id);
 CREATE INDEX idx_task_staff ON staff_tasks(staff_id);

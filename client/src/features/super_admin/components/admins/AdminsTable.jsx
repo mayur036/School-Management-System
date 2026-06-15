@@ -1,6 +1,6 @@
 import EmptyTableState from '@/components/shared/EmptyTableState';
 import StatusBadge from '@/components/shared/StatusBadge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import UserAvatar from '@/components/shared/UserAvatar';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -21,7 +21,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { ACTIONS, BASE, EMPTY_STATE } from '@/lib/icons';
-import { formatDate, getInitials } from '@/lib/utils';
+import { formatDate } from '@/lib/utils';
 
 const SkeletonRows = ({ count = 5 }) =>
   Array.from({ length: count }).map((_, i) => (
@@ -108,19 +108,13 @@ const AdminsTable = ({ admins, isLoading, onToggleStatus, onDeleteAdmin }) => {
             <TableRow key={admin.staff_id}>
               <TableCell>
                 <div className="flex items-center gap-3">
-                  <Avatar className="size-9 border">
-                    <AvatarImage
-                      src={admin.avatar_url}
-                      alt={`${admin.first_name} ${admin.last_name}`}
-                    />
-                    <AvatarFallback className="bg-primary/5 text-primary text-xs">
-                      {getInitials(admin.first_name, admin.last_name)}
-                    </AvatarFallback>
-                  </Avatar>
+                  <UserAvatar
+                    name={`${admin.first_name} ${admin.last_name}`}
+                    avatarUrl={admin.avatar_url}
+                    size="sm"
+                  />
                   <div className="flex flex-col">
-                    <span className="font-medium">
-                      {admin.first_name} {admin.last_name}
-                    </span>
+                    <span className="font-medium">{`${admin.first_name} ${admin.last_name}`}</span>
                     <span className="text-muted-foreground text-xs">
                       {admin.email}
                     </span>

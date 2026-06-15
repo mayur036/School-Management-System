@@ -391,6 +391,7 @@ END $$
 -- ============================================================
 
 -- sp_get_staff_dashboard_stats : get dashboard metrics for staff
+-- Updated to join school_periods for today_classes count
 DROP PROCEDURE IF EXISTS sp_get_staff_dashboard_stats $$
 CREATE PROCEDURE sp_get_staff_dashboard_stats(IN p_staff_id INT)
 BEGIN
@@ -401,8 +402,11 @@ BEGIN
   DECLARE v_total_work_seconds INT DEFAULT 0;
 
   SELECT COUNT(*) INTO v_today_classes
-  FROM staff_schedules
-  WHERE staff_id = p_staff_id AND day_of_week = DAYNAME(CURDATE());
+  FROM staff_schedules ss
+  JOIN school_periods sp ON sp.period_id = ss.period_id
+  WHERE ss.staff_id = p_staff_id
+    AND ss.day_of_week = DAYNAME(CURDATE())
+    AND sp.is_break = FALSE;
 
   SELECT COUNT(*) INTO v_pending_tasks
   FROM staff_tasks
@@ -431,14 +435,19 @@ BEGIN
     ROUND(v_total_work_seconds / 3600, 1) AS total_work_hours;
 END $$
 
--- sp_get_staff_schedule : get staff weekly schedule
+-- sp_get_staff_schedule : get staff weekly schedule with period info
 DROP PROCEDURE IF EXISTS sp_get_staff_schedule $$
 CREATE PROCEDURE sp_get_staff_schedule(IN p_staff_id INT)
 BEGIN
-  SELECT * FROM staff_schedules
-  WHERE staff_id = p_staff_id
+  SELECT
+    ss.schedule_id, ss.staff_id, ss.period_id, ss.subject_name,
+    ss.class_name, ss.day_of_week, ss.room,
+    sp.period_name, sp.start_time, sp.end_time, sp.period_order, sp.is_break
+  FROM staff_schedules ss
+  JOIN school_periods sp ON sp.period_id = ss.period_id
+  WHERE ss.staff_id = p_staff_id
   ORDER BY
-    CASE day_of_week
+    CASE ss.day_of_week
       WHEN 'Monday' THEN 1
       WHEN 'Tuesday' THEN 2
       WHEN 'Wednesday' THEN 3
@@ -447,7 +456,7 @@ BEGIN
       WHEN 'Saturday' THEN 6
       WHEN 'Sunday' THEN 7
     END,
-    start_time;
+    sp.period_order;
 END $$
 
 -- sp_get_staff_attendance : list attendance logs in range
@@ -569,6 +578,133 @@ END $$
 
 
 -- ============================================================
+-- SCHOOL PERIODS (school admin manages bell schedule)
+-- ============================================================
+
+-- sp_create_school_period : add a period to a school's bell schedule
+DROP PROCEDURE IF EXISTS sp_create_school_period $$
+CREATE PROCEDURE sp_create_school_period(
+  IN p_school_id    INT,
+  IN p_period_name  VARCHAR(50),
+  IN p_period_order SMALLINT,
+  IN p_start_time   TIME,
+  IN p_end_time     TIME,
+  IN p_is_break     BOOLEAN
+)
+BEGIN
+  IF p_end_time <= p_start_time THEN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Validation error: End time must be after start time.';
+  END IF;
+
+  INSERT INTO school_periods (school_id, period_name, period_order, start_time, end_time, is_break)
+  VALUES (p_school_id, p_period_name, p_period_order, p_start_time, p_end_time, p_is_break);
+
+  SELECT * FROM school_periods WHERE period_id = LAST_INSERT_ID();
+END $$
+
+-- sp_list_school_periods : list all periods of a school in order
+DROP PROCEDURE IF EXISTS sp_list_school_periods $$
+CREATE PROCEDURE sp_list_school_periods(IN p_school_id INT)
+BEGIN
+  SELECT * FROM school_periods
+  WHERE school_id = p_school_id
+  ORDER BY period_order ASC;
+END $$
+
+-- sp_update_school_period : edit a period
+DROP PROCEDURE IF EXISTS sp_update_school_period $$
+CREATE PROCEDURE sp_update_school_period(
+  IN p_period_id    INT,
+  IN p_school_id    INT,
+  IN p_period_name  VARCHAR(50),
+  IN p_period_order SMALLINT,
+  IN p_start_time   TIME,
+  IN p_end_time     TIME,
+  IN p_is_break     BOOLEAN
+)
+BEGIN
+  DECLARE v_period_school INT;
+
+  IF p_end_time <= p_start_time THEN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Validation error: End time must be after start time.';
+  END IF;
+
+  SELECT school_id INTO v_period_school
+  FROM school_periods WHERE period_id = p_period_id;
+
+  IF v_period_school != p_school_id THEN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Tenancy violation: Period does not belong to this school.';
+  END IF;
+
+  UPDATE school_periods
+  SET period_name  = p_period_name,
+      period_order = p_period_order,
+      start_time   = p_start_time,
+      end_time     = p_end_time,
+      is_break     = p_is_break
+  WHERE period_id = p_period_id;
+
+  SELECT * FROM school_periods WHERE period_id = p_period_id;
+END $$
+
+-- sp_delete_school_period : delete a period (fails if schedules reference it)
+DROP PROCEDURE IF EXISTS sp_delete_school_period $$
+CREATE PROCEDURE sp_delete_school_period(
+  IN p_period_id  INT,
+  IN p_school_id  INT
+)
+BEGIN
+  DECLARE v_period_school INT;
+  DECLARE v_schedule_count INT;
+
+  SELECT school_id INTO v_period_school
+  FROM school_periods WHERE period_id = p_period_id;
+
+  IF v_period_school IS NULL OR v_period_school != p_school_id THEN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Tenancy violation: Period does not belong to this school.';
+  END IF;
+
+  SELECT COUNT(*) INTO v_schedule_count
+  FROM staff_schedules WHERE period_id = p_period_id;
+
+  IF v_schedule_count > 0 THEN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Cannot delete period: it is referenced by existing schedule entries. Remove those entries first.';
+  END IF;
+
+  DELETE FROM school_periods WHERE period_id = p_period_id;
+END $$
+
+-- ============================================================
+-- SCHOOL SETTINGS (working days)
+-- ============================================================
+
+-- sp_update_working_days : set working days for a school
+DROP PROCEDURE IF EXISTS sp_update_working_days $$
+CREATE PROCEDURE sp_update_working_days(
+  IN p_school_id    INT,
+  IN p_working_days VARCHAR(255)
+)
+BEGIN
+  UPDATE schools
+  SET working_days = p_working_days
+  WHERE school_id = p_school_id;
+
+  SELECT working_days FROM schools WHERE school_id = p_school_id;
+END $$
+
+-- sp_get_school_settings : get school-level timetable settings
+DROP PROCEDURE IF EXISTS sp_get_school_settings $$
+CREATE PROCEDURE sp_get_school_settings(IN p_school_id INT)
+BEGIN
+  SELECT school_id, working_days FROM schools WHERE school_id = p_school_id;
+END $$
+
+-- ============================================================
 -- SCHOOL ADMIN STAFF MANAGEMENT
 -- ============================================================
 
@@ -647,59 +783,193 @@ BEGIN
   END IF;
 END $$
 
--- sp_create_staff_schedule : set timetable schedule for staff
+-- ============================================================
+-- TIMETABLE SCHEDULE MANAGEMENT (school admin)
+-- ============================================================
+
+-- sp_create_staff_schedule : create a timetable entry with conflict detection
+-- Validates: tenancy, teacher conflict (same staff+day+period),
+--            room conflict (same room+day+period within school)
 DROP PROCEDURE IF EXISTS sp_create_staff_schedule $$
 CREATE PROCEDURE sp_create_staff_schedule(
   IN p_school_id    INT,
   IN p_staff_id     INT,
+  IN p_period_id    INT,
   IN p_subject_name VARCHAR(100),
   IN p_class_name   VARCHAR(50),
   IN p_day_of_week  ENUM('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'),
-  IN p_start_time   TIME,
-  IN p_end_time     TIME,
   IN p_room         VARCHAR(50)
 )
 BEGIN
   DECLARE v_staff_school INT;
+  DECLARE v_period_school INT;
+  DECLARE v_is_break BOOLEAN;
+  DECLARE v_teacher_conflict INT;
+  DECLARE v_room_conflict INT;
+
+  -- 1. Tenancy check: staff belongs to school
   SELECT school_id INTO v_staff_school FROM staff WHERE staff_id = p_staff_id;
-
-  IF v_staff_school = p_school_id THEN
-    INSERT INTO staff_schedules (staff_id, subject_name, class_name, day_of_week, start_time, end_time, room)
-    VALUES (p_staff_id, p_subject_name, p_class_name, p_day_of_week, p_start_time, p_end_time, p_room);
-
-    SELECT * FROM staff_schedules WHERE schedule_id = LAST_INSERT_ID();
-  ELSE
-    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Tenancy violation: Staff does not belong to this school.';
+  IF v_staff_school IS NULL OR v_staff_school != p_school_id THEN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Tenancy violation: Staff does not belong to this school.';
   END IF;
+
+  -- 2. Period belongs to school and is not a break
+  SELECT school_id, is_break INTO v_period_school, v_is_break
+  FROM school_periods WHERE period_id = p_period_id;
+  IF v_period_school IS NULL OR v_period_school != p_school_id THEN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Validation error: Period does not belong to this school.';
+  END IF;
+  IF v_is_break = TRUE THEN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Validation error: Cannot assign a class to a break period.';
+  END IF;
+
+  -- 3. Teacher conflict: same staff + same day + same period
+  SELECT COUNT(*) INTO v_teacher_conflict
+  FROM staff_schedules
+  WHERE staff_id = p_staff_id AND day_of_week = p_day_of_week AND period_id = p_period_id;
+  IF v_teacher_conflict > 0 THEN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Teacher conflict: This staff member already has a class assigned during this period on this day.';
+  END IF;
+
+  -- 4. Room conflict: same room + same day + same period (within school)
+  IF p_room IS NOT NULL AND p_room != '' THEN
+    SELECT COUNT(*) INTO v_room_conflict
+    FROM staff_schedules ss
+    JOIN staff s ON s.staff_id = ss.staff_id
+    WHERE s.school_id = p_school_id
+      AND ss.room = p_room
+      AND ss.day_of_week = p_day_of_week
+      AND ss.period_id = p_period_id;
+    IF v_room_conflict > 0 THEN
+      SIGNAL SQLSTATE '45000'
+      SET MESSAGE_TEXT = 'Room conflict: This room is already occupied during this period on this day.';
+    END IF;
+  END IF;
+
+  -- 5. Insert
+  INSERT INTO staff_schedules (staff_id, period_id, subject_name, class_name, day_of_week, room)
+  VALUES (p_staff_id, p_period_id, p_subject_name, p_class_name, p_day_of_week, p_room);
+
+  -- 6. Return the created entry with period info
+  SELECT ss.*, sp.period_name, sp.start_time, sp.end_time, sp.period_order, sp.is_break
+  FROM staff_schedules ss
+  JOIN school_periods sp ON sp.period_id = ss.period_id
+  WHERE ss.schedule_id = LAST_INSERT_ID();
 END $$
 
--- sp_list_school_tasks : list all tasks in school
-DROP PROCEDURE IF EXISTS sp_list_school_tasks $$
-CREATE PROCEDURE sp_list_school_tasks(IN p_school_id INT)
+-- sp_update_staff_schedule : update an existing schedule entry with conflict detection
+DROP PROCEDURE IF EXISTS sp_update_staff_schedule $$
+CREATE PROCEDURE sp_update_staff_schedule(
+  IN p_schedule_id  INT,
+  IN p_school_id    INT,
+  IN p_period_id    INT,
+  IN p_subject_name VARCHAR(100),
+  IN p_class_name   VARCHAR(50),
+  IN p_day_of_week  ENUM('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'),
+  IN p_room         VARCHAR(50)
+)
 BEGIN
-  SELECT t.*,
-         CONCAT(s.first_name, ' ', s.last_name) AS staff_name,
-         d.name AS department_name
-  FROM staff_tasks t
-  JOIN staff s ON s.staff_id = t.staff_id
-  LEFT JOIN departments d ON d.department_id = s.department_id
-  WHERE s.school_id = p_school_id
-  ORDER BY t.created_at DESC;
+  DECLARE v_staff_id INT;
+  DECLARE v_staff_school INT;
+  DECLARE v_period_school INT;
+  DECLARE v_is_break BOOLEAN;
+  DECLARE v_teacher_conflict INT;
+  DECLARE v_room_conflict INT;
+
+  -- 1. Get staff_id from existing schedule and verify tenancy
+  SELECT ss.staff_id, s.school_id INTO v_staff_id, v_staff_school
+  FROM staff_schedules ss
+  JOIN staff s ON s.staff_id = ss.staff_id
+  WHERE ss.schedule_id = p_schedule_id;
+
+  IF v_staff_id IS NULL OR v_staff_school != p_school_id THEN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Tenancy violation: Schedule does not belong to this school.';
+  END IF;
+
+  -- 2. Period belongs to school and is not a break
+  SELECT school_id, is_break INTO v_period_school, v_is_break
+  FROM school_periods WHERE period_id = p_period_id;
+  IF v_period_school IS NULL OR v_period_school != p_school_id THEN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Validation error: Period does not belong to this school.';
+  END IF;
+  IF v_is_break = TRUE THEN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Validation error: Cannot assign a class to a break period.';
+  END IF;
+
+  -- 3. Teacher conflict (exclude self)
+  SELECT COUNT(*) INTO v_teacher_conflict
+  FROM staff_schedules
+  WHERE staff_id = v_staff_id
+    AND day_of_week = p_day_of_week
+    AND period_id = p_period_id
+    AND schedule_id != p_schedule_id;
+  IF v_teacher_conflict > 0 THEN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Teacher conflict: This staff member already has a class assigned during this period on this day.';
+  END IF;
+
+  -- 4. Room conflict (exclude self)
+  IF p_room IS NOT NULL AND p_room != '' THEN
+    SELECT COUNT(*) INTO v_room_conflict
+    FROM staff_schedules ss
+    JOIN staff s ON s.staff_id = ss.staff_id
+    WHERE s.school_id = p_school_id
+      AND ss.room = p_room
+      AND ss.day_of_week = p_day_of_week
+      AND ss.period_id = p_period_id
+      AND ss.schedule_id != p_schedule_id;
+    IF v_room_conflict > 0 THEN
+      SIGNAL SQLSTATE '45000'
+      SET MESSAGE_TEXT = 'Room conflict: This room is already occupied during this period on this day.';
+    END IF;
+  END IF;
+
+  -- 5. Update
+  UPDATE staff_schedules
+  SET period_id    = p_period_id,
+      subject_name = p_subject_name,
+      class_name   = p_class_name,
+      day_of_week  = p_day_of_week,
+      room         = p_room
+  WHERE schedule_id = p_schedule_id;
+
+  -- 6. Return updated entry
+  SELECT ss.*, sp.period_name, sp.start_time, sp.end_time, sp.period_order, sp.is_break
+  FROM staff_schedules ss
+  JOIN school_periods sp ON sp.period_id = ss.period_id
+  WHERE ss.schedule_id = p_schedule_id;
 END $$
 
--- sp_list_school_schedules : list all schedules in school
+-- sp_list_school_schedules : list all schedules in school with period info
+-- Supports optional filtering by staff_id (pass 0 or NULL to skip)
 DROP PROCEDURE IF EXISTS sp_list_school_schedules $$
-CREATE PROCEDURE sp_list_school_schedules(IN p_school_id INT)
+CREATE PROCEDURE sp_list_school_schedules(
+  IN p_school_id INT,
+  IN p_staff_id  INT
+)
 BEGIN
-  SELECT sch.*,
-         CONCAT(s.first_name, ' ', s.last_name) AS staff_name,
-         d.name AS department_name
-  FROM staff_schedules sch
-  JOIN staff s ON s.staff_id = sch.staff_id
+  SELECT
+    ss.schedule_id, ss.staff_id, ss.period_id, ss.subject_name,
+    ss.class_name, ss.day_of_week, ss.room, ss.created_at, ss.updated_at,
+    sp.period_name, sp.start_time, sp.end_time, sp.period_order, sp.is_break,
+    CONCAT(s.first_name, ' ', s.last_name) AS staff_name,
+    d.name AS department_name
+  FROM staff_schedules ss
+  JOIN school_periods sp ON sp.period_id = ss.period_id
+  JOIN staff s ON s.staff_id = ss.staff_id
   LEFT JOIN departments d ON d.department_id = s.department_id
   WHERE s.school_id = p_school_id
+    AND (p_staff_id IS NULL OR p_staff_id = 0 OR ss.staff_id = p_staff_id)
   ORDER BY
-    CASE sch.day_of_week
+    CONCAT(s.first_name, ' ', s.last_name),
+    CASE ss.day_of_week
       WHEN 'Monday' THEN 1
       WHEN 'Tuesday' THEN 2
       WHEN 'Wednesday' THEN 3
@@ -708,7 +978,7 @@ BEGIN
       WHEN 'Saturday' THEN 6
       WHEN 'Sunday' THEN 7
     END,
-    sch.start_time;
+    sp.period_order;
 END $$
 
 -- sp_delete_staff_schedule : delete a schedule slot
@@ -729,6 +999,120 @@ BEGIN
   ELSE
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Tenancy violation: Schedule belongs to another school.';
   END IF;
+END $$
+
+-- sp_bulk_create_staff_schedules : insert multiple schedule entries at once
+-- Accepts a JSON array of entries. Validates tenancy, teacher + room conflicts.
+DROP PROCEDURE IF EXISTS sp_bulk_create_staff_schedules $$
+CREATE PROCEDURE sp_bulk_create_staff_schedules(
+  IN p_school_id INT,
+  IN p_staff_id  INT,
+  IN p_entries   JSON
+)
+BEGIN
+  DECLARE v_staff_school INT;
+  DECLARE v_teacher_conflict INT;
+  DECLARE v_room_conflict INT;
+  DECLARE v_break_conflict INT;
+  DECLARE v_inserted INT;
+
+  -- 1. Tenancy check
+  SELECT school_id INTO v_staff_school FROM staff WHERE staff_id = p_staff_id;
+  IF v_staff_school IS NULL OR v_staff_school != p_school_id THEN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Tenancy violation: Staff does not belong to this school.';
+  END IF;
+
+  -- 2. Check no entries target break periods
+  SELECT COUNT(*) INTO v_break_conflict
+  FROM JSON_TABLE(p_entries, '$[*]' COLUMNS (
+    period_id INT PATH '$.period_id'
+  )) AS jt
+  JOIN school_periods sp ON sp.period_id = jt.period_id
+  WHERE sp.is_break = TRUE;
+  IF v_break_conflict > 0 THEN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Validation error: Cannot assign classes to break periods.';
+  END IF;
+
+  -- 3. Teacher conflict: check against existing schedules
+  SELECT COUNT(*) INTO v_teacher_conflict
+  FROM JSON_TABLE(p_entries, '$[*]' COLUMNS (
+    period_id   INT PATH '$.period_id',
+    day_of_week VARCHAR(20) PATH '$.day_of_week'
+  )) AS jt
+  JOIN staff_schedules ss ON ss.staff_id = p_staff_id
+    AND ss.day_of_week = jt.day_of_week
+    AND ss.period_id = jt.period_id;
+  IF v_teacher_conflict > 0 THEN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Teacher conflict: Staff already has assignments during one or more of the specified periods.';
+  END IF;
+
+  -- 4. Room conflict: check against all school schedules
+  SELECT COUNT(*) INTO v_room_conflict
+  FROM JSON_TABLE(p_entries, '$[*]' COLUMNS (
+    period_id   INT PATH '$.period_id',
+    day_of_week VARCHAR(20) PATH '$.day_of_week',
+    room        VARCHAR(50) PATH '$.room'
+  )) AS jt
+  JOIN staff_schedules ss ON ss.day_of_week = jt.day_of_week
+    AND ss.period_id = jt.period_id
+    AND ss.room = jt.room
+  JOIN staff s ON s.staff_id = ss.staff_id AND s.school_id = p_school_id
+  WHERE jt.room IS NOT NULL AND jt.room != '';
+  IF v_room_conflict > 0 THEN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Room conflict: One or more rooms are already occupied during the specified periods.';
+  END IF;
+
+  -- 5. Bulk insert
+  INSERT INTO staff_schedules (staff_id, period_id, subject_name, class_name, day_of_week, room)
+  SELECT p_staff_id, jt.period_id, jt.subject_name, jt.class_name, jt.day_of_week, jt.room
+  FROM JSON_TABLE(p_entries, '$[*]' COLUMNS (
+    period_id    INT PATH '$.period_id',
+    subject_name VARCHAR(100) PATH '$.subject_name',
+    class_name   VARCHAR(50) PATH '$.class_name',
+    day_of_week  VARCHAR(20) PATH '$.day_of_week',
+    room         VARCHAR(50) PATH '$.room'
+  )) AS jt;
+
+  SET v_inserted = ROW_COUNT();
+
+  -- 6. Return all entries for this staff with period info
+  SELECT
+    ss.schedule_id, ss.staff_id, ss.period_id, ss.subject_name,
+    ss.class_name, ss.day_of_week, ss.room, ss.created_at, ss.updated_at,
+    sp.period_name, sp.start_time, sp.end_time, sp.period_order, sp.is_break,
+    v_inserted AS total_inserted
+  FROM staff_schedules ss
+  JOIN school_periods sp ON sp.period_id = ss.period_id
+  WHERE ss.staff_id = p_staff_id
+  ORDER BY
+    CASE ss.day_of_week
+      WHEN 'Monday' THEN 1
+      WHEN 'Tuesday' THEN 2
+      WHEN 'Wednesday' THEN 3
+      WHEN 'Thursday' THEN 4
+      WHEN 'Friday' THEN 5
+      WHEN 'Saturday' THEN 6
+      WHEN 'Sunday' THEN 7
+    END,
+    sp.period_order;
+END $$
+
+-- sp_list_school_tasks : list all tasks in school
+DROP PROCEDURE IF EXISTS sp_list_school_tasks $$
+CREATE PROCEDURE sp_list_school_tasks(IN p_school_id INT)
+BEGIN
+  SELECT t.*,
+         CONCAT(s.first_name, ' ', s.last_name) AS staff_name,
+         d.name AS department_name
+  FROM staff_tasks t
+  JOIN staff s ON s.staff_id = t.staff_id
+  LEFT JOIN departments d ON d.department_id = s.department_id
+  WHERE s.school_id = p_school_id
+  ORDER BY t.created_at DESC;
 END $$
 
 -- sp_delete_staff_task : delete an assigned task
@@ -767,4 +1151,3 @@ BEGIN
 END $$
 
 DELIMITER ;
-

@@ -113,16 +113,18 @@ export const ProfileView = () => {
             to:
               user.role_name === 'super_admin'
                 ? '/super/dashboard'
-                : '/school/dashboard',
+                : user.role_name === 'staff'
+                  ? '/staff/dashboard'
+                  : '/school/dashboard',
           },
           { label: 'Profile Settings' },
         ]}
       />
 
       {/* ── Hero Profile Header Card ────────────────────────── */}
-      <div className="border-border bg-card relative overflow-hidden rounded-2xl border shadow-sm">
-        {/* Colorful Gradient Header Background Accent */}
-        <div className="from-primary/15 absolute top-0 left-0 h-32 w-full border-b bg-linear-to-r via-indigo-500/5 to-purple-500/15" />
+      <div className="border-border bg-card border-l-primary relative overflow-hidden rounded-2xl border border-l-4 shadow-sm">
+        {/* Neutral Header Background Accent */}
+        <div className="bg-muted/30 absolute top-0 left-0 h-32 w-full border-b" />
 
         <div className="relative flex flex-col gap-6 px-6 pt-16 pb-6 sm:flex-row sm:items-end sm:justify-between">
           <div className="flex flex-col items-center gap-4 text-center sm:flex-row sm:text-left">
@@ -178,10 +180,9 @@ export const ProfileView = () => {
               <div className="text-muted-foreground mt-3 flex flex-wrap justify-center gap-x-4 gap-y-1.5 text-xs sm:justify-start">
                 <span className="flex items-center gap-1">
                   <BASE.CLOCK className="size-3.5" />
-                  Last Login:{' '}
                   {user.last_login_at
-                    ? formatDate(user.last_login_at, 'short-time')
-                    : 'Never'}
+                    ? `Last Login: ${formatDate(user.last_login_at, 'short-time')}`
+                    : 'First session active'}
                 </span>
                 <span className="flex items-center gap-1">
                   <BASE.CALENDAR className="size-3.5" />
@@ -239,13 +240,36 @@ export const ProfileView = () => {
               {completionItems.map((item) => (
                 <div
                   key={item.label}
-                  className="flex items-center justify-between text-xs"
+                  className="flex items-center justify-between py-0.5 text-xs"
                 >
                   <span className="text-muted-foreground">{item.label}</span>
                   {item.completed ? (
-                    <STATUS.ACTIVE className="size-4 font-bold text-emerald-500" />
+                    <STATUS.ACTIVE className="size-4 shrink-0 font-bold text-emerald-500" />
                   ) : (
-                    <span className="size-2 rounded-full bg-amber-400" />
+                    <button
+                      onClick={() => {
+                        if (item.label === 'Preferences Details') {
+                          setActiveTab('preferences');
+                          setMobileActiveSubView('preferences');
+                          setTimeout(() => {
+                            const el = document.getElementById(
+                              'preferences-section'
+                            );
+                            if (el) {
+                              el.scrollIntoView({ behavior: 'smooth' });
+                            }
+                          }, 100);
+                        } else if (item.label === 'Profile Photo') {
+                          fileInputRef.current?.click();
+                        } else {
+                          setIsEditProfileOpen(true);
+                        }
+                      }}
+                      className="text-primary flex shrink-0 cursor-pointer items-center gap-0.5 text-[11px] font-semibold hover:underline"
+                    >
+                      Complete
+                      <BASE.CHEVRON_RIGHT className="size-3" />
+                    </button>
                   )}
                 </div>
               ))}
@@ -402,17 +426,16 @@ export const ProfileView = () => {
                 <span className="text-muted-foreground text-[10px]">
                   {user.last_login_at
                     ? formatDate(user.last_login_at, 'medium-time')
-                    : 'Never'}
+                    : 'First session active'}
                 </span>
               </div>
               <div className="flex items-center justify-between border-t pt-3">
                 <span className="text-foreground font-semibold">Password</span>
-                <button
-                  onClick={() => setIsChangePasswordOpen(true)}
-                  className="text-primary cursor-pointer font-semibold hover:underline"
-                >
-                  Change
-                </button>
+                <span className="text-muted-foreground text-[10px]">
+                  {user.password_last_changed_at || user.passwordLastChangedAt
+                    ? `Changed ${formatDate(user.password_last_changed_at || user.passwordLastChangedAt, 'short')}`
+                    : 'Not yet changed'}
+                </span>
               </div>
             </div>
           </Card>
@@ -427,7 +450,7 @@ export const ProfileView = () => {
             <CardContent className="px-5 pb-5">
               <div className="text-muted-foreground flex flex-col items-center justify-center gap-2 py-6 text-center text-xs">
                 <STATUS.ACTIVE className="size-7 opacity-40" />
-                Activity tracking is coming soon.
+                No recent activity to show.
               </div>
             </CardContent>
           </Card>

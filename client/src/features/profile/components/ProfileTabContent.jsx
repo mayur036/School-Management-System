@@ -291,7 +291,7 @@ const ProfileTabContent = ({
       );
     case 'preferences':
       return (
-        <Card className="border-border bg-card border">
+        <Card id="preferences-section" className="border-border bg-card border">
           <CardHeader className="pb-3">
             <CardTitle className="text-base font-bold">
               General Preferences

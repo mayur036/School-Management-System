@@ -163,32 +163,3 @@ export const reviewLeaveSchema = z.object({
     comments: z.string().trim().optional().nullable(),
   }),
 });
-
-export const createScheduleSchema = z.object({
-  body: z.object({
-    staff_id: idParam,
-    subject_name: z.string().trim().min(1, 'Subject name is required').max(100),
-    class_name: z.string().trim().min(1, 'Class name is required').max(50),
-    day_of_week: z.enum(
-      [
-        'Monday',
-        'Tuesday',
-        'Wednesday',
-        'Thursday',
-        'Friday',
-        'Saturday',
-        'Sunday',
-      ],
-      {
-        errorMap: () => ({ message: 'Invalid day of the week' }),
-      }
-    ),
-    start_time: z
-      .string()
-      .regex(/^\d{2}:\d{2}(:\d{2})?$/, 'Start time must be HH:MM or HH:MM:SS'),
-    end_time: z
-      .string()
-      .regex(/^\d{2}:\d{2}(:\d{2})?$/, 'End time must be HH:MM or HH:MM:SS'),
-    room: z.string().trim().max(50).optional().nullable(),
-  }),
-});

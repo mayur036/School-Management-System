@@ -1,9 +1,8 @@
-import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import WelcomeBanner from '@/components/shared/WelcomeBanner';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -18,37 +17,13 @@ import {
   useGetStaffDashboardStatsQuery,
   useGetStaffScheduleQuery,
 } from '@/features/staff/staffActivity.api';
-import { useAuth } from '@/hooks/useAuth';
-import { EMPTY_STATE, STAFF, STATUS } from '@/lib/icons';
-import { getInitials } from '@/lib/utils';
+import { BASE, STAFF } from '@/lib/icons';
+import { cn } from '@/lib/utils';
 
-const DynamicClock = () => {
-  const [time, setTime] = useState(new Date());
-
-  useEffect(() => {
-    const timer = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  return (
-    <div className="space-y-1 text-center">
-      <div className="text-foreground font-mono text-4xl font-bold tracking-tight">
-        {time.toLocaleTimeString('en-US', { hour12: true })}
-      </div>
-      <div className="text-muted-foreground text-xs font-medium">
-        {time.toLocaleDateString('en-US', {
-          weekday: 'long',
-          month: 'short',
-          day: 'numeric',
-        })}
-      </div>
-    </div>
-  );
-};
+import DynamicClock from '../components/DynamicClock';
+import StaffDashboardstatCard from '../components/StaffDashboardstatCard';
 
 export const StaffDashboard = () => {
-  const { user } = useAuth();
-
   const todayStr = new Date().toISOString().split('T')[0];
   const dayName = new Date().toLocaleDateString('en-US', { weekday: 'long' });
 
@@ -66,14 +41,10 @@ export const StaffDashboard = () => {
   // API Mutations
   const [clockInOut, { isLoading: isClocking }] = useClockInOutMutation();
 
-  // Dynamic clock has been isolated to prevent parent re-renders every second
-
   // Compute Clock Status
   const todayAttendance = attendanceData?.data?.attendance?.[0];
   const isClockedIn = !!todayAttendance?.clock_in;
   const isClockedOut = !!todayAttendance?.clock_out;
-
-  console.log({ statsData, scheduleData, attendanceData });
 
   const handleClockAction = async () => {
     try {
@@ -92,218 +63,47 @@ export const StaffDashboard = () => {
   return (
     <div className="space-y-6">
       {/* Welcome Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-linear-to-r from-blue-600 to-indigo-700 p-6 text-white shadow-md">
-        <div className="relative z-10 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-          <div className="flex items-center gap-4">
-            <Avatar className="h-16 w-16 border-2 border-white/20">
-              <AvatarImage src={user?.avatar_url} />
-              <AvatarFallback className="bg-white/10 text-lg font-semibold text-white">
-                {getInitials(`${user?.first_name} ${user?.last_name || ''}`)}
-              </AvatarFallback>
-            </Avatar>
+      <WelcomeBanner />
+
+      {/* Stats Cards (Full-width row) */}
+      <StaffDashboardstatCard
+        stats={statsData?.data?.stats}
+        isLoading={isStatsLoading}
+      />
+
+      {/* Clock and Timetable row (50/50 Grid) */}
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        {/* Attendance Clock Card */}
+        <Card className="bg-card flex flex-col justify-between border-indigo-100 shadow-sm dark:border-indigo-950/40">
+          <CardHeader className="flex flex-row items-center gap-3 border-b border-indigo-50/50 pb-3 dark:border-indigo-950/20">
+            <div className="bg-indigo-650 flex size-9 items-center justify-center rounded-xl text-white">
+              <BASE.CLOCK className="text-primary h-5 w-5" />
+            </div>
             <div>
-              <h1 className="text-2xl font-bold tracking-tight">
-                Welcome back, {user?.first_name}!
-              </h1>
-              <p className="mt-0.5 text-sm text-blue-100">
-                {user?.department_name || 'Staff Member'} ·{' '}
-                {user?.role_name === 'staff'
-                  ? 'Departmental Staff'
-                  : user?.role_name}
-              </p>
+              <CardTitle className="text-lg font-semibold">
+                Attendance Clock
+              </CardTitle>
+              <CardDescription>Log your daily working hours</CardDescription>
             </div>
-          </div>
-          <Badge className="border-none bg-white/20 px-3 py-1.5 font-medium text-white backdrop-blur-md">
-            {new Date().toLocaleDateString('en-US', { dateStyle: 'long' })}
-          </Badge>
-        </div>
-        <div className="pointer-events-none absolute top-0 right-0 -mt-16 -mr-16 h-48 w-48 rounded-full bg-white/5 blur-3xl" />
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-3">
-        {/* Time Clock Widget */}
-        <Card className="border-border bg-card flex flex-col justify-between shadow-sm md:col-span-1">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-lg font-semibold">
-              <STAFF.TIME_LOG className="h-5 w-5 text-indigo-500" />
-              Attendance Clock
-            </CardTitle>
-            <CardDescription>Log your daily working hours</CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-1 flex-col justify-center space-y-6 py-4">
-            <DynamicClock />
-
-            <div className="border-border bg-muted/40 space-y-1 rounded-lg border p-3.5 text-center">
-              {isAttendanceLoading ? (
-                <Skeleton className="mx-auto h-5 w-3/4" />
-              ) : isClockedOut ? (
-                <div className="flex flex-col items-center gap-1">
-                  <Badge
-                    variant="secondary"
-                    className="bg-muted text-muted-foreground border-none"
-                  >
-                    Shift Ended
-                  </Badge>
-                  <p className="text-muted-foreground mt-1 text-xs">
-                    Clock In: {todayAttendance.clock_in} · Clock Out:{' '}
-                    {todayAttendance.clock_out}
-                  </p>
-                </div>
-              ) : isClockedIn ? (
-                <div className="flex flex-col items-center gap-1">
-                  <Badge className="border-none bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                    Active Shift
-                  </Badge>
-                  <p className="text-muted-foreground mt-1 text-xs">
-                    Clocked in at {todayAttendance.clock_in}
-                  </p>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center gap-1">
-                  <Badge
-                    variant="outline"
-                    className="border-border text-muted-foreground"
-                  >
-                    Not Clocked In
-                  </Badge>
-                  <p className="text-muted-foreground/85 mt-1 text-xs">
-                    Ready to start your workday
-                  </p>
-                </div>
-              )}
-            </div>
+          <CardContent className="flex flex-1 flex-col justify-center py-4">
+            <DynamicClock
+              todayAttendance={todayAttendance}
+              isClockedIn={isClockedIn}
+              isClockedOut={isClockedOut}
+              isAttendanceLoading={isAttendanceLoading}
+              isClocking={isClocking}
+              handleClockAction={handleClockAction}
+            />
           </CardContent>
-          <div className="p-6 pt-0">
-            <Button
-              className="w-full font-semibold"
-              variant={isClockedIn && !isClockedOut ? 'destructive' : 'default'}
-              disabled={isClockedOut || isAttendanceLoading || isClocking}
-              onClick={handleClockAction}
-            >
-              {isClocking ? (
-                'Syncing...'
-              ) : isClockedOut ? (
-                'Shift Complete'
-              ) : isClockedIn ? (
-                <>
-                  <STAFF.LOGOUT className="mr-2 h-4 w-4" /> Clock Out
-                </>
-              ) : (
-                <>
-                  <STATUS.ACTIVE className="mr-2 h-4 w-4" /> Clock In
-                </>
-              )}
-            </Button>
-          </div>
         </Card>
 
-        {/* Dashboard Stats */}
-        <div className="grid grid-cols-2 gap-4 md:col-span-2 lg:grid-cols-4">
-          {/* Today's classes */}
-          <Card className="border-border bg-card shadow-sm">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
-                Classes Today
-              </CardTitle>
-              <div className="rounded-full bg-blue-500/10 p-2">
-                <STAFF.SUBJECTS className="h-4 w-4 text-blue-500" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              {isStatsLoading ? (
-                <Skeleton className="h-8 w-12" />
-              ) : (
-                <div className="text-foreground text-2xl font-bold">
-                  {statsData?.data?.stats?.today_classes ?? 0}
-                </div>
-              )}
-              <p className="text-muted-foreground mt-1 text-[10px]">
-                Scheduled for {dayName}
-              </p>
-            </CardContent>
-          </Card>
-
-          {/* Present Days */}
-          <Card className="border-border bg-card shadow-sm">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
-                Present Days
-              </CardTitle>
-              <div className="rounded-full bg-emerald-500/10 p-2">
-                <STAFF.ATTENDANCE className="h-4 w-4 text-emerald-500" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              {isStatsLoading ? (
-                <Skeleton className="h-8 w-12" />
-              ) : (
-                <div className="text-foreground text-2xl font-bold">
-                  {statsData?.data?.stats?.present_days ?? 0}
-                </div>
-              )}
-              <p className="text-muted-foreground mt-1 text-[10px]">
-                This current month
-              </p>
-            </CardContent>
-          </Card>
-
-          {/* Working Hours */}
-          <Card className="border-border bg-card shadow-sm">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
-                Working Hours
-              </CardTitle>
-              <div className="rounded-full bg-indigo-500/10 p-2">
-                <STAFF.TIME_LOG className="h-4 w-4 text-indigo-500" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              {isStatsLoading ? (
-                <Skeleton className="h-8 w-12" />
-              ) : (
-                <div className="text-foreground text-2xl font-bold">
-                  {statsData?.data?.stats?.total_work_hours ?? 0} hrs
-                </div>
-              )}
-              <p className="text-muted-foreground mt-1 text-[10px]">
-                This current month
-              </p>
-            </CardContent>
-          </Card>
-
-          {/* Leaves Taken */}
-          <Card className="border-border bg-card shadow-sm">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
-                Leaves Taken
-              </CardTitle>
-              <div className="rounded-full bg-purple-500/10 p-2">
-                <STAFF.LEAVE_REQUEST className="h-4 w-4 text-purple-500" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              {isStatsLoading ? (
-                <Skeleton className="h-8 w-12" />
-              ) : (
-                <div className="text-foreground text-2xl font-bold">
-                  {statsData?.data?.stats?.leave_days ?? 0}
-                </div>
-              )}
-              <p className="text-muted-foreground mt-1 text-[10px]">
-                Days absent on leave
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-
-      <div className="max-w-3xl">
-        {/* Today's Timetable */}
-        <Card className="border-border bg-card shadow-sm">
+        {/* Today's Timetable Card */}
+        <Card className="border-border bg-card flex flex-col justify-between shadow-sm">
           <CardHeader className="border-border border-b pb-3">
             <CardTitle className="flex items-center justify-between text-base font-semibold">
               <span className="flex items-center gap-2">
-                <STAFF.SCHEDULE className="h-4 w-4 text-blue-500" />
+                <STAFF.SCHEDULE className="text-primary h-4 w-4" />
                 Today's Timetable
               </span>
               <Badge
@@ -314,14 +114,14 @@ export const StaffDashboard = () => {
               </Badge>
             </CardTitle>
           </CardHeader>
-          <CardContent className="pt-4">
+          <CardContent className="flex flex-1 flex-col justify-center pt-4">
             {isScheduleLoading ? (
               <div className="space-y-3">
                 <Skeleton className="h-14 w-full" />
                 <Skeleton className="h-14 w-full" />
               </div>
             ) : todayClasses.length > 0 ? (
-              <div className="border-border relative space-y-5 border-l py-1 pl-4">
+              <div className="border-border relative my-2 space-y-5 border-l py-1 pl-4">
                 {todayClasses.map((item) => (
                   <div key={item.schedule_id} className="group relative">
                     {/* Bullet indicator */}
@@ -333,7 +133,8 @@ export const StaffDashboard = () => {
                           {item.subject_name}
                         </h4>
                         <p className="text-muted-foreground text-xs">
-                          {item.class_name} · Room {item.room || 'N/A'}
+                          {item.class_name} · {item.period_name}{' '}
+                          {item.room ? `· Room ${item.room}` : ''}
                         </p>
                       </div>
                       <Badge
@@ -348,19 +149,82 @@ export const StaffDashboard = () => {
                 ))}
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center py-8 text-center">
-                <EMPTY_STATE.NO_DATA className="mb-2.5 h-10 w-10 text-slate-300" />
-                <h3 className="text-foreground text-sm font-semibold">
-                  No Classes Today
+              <div className="flex flex-col items-center justify-center py-6 text-center">
+                <div className="mb-4 flex size-14 items-center justify-center rounded-full border border-blue-100/30 bg-blue-50/50 text-blue-500 dark:border-blue-950/30 dark:bg-blue-950/20">
+                  <STAFF.SCHEDULE className="size-6 text-blue-600 dark:text-blue-400" />
+                </div>
+                <h3 className="text-foreground text-base font-bold">
+                  No classes scheduled for today
                 </h3>
-                <p className="text-muted-foreground mt-0.5 max-w-65 text-xs">
-                  You have no teaching or duty sessions scheduled for today.
-                  Enjoy!
+                <p className="text-muted-foreground mt-1 max-w-72 text-xs leading-relaxed">
+                  Enjoy your free time or prepare for upcoming classes.
                 </p>
               </div>
             )}
           </CardContent>
         </Card>
+      </div>
+
+      {/* Quick Actions Section (Full width) */}
+      <div className="space-y-3.5">
+        <h2 className="text-foreground text-base font-bold tracking-tight">
+          Quick Actions
+        </h2>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            {
+              title: 'View My Schedule',
+              desc: 'See your upcoming classes',
+              to: '/staff/schedule',
+              Icon: STAFF.SCHEDULE,
+              iconClass: 'bg-blue-500/10 text-blue-500',
+            },
+            {
+              title: 'Apply for Leave',
+              desc: 'Submit leave requests',
+              to: '/staff/attendance',
+              Icon: STAFF.LEAVE_REQUEST,
+              iconClass: 'bg-emerald-500/10 text-emerald-500',
+            },
+            {
+              title: 'Attendance Records',
+              desc: 'View attendance history',
+              to: '/staff/attendance',
+              Icon: STAFF.ATTENDANCE,
+              iconClass: 'bg-indigo-500/10 text-indigo-500',
+            },
+            {
+              title: 'Update Profile',
+              desc: 'Manage your profile',
+              to: '/staff/profile',
+              Icon: STAFF.PROFILE,
+              iconClass: 'bg-purple-500/10 text-purple-500',
+            },
+          ].map((action) => (
+            <Link
+              key={action.title}
+              to={action.to}
+              className="bg-card border-border hover:bg-muted/30 group flex cursor-pointer items-center gap-4 rounded-xl border p-4.5 shadow-xs transition-all duration-200"
+            >
+              <div
+                className={cn(
+                  'flex size-10 shrink-0 items-center justify-center rounded-xl transition-colors',
+                  action.iconClass
+                )}
+              >
+                <action.Icon className="size-5" />
+              </div>
+              <div className="flex min-w-0 flex-col leading-tight">
+                <span className="text-foreground group-hover:text-primary text-sm font-semibold tracking-tight transition-colors">
+                  {action.title}
+                </span>
+                <span className="text-muted-foreground mt-0.5 truncate text-[11px]">
+                  {action.desc}
+                </span>
+              </div>
+            </Link>
+          ))}
+        </div>
       </div>
     </div>
   );

@@ -29,6 +29,7 @@ bun-debug.log*
 dist/
 build/
 out/
+ui/
 
 # Caches
 .cache/

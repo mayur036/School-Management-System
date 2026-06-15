@@ -42,7 +42,7 @@ const config = {
         {
           to: '/school/schedules',
           label: 'Staff Timetable',
-          Icon: SCHOOL_ADMIN.ATTENDANCE,
+          Icon: SCHOOL_ADMIN.TIMETABLE,
         },
         {
           to: '/school/leaves',

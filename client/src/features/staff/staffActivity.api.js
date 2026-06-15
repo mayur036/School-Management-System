@@ -98,37 +98,6 @@ export const staffActivityApi = baseApi.injectEndpoints({
         { type: 'StaffLeave', id: 'LIST' },
       ],
     }),
-
-    createStaffSchedule: builder.mutation({
-      query: (data) => ({
-        url: '/school-admin/schedules',
-        method: 'POST',
-        data,
-      }),
-      invalidatesTags: [{ type: 'StaffSchedule', id: 'LIST' }],
-    }),
-
-    listSchoolSchedules: builder.query({
-      query: () => ({ url: '/school-admin/schedules', method: 'GET' }),
-      providesTags: (result) =>
-        result?.data?.schedules
-          ? [
-              ...result.data.schedules.map((s) => ({
-                type: 'StaffSchedule',
-                id: s.schedule_id,
-              })),
-              { type: 'StaffSchedule', id: 'LIST' },
-            ]
-          : [{ type: 'StaffSchedule', id: 'LIST' }],
-    }),
-
-    deleteStaffSchedule: builder.mutation({
-      query: (id) => ({
-        url: `/school-admin/schedules/${id}`,
-        method: 'DELETE',
-      }),
-      invalidatesTags: [{ type: 'StaffSchedule', id: 'LIST' }],
-    }),
   }),
 });
 
@@ -144,7 +113,4 @@ export const {
   // School Admin Management
   useListSchoolLeaveRequestsQuery,
   useReviewLeaveRequestMutation,
-  useCreateStaffScheduleMutation,
-  useListSchoolSchedulesQuery,
-  useDeleteStaffScheduleMutation,
 } = staffActivityApi;

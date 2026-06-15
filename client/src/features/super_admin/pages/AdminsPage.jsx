@@ -91,6 +91,10 @@ const AdminsPage = () => {
             Manage administrators across all registered schools.
           </p>
         </div>
+        <Button className="bg-primary hover:bg-primary/90 w-fit cursor-pointer gap-2 rounded-xl font-semibold text-white shadow-sm">
+          <BASE.PLUS className="size-4" />
+          Register Admin
+        </Button>
       </div>
 
       {/* ── Stats Summary Grid ────────────────────────────────── */}

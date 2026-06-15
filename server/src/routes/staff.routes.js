@@ -1,6 +1,10 @@
 import { Router } from 'express';
 
 import {
+  getSchoolSettings,
+  listPeriods,
+} from '../controllers/schedule.controller.js';
+import {
   changeMyPassword,
   createStaff,
   getMyProfile,
@@ -60,6 +64,8 @@ router.get(
   getStaffDashboardStats
 );
 router.get('/me/schedule', protect, authorize('staff'), getStaffSchedule);
+router.get('/me/periods', protect, authorize('staff'), listPeriods);
+router.get('/me/settings', protect, authorize('staff'), getSchoolSettings);
 router.get('/me/attendance', protect, authorize('staff'), getStaffAttendance);
 router.post(
   '/me/attendance/clock',

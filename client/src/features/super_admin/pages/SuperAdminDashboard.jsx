@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { useAuth } from '@/hooks/useAuth';
+import WelcomeBanner from '@/components/shared/WelcomeBanner';
 
 import RecentSchools from '../components/dashboard/RecentSchools';
 import SchoolsGrowthChart from '../components/dashboard/SchoolsGrowthChart';
@@ -16,8 +16,6 @@ import {
 } from '../utils/dashboard.utils';
 
 export const SuperAdminDashboard = () => {
-  const { user } = useAuth();
-
   const { data: schoolsData, isLoading: schoolsLoading } = useGetSchoolsQuery();
   const { data: adminsData, isLoading: adminsLoading } =
     useGetSchoolAdminsQuery();
@@ -39,15 +37,8 @@ export const SuperAdminDashboard = () => {
 
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
-      {/* Greeting header */}
-      <div>
-        <h1 className="text-foreground text-2xl font-bold tracking-tight sm:text-3xl">
-          Welcome back{user?.first_name ? `, ${user.first_name}` : ''}
-        </h1>
-        <p className="text-muted-foreground mt-1 text-sm">
-          Here's an overview of the platform's schools and admins.
-        </p>
-      </div>
+      {/* Welcome Banner */}
+      <WelcomeBanner />
 
       {/* KPI cards */}
       <SuperAdminStatCards stats={stats} isLoading={isLoading} />

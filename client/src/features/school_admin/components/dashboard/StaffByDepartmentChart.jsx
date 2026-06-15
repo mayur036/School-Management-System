@@ -1,4 +1,4 @@
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts';
+import { Bar, BarChart, CartesianGrid, Cell, XAxis, YAxis } from 'recharts';
 
 import {
   Card,
@@ -40,17 +40,11 @@ const StaffByDepartmentChart = ({ data = [], isLoading }) => (
           config={chartConfig}
           className="aspect-auto h-65 w-full"
         >
-          <AreaChart
+          <BarChart
             accessibilityLayer
             data={data}
             margin={{ left: -16, right: 16, top: 12, bottom: 0 }}
           >
-            <defs>
-              <linearGradient id="fillCount" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#6366f1" stopOpacity={0.4} />
-                <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
-              </linearGradient>
-            </defs>
             <CartesianGrid
               vertical={false}
               strokeDasharray="3 3"
@@ -71,27 +65,18 @@ const StaffByDepartmentChart = ({ data = [], isLoading }) => (
               fontSize={12}
             />
             <ChartTooltip
-              cursor={{
-                stroke: '#6366f1',
-                strokeWidth: 1,
-                strokeDasharray: '4 4',
-              }}
-              content={<ChartTooltipContent indicator="line" />}
+              cursor={{ fill: 'var(--color-muted)', opacity: 0.15 }}
+              content={<ChartTooltipContent indicator="dashed" />}
             />
-            <Area
-              type="monotone"
-              dataKey="count"
-              stroke="#6366f1"
-              strokeWidth={3}
-              fill="url(#fillCount)"
-              activeDot={{
-                r: 6,
-                fill: '#6366f1',
-                stroke: '#fff',
-                strokeWidth: 2,
-              }}
-            />
-          </AreaChart>
+            <Bar dataKey="count" fill="#6366f1" radius={[4, 4, 0, 0]}>
+              {data.map((entry, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={entry.count > 0 ? '#6366f1' : '#e2e8f0'}
+                />
+              ))}
+            </Bar>
+          </BarChart>
         </ChartContainer>
       )}
     </CardContent>

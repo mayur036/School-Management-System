@@ -50,35 +50,8 @@ const staffActivityModel = {
       reviewedBy,
     ]),
 
-  createStaffSchedule: (
-    schoolId,
-    staffId,
-    subjectName,
-    className,
-    dayOfWeek,
-    startTime,
-    endTime,
-    room
-  ) =>
-    callProcedureOne('sp_create_staff_schedule', [
-      schoolId,
-      staffId,
-      subjectName,
-      className,
-      dayOfWeek,
-      startTime,
-      endTime,
-      room,
-    ]),
-
   listSchoolTasks: (schoolId) =>
     callProcedure('sp_list_school_tasks', [schoolId]),
-
-  listSchoolSchedules: (schoolId) =>
-    callProcedure('sp_list_school_schedules', [schoolId]),
-
-  deleteStaffSchedule: (scheduleId, schoolId) =>
-    callProcedure('sp_delete_staff_schedule', [scheduleId, schoolId]),
 
   deleteStaffTask: (taskId, schoolId) =>
     callProcedure('sp_delete_staff_task', [taskId, schoolId]),

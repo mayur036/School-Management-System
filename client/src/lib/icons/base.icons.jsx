@@ -39,6 +39,7 @@ import {
   List,
   Loader2,
   Lock,
+  LogIn,
   LogOut,
   Mail,
   Menu,
@@ -137,6 +138,7 @@ export const BASE = {
 
   // Auth / Security
   LOCK: Lock,
+  LOGIN: LogIn,
   LOGOUT: LogOut,
 
   // Files
