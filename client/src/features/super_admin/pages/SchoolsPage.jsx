@@ -18,6 +18,7 @@ import { ACTIONS, BASE } from '@/lib/icons';
 
 import CreateSchoolAdminDialog from '../components/schools/CreateSchoolAdminDialog';
 import CreateSchoolDialog from '../components/schools/CreateSchoolDialog';
+import EditSchoolDialog from '../components/schools/EditSchoolDialog';
 import SchoolsTable from '../components/schools/SchoolsTable';
 import SchoolStatusToggle from '../components/schools/SchoolStatusToggle';
 import SuperAdminSchoolStatCards from '../components/schools/SuperAdminSchoolStatCards';
@@ -32,6 +33,7 @@ const SchoolsPage = () => {
   // Dialog states
   const [statusSchool, setStatusSchool] = useState(null);
   const [adminSchool, setAdminSchool] = useState(null);
+  const [editSchool, setEditSchool] = useState(null);
   const [createOpen, setCreateOpen] = useState(false);
 
   // Real-time headline stats
@@ -180,6 +182,7 @@ const SchoolsPage = () => {
           isLoading={isLoading}
           onToggleStatus={setStatusSchool}
           onAddAdmin={setAdminSchool}
+          onEditSchool={setEditSchool}
         />
 
         {!isLoading && (
@@ -198,6 +201,10 @@ const SchoolsPage = () => {
       <CreateSchoolDialog
         externalOpen={createOpen}
         onExternalOpenChange={setCreateOpen}
+      />
+      <EditSchoolDialog
+        school={editSchool}
+        onClose={() => setEditSchool(null)}
       />
       <SchoolStatusToggle
         school={statusSchool}

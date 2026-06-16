@@ -52,3 +52,44 @@ export const createSchoolAdminSchema = z.object({
       .regex(/^\d{10}$/, 'Phone number must be exactly 10 digits'),
   }),
 });
+
+export const updateSchoolSchema = z.object({
+  body: z.object({
+    name: z.string().trim().min(1, 'Name cannot be empty').max(150).optional(),
+    email: z.string().trim().email('Invalid email address').max(150).optional(),
+    phone: z
+      .string()
+      .trim()
+      .regex(/^\d{10}$/, 'Phone number must be exactly 10 digits')
+      .optional()
+      .nullable(),
+    address: z
+      .string()
+      .trim()
+      .min(1, 'Address cannot be empty')
+      .max(255)
+      .optional(),
+  }),
+});
+
+export const updateSchoolBySuperSchema = z.object({
+  params: z.object({ id: idParam }),
+  body: z.object({
+    name: z.string().trim().min(1, 'Name cannot be empty').max(150).optional(),
+    code: z.string().trim().min(1, 'Code cannot be empty').max(30).optional(),
+    email: z.string().trim().email('Invalid email address').max(150).optional(),
+    phone: z
+      .string()
+      .trim()
+      .regex(/^\d{10}$/, 'Phone number must be exactly 10 digits')
+      .optional()
+      .nullable(),
+    address: z
+      .string()
+      .trim()
+      .min(1, 'Address cannot be empty')
+      .max(255)
+      .optional(),
+    status: z.enum(['active', 'inactive']).optional(),
+  }),
+});

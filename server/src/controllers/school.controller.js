@@ -116,10 +116,72 @@ const createSchoolAdmin = asyncHandler(async (req, res) => {
   return created(res, { admin }, 'School admin created successfully');
 });
 
+/**
+ * @desc    Get operational details of current admin's school
+ * @route   GET /api/school-admin/settings/school
+ * @access  Private (school_admin)
+ */
+const getSchoolDetails = asyncHandler(async (req, res) => {
+  const schoolId = req.user.school_id;
+  const school = await schoolModel.getSchool(schoolId);
+  if (!school) {
+    throw new ApiError(404, 'School not found');
+  }
+  return ok(res, { school }, 'School details retrieved successfully');
+});
+
+/**
+ * @desc    Update operational details of current admin's school
+ * @route   PUT /api/school-admin/settings/school
+ * @access  Private (school_admin)
+ */
+const updateSchoolDetails = asyncHandler(async (req, res) => {
+  const schoolId = req.user.school_id;
+  const { name, email, phone, address } = req.body;
+
+  const school = await schoolModel.updateSchool(schoolId, {
+    name,
+    email,
+    phone,
+    address,
+  });
+
+  return ok(res, { school }, 'School profile updated successfully');
+});
+
+/**
+ * @desc    Super admin full update of a school
+ * @route   PUT /api/schools/:id
+ * @access  Private (super_admin)
+ */
+const updateSchoolBySuper = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { name, code, email, phone, address, status } = req.body;
+
+  const existing = await schoolModel.getSchool(id);
+  if (!existing) {
+    throw new ApiError(404, 'School not found');
+  }
+
+  const school = await schoolModel.updateSchoolBySuper(id, {
+    name,
+    code,
+    email,
+    phone,
+    address,
+    status,
+  });
+
+  return ok(res, { school }, 'School details updated successfully');
+});
+
 export {
   createSchool,
   createSchoolAdmin,
   getSchool,
+  getSchoolDetails,
   listSchools,
+  updateSchoolBySuper,
+  updateSchoolDetails,
   updateSchoolStatus,
 };

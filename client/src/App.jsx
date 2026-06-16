@@ -55,6 +55,9 @@ const SchoolAdminSchedulesPage = lazy(
 const SchoolAdminLeavesPage = lazy(
   () => import('./features/school_admin/pages/LeavesPage')
 );
+const SchoolSettingsPage = lazy(
+  () => import('./features/school_admin/pages/SchoolSettingsPage')
+);
 
 // Staff
 const StaffDashboard = lazy(
@@ -114,6 +117,7 @@ const router = createBrowserRouter([
               { path: 'schedules', element: <SchoolAdminSchedulesPage /> },
               { path: 'leaves', element: <SchoolAdminLeavesPage /> },
               { path: 'profile', element: <ProfileView /> },
+              { path: 'settings', element: <SchoolSettingsPage /> },
             ],
           },
         ],

@@ -5,6 +5,7 @@ import {
   createSchoolAdmin,
   getSchool,
   listSchools,
+  updateSchoolBySuper,
   updateSchoolStatus,
 } from '../controllers/school.controller.js';
 import { protect } from '../middleware/auth.js';
@@ -14,6 +15,7 @@ import {
   createSchoolAdminSchema,
   createSchoolSchema,
   schoolIdSchema,
+  updateSchoolBySuperSchema,
   updateSchoolStatusSchema,
 } from '../schema/school.schema.js';
 
@@ -26,7 +28,10 @@ router
   .post(validate(createSchoolSchema), createSchool)
   .get(listSchools);
 
-router.get('/:id', validate(schoolIdSchema), getSchool);
+router
+  .route('/:id')
+  .get(validate(schoolIdSchema), getSchool)
+  .put(validate(updateSchoolBySuperSchema), updateSchoolBySuper);
 
 router.patch(
   '/:id/status',

@@ -50,7 +50,13 @@ const SkeletonRows = ({ count = 5 }) =>
 
 // ── Main table ────────────────────────────────────────────────
 
-const SchoolsTable = ({ schools, isLoading, onToggleStatus, onAddAdmin }) => {
+const SchoolsTable = ({
+  schools,
+  isLoading,
+  onToggleStatus,
+  onAddAdmin,
+  onEditSchool,
+}) => {
   if (isLoading) {
     return (
       <div className="overflow-x-auto rounded-lg border">
@@ -155,6 +161,16 @@ const SchoolsTable = ({ schools, isLoading, onToggleStatus, onAddAdmin }) => {
                       >
                         <SUPER_ADMIN.CREATE_ADMIN data-icon="inline-start" />
                         Add Admin
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="cursor-pointer gap-2"
+                        onClick={() => onEditSchool(school)}
+                      >
+                        <BASE.EDIT
+                          className="text-muted-foreground size-4"
+                          data-icon="inline-start"
+                        />
+                        Edit Details
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         className="cursor-pointer gap-2"

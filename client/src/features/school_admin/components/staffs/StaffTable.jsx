@@ -1,4 +1,3 @@
-
 import EmptyTableState from '@/components/shared/EmptyTableState';
 import StatusBadge, { DepartmentBadge } from '@/components/shared/StatusBadge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -24,7 +23,6 @@ import {
 } from '@/components/ui/table';
 import { BASE, EMPTY_STATE, SCHOOL_ADMIN } from '@/lib/icons';
 import { formatDate, formatStaffId, getInitials } from '@/lib/utils';
-
 
 // ── Skeleton rows (loading state) ─────────────────────────────
 

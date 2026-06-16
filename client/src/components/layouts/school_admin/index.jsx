@@ -55,6 +55,11 @@ const config = {
       label: 'Account',
       items: [
         { to: '/school/profile', label: 'Profile', Icon: SCHOOL_ADMIN.PROFILE },
+        {
+          to: '/school/settings',
+          label: 'School Settings',
+          Icon: SCHOOL_ADMIN.SETTINGS,
+        },
       ],
     },
   ],

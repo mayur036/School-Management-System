@@ -44,6 +44,18 @@ export const schoolsApi = baseApi.injectEndpoints({
       ],
     }),
 
+    updateSchool: builder.mutation({
+      query: ({ id, ...data }) => ({
+        url: `/schools/${id}`,
+        method: 'PUT',
+        data,
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: 'School', id },
+        { type: 'School', id: 'LIST' },
+      ],
+    }),
+
     // ── School Admins ────────────────────────────────────────
 
     createSchoolAdmin: builder.mutation({
@@ -66,5 +78,6 @@ export const {
   useGetSchoolQuery,
   useCreateSchoolMutation,
   useUpdateSchoolStatusMutation,
+  useUpdateSchoolMutation,
   useCreateSchoolAdminMutation,
 } = schoolsApi;

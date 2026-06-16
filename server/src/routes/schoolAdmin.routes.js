@@ -14,6 +14,10 @@ import {
   updateWorkingDays,
 } from '../controllers/schedule.controller.js';
 import {
+  getSchoolDetails,
+  updateSchoolDetails,
+} from '../controllers/school.controller.js';
+import {
   assignTaskToStaff,
   deleteStaffTask,
   listSchoolLeaveRequests,
@@ -33,6 +37,7 @@ import {
   updateScheduleSchema,
   updateWorkingDaysSchema,
 } from '../schema/schedule.schema.js';
+import { updateSchoolSchema } from '../schema/school.schema.js';
 import {
   assignTaskSchema,
   reviewLeaveSchema,
@@ -43,6 +48,12 @@ const router = Router();
 
 // Protect all routes below and restrict them to school_admin
 router.use(protect, authorize('school_admin'));
+
+// School operational settings
+router
+  .route('/settings/school')
+  .get(getSchoolDetails)
+  .put(validate(updateSchoolSchema), updateSchoolDetails);
 
 // Timetable periods management
 router

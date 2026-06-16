@@ -67,8 +67,6 @@ export const SchedulesPage = () => {
   const settings = settingsData?.data?.settings || {};
   const schedules = schedulesData?.data?.schedules || [];
 
-  console.log({ settings });
-
   const workingDays = settings.working_days
     ? settings.working_days.split(',').map((d) => d.trim())
     : ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];

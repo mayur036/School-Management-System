@@ -704,6 +704,52 @@ BEGIN
   SELECT school_id, working_days FROM schools WHERE school_id = p_school_id;
 END $$
 
+-- sp_update_school : update operational details for a school
+DROP PROCEDURE IF EXISTS sp_update_school $$
+CREATE PROCEDURE sp_update_school(
+  IN p_school_id INT,
+  IN p_name      VARCHAR(150),
+  IN p_email     VARCHAR(150),
+  IN p_phone     VARCHAR(20),
+  IN p_address   VARCHAR(255)
+)
+BEGIN
+  UPDATE schools
+  SET
+    name = COALESCE(p_name, name),
+    email = COALESCE(p_email, email),
+    phone = COALESCE(p_phone, phone),
+    address = COALESCE(p_address, address)
+  WHERE school_id = p_school_id;
+
+  SELECT * FROM schools WHERE school_id = p_school_id;
+END $$
+
+-- sp_update_school_by_super : super admin full override
+DROP PROCEDURE IF EXISTS sp_update_school_by_super $$
+CREATE PROCEDURE sp_update_school_by_super(
+  IN p_school_id INT,
+  IN p_name      VARCHAR(150),
+  IN p_code      VARCHAR(30),
+  IN p_email     VARCHAR(150),
+  IN p_phone     VARCHAR(20),
+  IN p_address   VARCHAR(255),
+  IN p_status    ENUM('active','inactive')
+)
+BEGIN
+  UPDATE schools
+  SET
+    name = COALESCE(p_name, name),
+    code = COALESCE(p_code, code),
+    email = COALESCE(p_email, email),
+    phone = COALESCE(p_phone, phone),
+    address = COALESCE(p_address, address),
+    status = COALESCE(p_status, status)
+  WHERE school_id = p_school_id;
+
+  SELECT * FROM schools WHERE school_id = p_school_id;
+END $$
+
 -- ============================================================
 -- SCHOOL ADMIN STAFF MANAGEMENT
 -- ============================================================

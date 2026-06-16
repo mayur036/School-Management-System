@@ -21,6 +21,29 @@ const schoolModel = {
   updateSchoolStatus: (schoolId, status) =>
     callProcedureOne('sp_update_school_status', [schoolId, status]),
 
+  updateSchool: (schoolId, { name, email, phone, address }) =>
+    callProcedureOne('sp_update_school', [
+      schoolId,
+      name ?? null,
+      email ?? null,
+      phone ?? null,
+      address ?? null,
+    ]),
+
+  updateSchoolBySuper: (
+    schoolId,
+    { name, code, email, phone, address, status }
+  ) =>
+    callProcedureOne('sp_update_school_by_super', [
+      schoolId,
+      name ?? null,
+      code ?? null,
+      email ?? null,
+      phone ?? null,
+      address ?? null,
+      status ?? null,
+    ]),
+
   createSchoolAdmin: ({
     schoolId,
     firstName,
