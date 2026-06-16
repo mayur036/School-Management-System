@@ -29,14 +29,17 @@ export const StaffDashboard = () => {
 
   // API Queries
   const { data: statsData, isLoading: isStatsLoading } =
-    useGetStaffDashboardStatsQuery();
+    useGetStaffDashboardStatsQuery(undefined, { pollingInterval: 30000 });
   const { data: scheduleData, isLoading: isScheduleLoading } =
-    useGetStaffScheduleQuery();
+    useGetStaffScheduleQuery(undefined, { pollingInterval: 30000 });
   const { data: attendanceData, isLoading: isAttendanceLoading } =
-    useGetStaffAttendanceQuery({
-      startDate: todayStr,
-      endDate: todayStr,
-    });
+    useGetStaffAttendanceQuery(
+      {
+        startDate: todayStr,
+        endDate: todayStr,
+      },
+      { pollingInterval: 30000 }
+    );
 
   // API Mutations
   const [clockInOut, { isLoading: isClocking }] = useClockInOutMutation();

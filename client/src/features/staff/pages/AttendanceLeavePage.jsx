@@ -85,7 +85,7 @@ export const AttendanceLeavePage = () => {
       endDate,
     });
   const { data: leavesData, isLoading: isLeavesLoading } =
-    useGetStaffLeavesQuery();
+    useGetStaffLeavesQuery(undefined, { pollingInterval: 30000 });
 
   const attendance = useMemo(
     () => attendanceData?.data?.attendance || [],

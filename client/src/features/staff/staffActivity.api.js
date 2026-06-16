@@ -5,7 +5,11 @@ export const staffActivityApi = baseApi.injectEndpoints({
     // --- Staff Portal Queries/Mutations ---
     getStaffDashboardStats: builder.query({
       query: () => ({ url: '/staff/me/dashboard-stats', method: 'GET' }),
-      providesTags: ['StaffSchedule', 'StaffAttendance', 'StaffLeave'],
+      providesTags: [
+        { type: 'StaffSchedule', id: 'LIST' },
+        { type: 'StaffAttendance', id: 'LIST' },
+        { type: 'StaffLeave', id: 'LIST' },
+      ],
     }),
 
     getStaffSchedule: builder.query({

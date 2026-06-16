@@ -4,7 +4,16 @@ export const schoolAdminsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getSchoolAdmins: builder.query({
       query: () => ({ url: '/school-admins', method: 'GET' }),
-      providesTags: ['SchoolAdmin'],
+      providesTags: (result) =>
+        result?.data?.admins
+          ? [
+              ...result.data.admins.map((a) => ({
+                type: 'SchoolAdmin',
+                id: a.staff_id,
+              })),
+              { type: 'SchoolAdmin', id: 'LIST' },
+            ]
+          : [{ type: 'SchoolAdmin', id: 'LIST' }],
     }),
     updateSchoolAdminStatus: builder.mutation({
       query: ({ id, status }) => ({
@@ -12,14 +21,20 @@ export const schoolAdminsApi = baseApi.injectEndpoints({
         method: 'PATCH',
         data: { status },
       }),
-      invalidatesTags: ['SchoolAdmin'],
+      invalidatesTags: (result, error, { id }) => [
+        { type: 'SchoolAdmin', id },
+        { type: 'SchoolAdmin', id: 'LIST' },
+      ],
     }),
     deleteSchoolAdmin: builder.mutation({
       query: (id) => ({
         url: `/school-admins/${id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: ['SchoolAdmin'],
+      invalidatesTags: (result, error, id) => [
+        { type: 'SchoolAdmin', id },
+        { type: 'SchoolAdmin', id: 'LIST' },
+      ],
     }),
   }),
 });

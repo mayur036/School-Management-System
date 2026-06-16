@@ -46,7 +46,9 @@ const getSessionStatus = (session, day) => {
 };
 
 export const SchedulePage = () => {
-  const { data, isLoading } = useGetStaffScheduleQuery();
+  const { data, isLoading } = useGetStaffScheduleQuery(undefined, {
+    pollingInterval: 30000,
+  });
   const schedule = data?.data?.schedule || [];
 
   // Current day of the week to highlight
@@ -150,7 +152,7 @@ export const SchedulePage = () => {
                         return (
                           <div
                             key={session.schedule_id}
-                            className={`group relative space-y-1 rounded-r-md border-l-2 py-1.5 px-2 transition-colors ${
+                            className={`group relative space-y-1 rounded-r-md border-l-2 px-2 py-1.5 transition-colors ${
                               status === 'current'
                                 ? 'border-red-500 bg-red-500/5 dark:bg-red-950/10'
                                 : status === 'upcoming'

@@ -43,7 +43,10 @@ export const scheduleApi = baseApi.injectEndpoints({
         url: `/school-admin/schedules/periods/${id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: [{ type: 'SchoolPeriod', id: 'LIST' }],
+      invalidatesTags: (result, error, id) => [
+        { type: 'SchoolPeriod', id },
+        { type: 'SchoolPeriod', id: 'LIST' },
+      ],
     }),
 
     // --- School Settings / Working Days (Admin) ---
@@ -117,7 +120,10 @@ export const scheduleApi = baseApi.injectEndpoints({
         url: `/school-admin/schedules/${id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: [{ type: 'StaffSchedule', id: 'LIST' }],
+      invalidatesTags: (result, error, id) => [
+        { type: 'StaffSchedule', id },
+        { type: 'StaffSchedule', id: 'LIST' },
+      ],
     }),
 
     bulkCreateStaffSchedules: builder.mutation({

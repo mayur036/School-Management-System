@@ -59,7 +59,7 @@ export const LeavesPage = () => {
 
   // Queries
   const { data: leavesData, isLoading: isLeavesLoading } =
-    useListSchoolLeaveRequestsQuery();
+    useListSchoolLeaveRequestsQuery(undefined, { pollingInterval: 30000 });
 
   // Mutations
   const [reviewLeave, { isLoading: isSubmitting }] =

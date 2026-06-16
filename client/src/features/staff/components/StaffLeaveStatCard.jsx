@@ -4,6 +4,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { STATS } from '@/lib/icons';
 
 const StaffLeaveStatCard = ({ stats = {}, isLoading }) => {
+  console.log(stats);
   const items = [
     {
       label: 'Total Leaves',
@@ -15,25 +16,25 @@ const StaffLeaveStatCard = ({ stats = {}, isLoading }) => {
     },
     {
       label: 'Annual Leaves',
-      value: stats?.annual_leaves ?? '18 / 18 days',
+      value: stats?.annual_leaves ?? '12 / 12 days',
       Icon: STATS.ANNUAL_LEAVES,
-      subtext: 'Annual leaves balance',
+      subtext: 'Annual leaves taken',
       accentClassName: 'border-yellow-500',
       iconChipClassName: 'bg-yellow-500/10 text-yellow-500',
     },
     {
       label: 'Casual Leaves',
-      value: stats?.casual_leaves ?? '12 / 12 days',
+      value: stats?.casual_leaves ?? '5 / 5 days',
       Icon: STATS.CASUAL_LEAVES,
-      subtext: 'Casual leaves balance',
+      subtext: 'Casual leaves taken',
       accentClassName: 'border-orange-500',
       iconChipClassName: 'bg-orange-500/10 text-orange-500',
     },
     {
       label: 'Sick Leaves',
-      value: stats?.sick_leaves ?? '12 / 12 days',
+      value: stats?.sick_leaves ?? '4 / 4 days',
       Icon: STATS.SICK_LEAVES,
-      subtext: 'Sick leaves balance',
+      subtext: 'Sick leaves taken',
       accentClassName: 'border-red-500',
       iconChipClassName: 'bg-red-500/10 text-red-500',
     },

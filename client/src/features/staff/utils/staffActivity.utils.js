@@ -5,6 +5,8 @@ export const computeStaffLeavesStats = (leaves = []) => {
   let casualUsed = 0;
   let sickUsed = 0;
 
+  console.log(leaves);
+
   leaves.forEach((leave) => {
     if (leave.status === 'approved') {
       const days = Number(leave.total_days ?? 0);
@@ -23,12 +25,16 @@ export const computeStaffLeavesStats = (leaves = []) => {
   const casualRemaining = Math.max(0, LEAVE_BALANCE.casual.total - casualUsed);
   const sickRemaining = Math.max(0, LEAVE_BALANCE.sick.total - sickUsed);
 
+  console.log({ sickUsed, annualUsed, casualUsed });
+  console.log({ sickRemaining, annualRemaining, casualRemaining });
   return {
-    total: leaves.reduce((acc, l) => acc + Number(l.total_days ?? 0), 0),
+    total: leaves
+      .filter((l) => l.status === 'approved')
+      .reduce((acc, l) => acc + Number(l.total_days ?? 0), 0),
     approved: leaves.filter((l) => l.status === 'approved').length,
-    annual_leaves: `${annualRemaining} / ${LEAVE_BALANCE.annual.total} days`,
-    casual_leaves: `${casualRemaining} / ${LEAVE_BALANCE.casual.total} days`,
-    sick_leaves: `${sickRemaining} / ${LEAVE_BALANCE.sick.total} days`,
+    annual_leaves: `${annualUsed} / ${LEAVE_BALANCE.annual.total} days`,
+    casual_leaves: `${casualUsed} / ${LEAVE_BALANCE.casual.total} days`,
+    sick_leaves: `${sickUsed} / ${LEAVE_BALANCE.sick.total} days`,
   };
 };
 

@@ -55,6 +55,7 @@ export const schoolsApi = baseApi.injectEndpoints({
       invalidatesTags: (result, error, { schoolId }) => [
         { type: 'School', id: schoolId },
         { type: 'School', id: 'LIST' },
+        { type: 'SchoolAdmin', id: 'LIST' },
       ],
     }),
   }),

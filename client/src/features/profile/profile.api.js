@@ -11,6 +11,7 @@ export const profileApi = baseApi.injectEndpoints({
         method: 'PATCH',
         data: formData,
       }),
+      invalidatesTags: ['User'],
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
@@ -27,6 +28,7 @@ export const profileApi = baseApi.injectEndpoints({
         method: 'PATCH',
         data: profileData,
       }),
+      invalidatesTags: ['User'],
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;

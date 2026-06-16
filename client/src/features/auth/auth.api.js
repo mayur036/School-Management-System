@@ -15,6 +15,7 @@ export const authApi = baseApi.injectEndpoints({
           const { data } = await queryFulfilled;
           // API returns { success, message, data: { user } }
           dispatch(setCredentials({ user: data.data.user }));
+          dispatch(baseApi.util.resetApiState());
         } catch {
           // surfaced to the caller via unwrap()
         }
