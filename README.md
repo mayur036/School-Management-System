@@ -12,11 +12,13 @@ For the full architecture and phase-by-phase roadmap, see [PROJECT_PLAN.md](PROJ
 ## ✨ Features
 
 ### Super Admin
+
 - Register and manage schools (create, activate/deactivate)
 - Create and manage school admins (create, list, toggle status, delete)
 - Dashboard with platform-wide statistics and charts (recharts)
 
 ### School Admin
+
 - Create and manage departments (with status toggle)
 - Register staff (single or batch registration with welcome emails)
 - Enable/disable staff status
@@ -26,6 +28,7 @@ For the full architecture and phase-by-phase roadmap, see [PROJECT_PLAN.md](PROJ
 - Dashboard with school-level analytics
 
 ### Staff Portal
+
 - View personalized dashboard (today's classes, pending tasks, attendance stats, work hours)
 - Clock in/out with automated status detection (present, late, half-day)
 - View weekly schedule/timetable
@@ -34,6 +37,7 @@ For the full architecture and phase-by-phase roadmap, see [PROJECT_PLAN.md](PROJ
 - View and update assigned tasks
 
 ### All Roles
+
 - Secure login with JWT (httpOnly cookie)
 - Forgot/reset password via email
 - View and edit profile (name, phone)
@@ -43,11 +47,11 @@ For the full architecture and phase-by-phase roadmap, see [PROJECT_PLAN.md](PROJ
 
 ## 🧱 Roles at a glance
 
-| Role           | Can do                                                                      |
-| -------------- | --------------------------------------------------------------------------- |
-| `super_admin`  | Create/manage schools, create/manage school admins, platform analytics      |
+| Role           | Can do                                                                             |
+| -------------- | ---------------------------------------------------------------------------------- |
+| `super_admin`  | Create/manage schools, create/manage school admins, platform analytics             |
 | `school_admin` | Create departments, register/manage staff, assign tasks, manage schedules & leaves |
-| `staff`        | Clock in/out, view schedule, request leave, update tasks, manage profile     |
+| `staff`        | Clock in/out, view schedule, request leave, update tasks, manage profile           |
 
 ---
 
@@ -108,8 +112,8 @@ The client runs on Vite's dev server (port 5173) and talks to the backend via `V
 
 ### 4. Default credentials
 
-| Role | Email | Password |
-|------|-------|----------|
+| Role        | Email                | Password    |
+| ----------- | -------------------- | ----------- |
 | Super Admin | `superadmin@sms.com` | `Admin@123` |
 
 > Change the password after first login.
@@ -132,6 +136,7 @@ React Frontend (RTK Query) ──► Express Router ──► Auth Middleware �
 ```
 
 Key architectural decisions:
+
 - **Stored procedures only** — no inline SQL in application code
 - **Unified staff table** — all users (super admin, school admin, staff) in one table
 - **Tenant scoping** — school_id always derived from JWT, never from request body
@@ -144,16 +149,16 @@ Key architectural decisions:
 
 Development follows the phases in [PROJECT_PLAN.md](PROJECT_PLAN.md):
 
-| Phase | Description | Status |
-|-------|-------------|--------|
-| 0–2 | Setup, Database, DB Connection | ✅ Complete |
-| 3 | Authentication | ✅ Complete |
-| 4 | Super Admin Module | ✅ Complete |
-| 5 | School Admin Module | ✅ Complete |
-| 6 | Staff & Profile | ✅ Complete |
-| 7 | Frontend (React + RTK Query) | ✅ Complete |
-| 8 | Polish (Email, Search, Charts) | ✅ Mostly Complete |
-| 9 | Staff Portal & Admin Management | ✅ Mostly Complete |
-| 10 | Future Roadmap | 📋 Planned |
+| Phase | Description                     | Status             |
+| ----- | ------------------------------- | ------------------ |
+| 0–2   | Setup, Database, DB Connection  | ✅ Complete        |
+| 3     | Authentication                  | ✅ Complete        |
+| 4     | Super Admin Module              | ✅ Complete        |
+| 5     | School Admin Module             | ✅ Complete        |
+| 6     | Staff & Profile                 | ✅ Complete        |
+| 7     | Frontend (React + RTK Query)    | ✅ Complete        |
+| 8     | Polish (Email, Search, Charts)  | ✅ Mostly Complete |
+| 9     | Staff Portal & Admin Management | ✅ Mostly Complete |
+| 10    | Future Roadmap                  | 📋 Planned         |
 
 See [PROJECT_PLAN.md §10](PROJECT_PLAN.md) for the full future roadmap with near-term, medium-term, and long-term feature plans.

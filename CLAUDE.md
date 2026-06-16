@@ -64,11 +64,11 @@ Procedures also validate tenancy where relevant (e.g. staff must belong to the p
 - **Routes** (`src/routes/*.routes.js`) are aggregated in `src/routes.js`, mounted under `/api` in `src/app.js`. `index.js` verifies the DB connection before listening and closes the pool on shutdown.
 - **Route files and their responsibilities:**
   - `auth.routes.js` — login, logout, forgot-password, reset-password, getMe
-  - `school.routes.js` — CRUD schools + create school admin (super_admin only)
+  - `school.routes.js` — CRUD schools + create school admin + update details (super_admin only)
   - `schoolAdminManager.routes.js` — list/delete school admins (super_admin only)
   - `department.routes.js` — create/list departments (school_admin only)
   - `staff.routes.js` — profile endpoints (all roles), staff portal endpoints (staff only), staff CRUD (school_admin only)
-  - `schoolAdmin.routes.js` — task assignment, leave review, schedule management (school_admin only)
+  - `schoolAdmin.routes.js` — task assignment, leave review, schedule management, school settings profile (school_admin only)
 - **Auth/guards**: `protect` (middleware/auth.js) reads the JWT from the `token` httpOnly cookie _or_ a `Bearer` header, verifies it, and attaches `req.user` (claims: `staff_id`, `role_name`, `school_id`, `department_id`, names, email). `authorize('super_admin' | 'school_admin' | ...)` guards by role.
 - **Tenant scoping is mandatory and never trusts the request body.** For school_admin/staff routes, the `school_id` comes from `req.user.school_id` (the token), never from params/body. Cross-school access returns 404.
 - **Validation**: `validate(zodSchema)` middleware runs zod schemas from `src/schema/*.schema.js`.
@@ -104,8 +104,9 @@ All server state flows through **one** `baseApi` (`src/app/baseApi.js`) using a 
 - **Feature folders**: `src/features/<feature>/{<feature>.api.js, <feature>Slice.js?, pages/, components/, constants/, utils/}`. Pages are `lazy`-loaded in `App.jsx`.
 - **Feature API files:**
   - `features/auth/auth.api.js` — login, getMe, logout
-  - `features/super_admin/schools.api.js` — school CRUD + status toggle
+  - `features/super_admin/schools.api.js` — school CRUD + status toggle + update school
   - `features/super_admin/schoolAdmins.api.js` — school admin creation
+  - `features/school_admin/school.api.js` — school settings endpoints (profile + preferences)
   - `features/school_admin/departments.api.js` — department CRUD
   - `features/school_admin/staff.api.js` — staff CRUD + status toggle
   - `features/profile/profile.api.js` — avatar upload, profile update, password change
@@ -142,6 +143,6 @@ See PROJECT_PLAN.md §8 for the full endpoint map. Shape:
 
 ## Current implementation status
 
-- **Fully implemented**: Auth, Schools, School Admins, Departments, Staff CRUD, Profile/Avatar/Password, Forgot/Reset Password, Staff Dashboard, Schedule, Attendance/Clocking, Leaves (submit + review), Tasks (assign + status update), School Admin Schedules/Leaves management
+- **Fully implemented**: Auth, Schools, School Admins, Departments, Staff CRUD, Profile/Avatar/Password, Forgot/Reset Password, Staff Dashboard, Schedule, Attendance/Clocking, Leaves (submit + review), Tasks (assign + status update), School Admin Schedules/Leaves management, School Settings (profile + preferences), Super Admin school overrides
 - **Partially implemented**: Staff Tasks page (backend ready, needs dedicated frontend page)
 - **Not yet started**: Documents/Payslips page, Audit fields/soft delete, Activity logs, Notifications, Student module

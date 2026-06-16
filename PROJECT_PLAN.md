@@ -2,8 +2,8 @@
 
 > Phase-by-phase blueprint for building the School Management System.
 > Stack: **MySQL (stored procedures)** + **Node/Express** backend + **React (Vite)** frontend.
-> Author: Mayur Kapadi · Status: Active Development (Phase 9 in progress)
-> Last Updated: 2026-06-15
+> Author: Mayur Kapadi · Status: Active Development (Phase 9 settings complete)
+> Last Updated: 2026-06-16
 
 ---
 
@@ -18,15 +18,15 @@ A multi-tenant School Management System where:
 
 ### Core rules (from requirements)
 
-| Rule               | Meaning                                                                      |
-| ------------------ | ---------------------------------------------------------------------------- |
-| Roles are fixed    | `super_admin`, `school_admin`, `staff` live in a `roles` table               |
-| One user table     | Everyone who can log in is a row in `staff` with a `role_id` FK              |
-| Super Admin scope  | Can **only** create Schools + School Admins                                  |
+| Rule               | Meaning                                                                                                           |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| Roles are fixed    | `super_admin`, `school_admin`, `staff` live in a `roles` table                                                    |
+| One user table     | Everyone who can log in is a row in `staff` with a `role_id` FK                                                   |
+| Super Admin scope  | Can **only** create Schools + School Admins                                                                       |
 | School Admin scope | Can log in, create departments, register staff, assign tasks, manage leaves & schedules **for their school only** |
-| Staff scope        | Can clock in/out, view schedule, request leave, update tasks, view/edit profile |
-| Staff registration | Staff are added by a School Admin from their panel (register page)           |
-| Tenancy            | Every School Admin and Staff row is tied to a `school_id`                    |
+| Staff scope        | Can clock in/out, view schedule, request leave, update tasks, view/edit profile                                   |
+| Staff registration | Staff are added by a School Admin from their panel (register page)                                                |
+| Tenancy            | Every School Admin and Staff row is tied to a `school_id`                                                         |
 
 ---
 
@@ -62,26 +62,26 @@ A multi-tenant School Management System where:
 
 ## 3. Roles & Permission Matrix
 
-| Action                                | Super Admin | School Admin |   Staff   |
-| ------------------------------------ | :---------: | :----------: | :-------: |
-| Create / list schools                |     ✅      |      ❌      |    ❌     |
-| Create school admin                  |     ✅      |      ❌      |    ❌     |
-| Manage school admins (list/delete)   |     ✅      |      ❌      |    ❌     |
-| Log in                               |     ✅      |      ✅      |    ✅     |
-| Create department (own school)       |     ❌      |      ✅      |    ❌     |
-| Register staff (own school)          |     ❌      |      ✅      |    ❌     |
-| List staff (own school)              |     ❌      |      ✅      | view self |
-| Assign tasks to staff                |     ❌      |      ✅      |    ❌     |
-| Manage staff schedules               |     ❌      |      ✅      |    ❌     |
-| Review staff leaves                  |     ❌      |      ✅      |    ❌     |
-| View own profile                     |     ✅      |      ✅      |    ✅     |
-| Edit own profile / change password   |     ✅      |      ✅      |    ✅     |
-| Upload avatar                        |     ✅      |      ✅      |    ✅     |
-| View own schedule / classes          |     ❌      |      ❌      |    ✅     |
-| Clock in / Clock out (Time logs)     |     ❌      |      ❌      |    ✅     |
-| Request leave / View own leaves      |     ❌      |      ❌      |    ✅     |
-| View / update own tasks              |     ❌      |      ❌      |    ✅     |
-| View dashboard statistics            |     ✅      |      ✅      |    ✅     |
+| Action                             | Super Admin | School Admin |   Staff   |
+| ---------------------------------- | :---------: | :----------: | :-------: |
+| Create / list schools              |     ✅      |      ❌      |    ❌     |
+| Create school admin                |     ✅      |      ❌      |    ❌     |
+| Manage school admins (list/delete) |     ✅      |      ❌      |    ❌     |
+| Log in                             |     ✅      |      ✅      |    ✅     |
+| Create department (own school)     |     ❌      |      ✅      |    ❌     |
+| Register staff (own school)        |     ❌      |      ✅      |    ❌     |
+| List staff (own school)            |     ❌      |      ✅      | view self |
+| Assign tasks to staff              |     ❌      |      ✅      |    ❌     |
+| Manage staff schedules             |     ❌      |      ✅      |    ❌     |
+| Review staff leaves                |     ❌      |      ✅      |    ❌     |
+| View own profile                   |     ✅      |      ✅      |    ✅     |
+| Edit own profile / change password |     ✅      |      ✅      |    ✅     |
+| Upload avatar                      |     ✅      |      ✅      |    ✅     |
+| View own schedule / classes        |     ❌      |      ❌      |    ✅     |
+| Clock in / Clock out (Time logs)   |     ❌      |      ❌      |    ✅     |
+| Request leave / View own leaves    |     ❌      |      ❌      |    ✅     |
+| View / update own tasks            |     ❌      |      ❌      |    ✅     |
+| View dashboard statistics          |     ✅      |      ✅      |    ✅     |
 
 Enforced by an **`authorize(...roles)` middleware** + **tenant scoping** (a school_admin or staff member can only touch rows scoped to their own `school_id` derived from their token).
 
@@ -208,47 +208,49 @@ staff (1) ────< (N) staff_tasks         created_by
 
 ### 4.4 Stored Procedures (the only DB interface)
 
-| Proc                                                            | Purpose                               | Called by    |
-| --------------------------------------------------------------- | ------------------------------------- | ------------ |
-| `sp_seed_roles`                                                 | Insert the 3 fixed roles (idempotent) | setup        |
-| `sp_login_get_user(email)`                                      | Return user row + role_name for auth  | auth         |
-| `sp_create_school(...)`                                         | Insert school                         | super admin  |
-| `sp_list_schools()`                                             | List all schools                      | super admin  |
-| `sp_get_school(id)`                                             | School detail                         | super admin  |
-| `sp_get_school_by_email(email)`                                 | Check for duplicate school emails     | super admin  |
-| `sp_update_school_status(id, status)`                           | Activate/deactivate                   | super admin  |
-| `sp_create_school_admin(school_id, name, email, hash, ...)`     | Create school_admin in `staff`        | super admin  |
-| `sp_list_all_school_admins()`                                   | List all admins globally              | super admin  |
-| `sp_delete_school_admin(staff_id)`                              | Permanently delete admin              | super admin  |
-| `sp_create_department(school_id, name)`                         | Add department                        | school admin |
-| `sp_list_departments(school_id)`                                | Departments of a school               | school admin |
-| `sp_update_department_status(school_id, dept_id, status)`       | Activate/deactivate department        | school admin |
-| `sp_create_staff(school_id, dept_id, role_id, ..., created_by)` | Register staff                        | school admin |
-| `sp_list_staff(school_id)`                                      | Staff of a school                     | school admin |
-| `sp_get_staff(staff_id)`                                        | Staff detail / own profile            | all          |
-| `sp_update_staff_status(staff_id, status)`                      | Enable/disable staff                  | school admin |
-| `sp_update_password(staff_id, hash)`                            | Change own password                   | all          |
-| `sp_update_avatar(staff_id, url, public_id)`                    | Update avatar URL + Cloudinary ID     | all          |
-| `sp_update_profile(staff_id, first_name, last_name, phone)`     | Update own profile info               | all          |
-| `sp_set_reset_token(email, token, expiry)`                      | Set reset token and expiry date       | auth         |
-| `sp_get_user_by_reset_token(token)`                             | Get user details by active token      | auth         |
-| `sp_reset_password_by_token(token, hash)`                       | Reset password and clear token fields | auth         |
-| `sp_get_staff_dashboard_stats(staff_id)`                        | Get staff dashboard metrics           | staff        |
-| `sp_get_staff_schedule(staff_id)`                               | Get staff weekly schedule             | staff        |
-| `sp_get_staff_attendance(staff_id, start_date, end_date)`       | List attendance logs                  | staff        |
-| `sp_clock_in_out(staff_id, date, time)`                         | Daily clock-in/out                    | staff        |
-| `sp_create_leave_request(staff_id, type, start, end, reason)`   | Submit new leave request              | staff        |
-| `sp_get_staff_leaves(staff_id)`                                 | View own leave history                | staff        |
-| `sp_get_staff_tasks(staff_id)`                                  | List assigned tasks                   | staff        |
-| `sp_update_task_status(task_id, staff_id, status)`              | Set task completion status            | staff        |
-| `sp_assign_staff_task(staff_id, title, desc, due, created_by)`  | Assign task to a staff                | school admin |
-| `sp_list_school_leave_requests(school_id)`                      | List leaves for approval              | school admin |
-| `sp_review_leave_request(leave_id, status, comments, reviewer)` | Approve or reject leave               | school admin |
-| `sp_create_staff_schedule(school_id, staff_id, sub, class, ...)`| Set timetable schedule for staff      | school admin |
-| `sp_list_school_tasks(school_id)`                               | List all tasks in school              | school admin |
-| `sp_list_school_schedules(school_id)`                           | List all schedules in school          | school admin |
-| `sp_delete_staff_schedule(schedule_id, school_id)`              | Delete a schedule entry               | school admin |
-| `sp_delete_staff_task(task_id, school_id)`                      | Delete an assigned task               | school admin |
+| Proc                                                             | Purpose                               | Called by    |
+| ---------------------------------------------------------------- | ------------------------------------- | ------------ |
+| `sp_seed_roles`                                                  | Insert the 3 fixed roles (idempotent) | setup        |
+| `sp_login_get_user(email)`                                       | Return user row + role_name for auth  | auth         |
+| `sp_create_school(...)`                                          | Insert school                         | super admin  |
+| `sp_list_schools()`                                              | List all schools                      | super admin  |
+| `sp_get_school(id)`                                              | School detail                         | super admin  |
+| `sp_get_school_by_email(email)`                                  | Check for duplicate school emails     | super admin  |
+| `sp_update_school_status(id, status)`                            | Activate/deactivate                   | super admin  |
+| `sp_create_school_admin(school_id, name, email, hash, ...)`      | Create school_admin in `staff`        | super admin  |
+| `sp_list_all_school_admins()`                                    | List all admins globally              | super admin  |
+| `sp_delete_school_admin(staff_id)`                               | Permanently delete admin              | super admin  |
+| `sp_create_department(school_id, name)`                          | Add department                        | school admin |
+| `sp_list_departments(school_id)`                                 | Departments of a school               | school admin |
+| `sp_update_department_status(school_id, dept_id, status)`        | Activate/deactivate department        | school admin |
+| `sp_create_staff(school_id, dept_id, role_id, ..., created_by)`  | Register staff                        | school admin |
+| `sp_list_staff(school_id)`                                       | Staff of a school                     | school admin |
+| `sp_get_staff(staff_id)`                                         | Staff detail / own profile            | all          |
+| `sp_update_staff_status(staff_id, status)`                       | Enable/disable staff                  | school admin |
+| `sp_update_password(staff_id, hash)`                             | Change own password                   | all          |
+| `sp_update_avatar(staff_id, url, public_id)`                     | Update avatar URL + Cloudinary ID     | all          |
+| `sp_update_profile(staff_id, first_name, last_name, phone)`      | Update own profile info               | all          |
+| `sp_set_reset_token(email, token, expiry)`                       | Set reset token and expiry date       | auth         |
+| `sp_get_user_by_reset_token(token)`                              | Get user details by active token      | auth         |
+| `sp_reset_password_by_token(token, hash)`                        | Reset password and clear token fields | auth         |
+| `sp_get_staff_dashboard_stats(staff_id)`                         | Get staff dashboard metrics           | staff        |
+| `sp_get_staff_schedule(staff_id)`                                | Get staff weekly schedule             | staff        |
+| `sp_get_staff_attendance(staff_id, start_date, end_date)`        | List attendance logs                  | staff        |
+| `sp_clock_in_out(staff_id, date, time)`                          | Daily clock-in/out                    | staff        |
+| `sp_create_leave_request(staff_id, type, start, end, reason)`    | Submit new leave request              | staff        |
+| `sp_get_staff_leaves(staff_id)`                                  | View own leave history                | staff        |
+| `sp_get_staff_tasks(staff_id)`                                   | List assigned tasks                   | staff        |
+| `sp_update_task_status(task_id, staff_id, status)`               | Set task completion status            | staff        |
+| `sp_assign_staff_task(staff_id, title, desc, due, created_by)`   | Assign task to a staff                | school admin |
+| `sp_list_school_leave_requests(school_id)`                       | List leaves for approval              | school admin |
+| `sp_review_leave_request(leave_id, status, comments, reviewer)`  | Approve or reject leave               | school admin |
+| `sp_create_staff_schedule(school_id, staff_id, sub, class, ...)` | Set timetable schedule for staff      | school admin |
+| `sp_list_school_tasks(school_id)`                                | List all tasks in school              | school admin |
+| `sp_list_school_schedules(school_id)`                            | List all schedules in school          | school admin |
+| `sp_delete_staff_schedule(schedule_id, school_id)`               | Delete a schedule entry               | school admin |
+| `sp_delete_staff_task(task_id, school_id)`                       | Delete an assigned task               | school admin |
+| `sp_update_school(school_id, name, email, phone, address)`       | Update school operational details     | school admin |
+| `sp_update_school_by_super(school_id, name, code, email, ...)`   | Update school full details / status   | super admin  |
 
 > Each proc validates tenancy where relevant (e.g. staff must belong to the school_id passed in). App layer also re-checks via JWT claims.
 
@@ -490,49 +492,65 @@ own `feature.api.js`. Cache coherence is driven by `tagTypes` + `providesTags` /
 - [x] API docs (docs/ — Swagger/OpenAPI JSDoc annotations for auth, schools, departments, staff)
 - [x] Security Hardening (helmet, global/auth/upload rate-limiters, input sanitization, file upload magic bytes validation)
 
-### Phase 9 — Staff Portal & School Admin Management ✅ (Partially Complete)
+### Phase 9 — Staff Portal, Admin Management & Settings ✅ (Partially Complete)
 
 Implementation of the staff portal and school admin management for schedules, attendance, leaves, and tasks.
 
 #### Phase 9.1 — Schema & Database Migration ✅
+
 - [x] Added `staff_schedules`, `staff_attendance`, `leave_requests`, and `staff_tasks` tables to `schema.sql`.
 - [x] Created all stored procedures in `procedures.sql` (37 total procs).
 - [x] Seed records available for testing.
 - [x] Migration scripts run in MySQL Workbench.
 
 #### Phase 9.2 — Backend Models & API Routes ✅
+
 - [x] Created Zod schemas in `schema/staff.schema.js` for leaves, clock-in, task status, schedules, assign task, review leave, and create schedule.
 - [x] Created thin model wrapper in `models/staffActivity.model.js` invoking procedures via `callProcedure`.
 - [x] Implemented staff portal controllers in `controllers/staff.controller.js` for `/api/staff/me/*` endpoints.
 - [x] Implemented School Admin management endpoints in `routes/schoolAdmin.routes.js` for tasks, leaves, and schedules.
 
 #### Phase 9.3 — Frontend RTK Query & Sidebar ✅
+
 - [x] Created `features/staff/staffActivity.api.js` with RTK Query endpoints and tag invalidations (`StaffSchedule`, `StaffAttendance`, `StaffLeave`).
 - [x] Registered routes inside `/staff/*` in `client/src/App.jsx` (dashboard, schedule, attendance).
 - [x] Updated sidebar navigation items in staff layout using `STAFF` icons.
 
 #### Phase 9.4 — Dashboard & Time Clocking ✅
+
 - [x] Built `StaffDashboard.jsx` with stat cards (today's classes, pending tasks, present days, leave days, work hours).
 - [x] Built Clock In/Out panel with status toggle.
 - [x] Interactive schedule and task widgets on dashboard.
 
 #### Phase 9.5 — Schedule Page ✅
+
 - [x] Built `SchedulePage.jsx` displaying a weekly timetable grid.
 
 #### Phase 9.6 — Attendance & Leaves ✅
+
 - [x] Built `AttendanceLeavePage.jsx` with dual-tab layout.
 - [x] Tab 1 (Attendance): Monthly table showing daily status marks, clock times, and work duration.
 - [x] Tab 2 (Leaves): Leave request history with status badges + `LeaveRequestDialog` modal form.
 - [x] Attendance and Leave stat cards (`StaffAttendanceStatCard`, `StaffLeaveStatCard`).
 
 #### Phase 9.7 — School Admin: Schedules & Leaves Management ✅
+
 - [x] Built `SchedulesPage.jsx` for school admin to create/view/delete staff schedules.
 - [x] Built `LeavesPage.jsx` for school admin to view/approve/reject staff leave requests.
 
-#### Phase 9.8 — Documents & Payslips 🔴 Pending
+#### Phase 9.8 — School Settings & Super Admin Overrides ✅
+
+- [x] Database: Stored procedures `sp_update_school` and `sp_update_school_by_super`.
+- [x] Backend: Exposed settings API endpoints with JWT scoping.
+- [x] Client Settings Page: Form-validation with React Hook Form + Zod, displaying field validation errors dynamically.
+- [x] Client Layout Sync: Immediate Redux auth state updates, synchronizing sidebar school name.
+- [x] Super Admin Dialog: Added Edit School modal form allowing updates to all fields including status and code.
+
+#### Phase 9.9 — Documents & Payslips 🔴 Pending
+
 - [ ] Build `DocumentsPage.jsx` listing downloadable school policies/materials and payslip records.
 
-**Done when:** A staff member logs in and can clock in/out, submit leave requests, view schedule, and view dashboard stats; a school admin can assign tasks, view/approve leaves, and manage schedules. ✓ (Partially — documents/payslips pending)
+**Done when:** A staff member logs in and can clock in/out, submit leave requests, view schedule, and view dashboard stats; a school admin can assign tasks, view/approve leaves, manage schedules, and configure school settings. ✓ (Partially — documents/payslips pending)
 
 ---
 
@@ -548,6 +566,7 @@ GET    /api/auth/me                    all        current user
 POST   /api/schools                    super      create school
 GET    /api/schools                    super      list schools
 GET    /api/schools/:id                super      school detail
+PUT    /api/schools/:id                super      update school details
 PATCH  /api/schools/:id/status         super      activate/deactivate
 POST   /api/schools/:id/admins         super      create school admin
 
@@ -587,6 +606,9 @@ PATCH  /api/school-admin/leaves/:id    school     approve/reject leave request
 POST   /api/school-admin/schedules     school     create staff schedule entry
 GET    /api/school-admin/schedules     school     list all school schedules
 DELETE /api/school-admin/schedules/:id school     delete a schedule entry
+
+GET    /api/school-admin/settings/school school     get school operational details
+PUT    /api/school-admin/settings/school school     update school operational details
 ```
 
 ---
@@ -613,47 +635,47 @@ DELETE /api/school-admin/schedules/:id school     delete a schedule entry
 
 Features that complete existing gaps and polish the current product.
 
-| # | Feature | Description | Affected Areas |
-|---|---------|-------------|----------------|
-| N1 | **Staff Tasks Page** | Build `TasksPage.jsx` separating assigned duties into To-Do, In Progress, and Completed tabs/cards with quick status toggles. (Backend ready; needs frontend page.) | `client/features/staff/pages/` |
-| N2 | **Documents & Payslips Page** | Build `DocumentsPage.jsx` listing downloadable school policies/materials and simulated payslip records with download action. | `client/features/staff/pages/`, `server/database/` |
-| N3 | **Audit Fields / Soft Delete** | Add `deleted_at` timestamp column to key tables (`staff`, `schools`, `departments`) for soft-delete instead of hard-delete. Update stored procedures to filter deleted rows. | `server/database/schema.sql`, `procedures.sql`, all models |
-| N4 | **Tag Invalidation Verification** | End-to-end verify tag invalidation matrix — ensure every mutation refetches the correct lists (e.g., schedule creation invalidates both staff and admin schedule views). | `client/features/*/api.js` |
-| N5 | **School Admin Tasks Page** | Complete the school admin tasks management UI — list assigned tasks with filtering, view task details, and task deletion confirmation. | `client/features/school_admin/pages/` |
-| N6 | **Department Status Toggle (Completed)** | Wired the `sp_update_department_status` stored procedure to the frontend UI. Toggles are fully operational on the Departments list/grid views. | `client/features/school_admin/`, `server/routes/department.routes.js` |
-| N7 | **Swagger Docs for Staff Portal** | Extend Swagger/OpenAPI annotations to cover the new staff portal and school-admin management endpoints. | `server/src/docs/` |
+| #   | Feature                                  | Description                                                                                                                                                                  | Affected Areas                                                        |
+| --- | ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| N1  | **Staff Tasks Page**                     | Build `TasksPage.jsx` separating assigned duties into To-Do, In Progress, and Completed tabs/cards with quick status toggles. (Backend ready; needs frontend page.)          | `client/features/staff/pages/`                                        |
+| N2  | **Documents & Payslips Page**            | Build `DocumentsPage.jsx` listing downloadable school policies/materials and simulated payslip records with download action.                                                 | `client/features/staff/pages/`, `server/database/`                    |
+| N3  | **Audit Fields / Soft Delete**           | Add `deleted_at` timestamp column to key tables (`staff`, `schools`, `departments`) for soft-delete instead of hard-delete. Update stored procedures to filter deleted rows. | `server/database/schema.sql`, `procedures.sql`, all models            |
+| N4  | **Tag Invalidation Verification**        | End-to-end verify tag invalidation matrix — ensure every mutation refetches the correct lists (e.g., schedule creation invalidates both staff and admin schedule views).     | `client/features/*/api.js`                                            |
+| N5  | **School Admin Tasks Page**              | Complete the school admin tasks management UI — list assigned tasks with filtering, view task details, and task deletion confirmation.                                       | `client/features/school_admin/pages/`                                 |
+| N6  | **Department Status Toggle (Completed)** | Wired the `sp_update_department_status` stored procedure to the frontend UI. Toggles are fully operational on the Departments list/grid views.                               | `client/features/school_admin/`, `server/routes/department.routes.js` |
+| N7  | **Swagger Docs for Staff Portal**        | Extend Swagger/OpenAPI annotations to cover the new staff portal and school-admin management endpoints.                                                                      | `server/src/docs/`                                                    |
 
 ### 🟡 Medium-Term (3–6 months) — Feature Expansion
 
 Features that deepen functionality and improve operational efficiency.
 
-| # | Feature | Description | Affected Areas |
-|---|---------|-------------|----------------|
-| M1 | **Activity Logs & Audit Trail** | Track user actions (login, profile edit, leave request, schedule change) in an `activity_logs` table. Display a filterable activity timeline on each user's profile. | New table + stored procs, new model, controller, frontend component |
-| M2 | **Notifications System** | In-app notification bell (unread count, dropdown list) for events like leave approval, task assignment, schedule change. Server-sent events (SSE) or polling. | New table `notifications`, server SSE endpoint, client notification dropdown |
-| M3 | **Bulk Operations** | Enable school admins to bulk-enable/disable staff, bulk-assign tasks, bulk-approve leaves. Add `SelectAll` checkbox to tables. | `client/components/shared/`, `server/database/procedures.sql` |
-| M4 | **Advanced Dashboard Analytics** | Expand dashboards with trend charts (attendance over time, leave patterns, task completion rates). Add date-range pickers and department-level filters. | `client/features/*/Dashboard.jsx`, recharts, new stored procs |
-| M5 | **PDF Export** | Generate downloadable PDF reports for attendance records, leave summaries, payslips. Use a library like `pdfmake` or `jsPDF` on the client or `pdfkit` on the server. | New util/library, server endpoint or client-side generation |
-| M6 | **School Settings Page** | Allow school admins to configure school-level settings: working hours (late threshold), leave policy (annual leave quota), academic calendar, school logo upload. | New table `school_settings`, stored procs, model, frontend page |
-| M7 | **Email Notifications** | Send automated email notifications for key events: leave approved/rejected, new task assigned, schedule updated, password changed. Extend existing mailer.js + templates. | `server/config/mailer.js`, new templates, controller hooks |
-| M8 | **Server-Side Pagination** | Replace client-side filtering with server-side paginated queries (`LIMIT/OFFSET` in stored procedures). Add `?page=&limit=&search=&sort=` query params. | `server/database/procedures.sql`, models, controllers, client pagination |
-| M9 | **Test Suite (Backend)** | Add unit tests for models and integration tests for API routes using Vitest or Jest. Mock the database pool and test each endpoint's auth, validation, and response. | New `server/__tests__/` directory, test config |
+| #   | Feature                          | Description                                                                                                                                                               | Affected Areas                                                               |
+| --- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| M1  | **Activity Logs & Audit Trail**  | Track user actions (login, profile edit, leave request, schedule change) in an `activity_logs` table. Display a filterable activity timeline on each user's profile.      | New table + stored procs, new model, controller, frontend component          |
+| M2  | **Notifications System**         | In-app notification bell (unread count, dropdown list) for events like leave approval, task assignment, schedule change. Server-sent events (SSE) or polling.             | New table `notifications`, server SSE endpoint, client notification dropdown |
+| M3  | **Bulk Operations**              | Enable school admins to bulk-enable/disable staff, bulk-assign tasks, bulk-approve leaves. Add `SelectAll` checkbox to tables.                                            | `client/components/shared/`, `server/database/procedures.sql`                |
+| M4  | **Advanced Dashboard Analytics** | Expand dashboards with trend charts (attendance over time, leave patterns, task completion rates). Add date-range pickers and department-level filters.                   | `client/features/*/Dashboard.jsx`, recharts, new stored procs                |
+| M5  | **PDF Export**                   | Generate downloadable PDF reports for attendance records, leave summaries, payslips. Use a library like `pdfmake` or `jsPDF` on the client or `pdfkit` on the server.     | New util/library, server endpoint or client-side generation                  |
+| M6  | **School Settings Page**         | Allow school admins to configure school-level settings: working hours (late threshold), leave policy (annual leave quota), academic calendar, school logo upload.         | New table `school_settings`, stored procs, model, frontend page              |
+| M7  | **Email Notifications**          | Send automated email notifications for key events: leave approved/rejected, new task assigned, schedule updated, password changed. Extend existing mailer.js + templates. | `server/config/mailer.js`, new templates, controller hooks                   |
+| M8  | **Server-Side Pagination**       | Replace client-side filtering with server-side paginated queries (`LIMIT/OFFSET` in stored procedures). Add `?page=&limit=&search=&sort=` query params.                   | `server/database/procedures.sql`, models, controllers, client pagination     |
+| M9  | **Test Suite (Backend)**         | Add unit tests for models and integration tests for API routes using Vitest or Jest. Mock the database pool and test each endpoint's auth, validation, and response.      | New `server/__tests__/` directory, test config                               |
 
 ### 🔴 Long-Term (6–12+ months) — Platform Evolution
 
 Features that transform the product into a comprehensive school operations platform.
 
-| # | Feature | Description | Affected Areas |
-|---|---------|-------------|----------------|
-| L1 | **Student Management Module** | New tables (`students`, `enrollments`, `grades`, `classes`). School admins register students, assign to classes. Staff can view/manage their class students. | Major: new schema, procedures, models, controllers, frontend feature |
-| L2 | **Parent / Guardian Portal** | New role `parent`. Parents log in to view their child's attendance, grades, schedule, and communicate with teachers. | New role, auth changes, new frontend layout + feature module |
-| L3 | **Fee Management & Billing** | Track student fee structures, payment records, generate invoices. Integrate with payment gateways (Stripe/Razorpay). | New tables, payment gateway integration, PDF invoices |
-| L4 | **Timetable Auto-Generation** | Algorithm to auto-generate conflict-free weekly timetables based on teacher availability, room capacity, and subject requirements. | New service layer logic, constraint-solving algorithm |
-| L5 | **Real-Time Chat / Messaging** | WebSocket-based chat between staff members, or between parents and teachers. Message history, read receipts. | WebSocket server (Socket.IO), new tables, real-time frontend |
-| L6 | **Mobile App (React Native)** | Native mobile companion app for staff clock-in/out (with GPS), push notifications, and quick task updates. | New `mobile/` package, shared API, push notification service |
-| L7 | **Multi-Language (i18n)** | Internationalize the frontend with `react-i18next`. Support English, Hindi, and other regional languages. | `client/` — locale files, translation keys, language switcher |
-| L8 | **Role-Based Dashboard Builder** | Allow super admins to configure custom dashboard widgets per role. Drag-and-drop layout with saved preferences. | New table `dashboard_configs`, dynamic dashboard rendering |
-| L9 | **Exam & Grade Management** | Create exam schedules, record grades/marks, generate report cards. Class-wise and student-wise performance analytics. | New tables, stored procs, frontend module |
-| L10 | **Security Hardening (Completed)** | Global/auth/upload rate limiting, helmet headers, custom input sanitization, and strict file magic-bytes/extension checks implemented. | `server/src/app.js`, new middlewares, custom sanitization, enhanced multer |
-| L11 | **CI/CD & Deployment** | GitHub Actions pipeline: lint → test → build → deploy. Containerize with Docker. Deploy to Vercel (frontend) + Railway/Render (backend). | `.github/workflows/`, `Dockerfile`, `docker-compose.yml` |
-| L12 | **Super Admin Platform Analytics** | Platform-wide analytics dashboard: total schools, total users, active vs inactive trends, revenue metrics (if billing enabled). | New stored procs, super admin dashboard expansion |
+| #   | Feature                            | Description                                                                                                                                                  | Affected Areas                                                             |
+| --- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------- |
+| L1  | **Student Management Module**      | New tables (`students`, `enrollments`, `grades`, `classes`). School admins register students, assign to classes. Staff can view/manage their class students. | Major: new schema, procedures, models, controllers, frontend feature       |
+| L2  | **Parent / Guardian Portal**       | New role `parent`. Parents log in to view their child's attendance, grades, schedule, and communicate with teachers.                                         | New role, auth changes, new frontend layout + feature module               |
+| L3  | **Fee Management & Billing**       | Track student fee structures, payment records, generate invoices. Integrate with payment gateways (Stripe/Razorpay).                                         | New tables, payment gateway integration, PDF invoices                      |
+| L4  | **Timetable Auto-Generation**      | Algorithm to auto-generate conflict-free weekly timetables based on teacher availability, room capacity, and subject requirements.                           | New service layer logic, constraint-solving algorithm                      |
+| L5  | **Real-Time Chat / Messaging**     | WebSocket-based chat between staff members, or between parents and teachers. Message history, read receipts.                                                 | WebSocket server (Socket.IO), new tables, real-time frontend               |
+| L6  | **Mobile App (React Native)**      | Native mobile companion app for staff clock-in/out (with GPS), push notifications, and quick task updates.                                                   | New `mobile/` package, shared API, push notification service               |
+| L7  | **Multi-Language (i18n)**          | Internationalize the frontend with `react-i18next`. Support English, Hindi, and other regional languages.                                                    | `client/` — locale files, translation keys, language switcher              |
+| L8  | **Role-Based Dashboard Builder**   | Allow super admins to configure custom dashboard widgets per role. Drag-and-drop layout with saved preferences.                                              | New table `dashboard_configs`, dynamic dashboard rendering                 |
+| L9  | **Exam & Grade Management**        | Create exam schedules, record grades/marks, generate report cards. Class-wise and student-wise performance analytics.                                        | New tables, stored procs, frontend module                                  |
+| L10 | **Security Hardening (Completed)** | Global/auth/upload rate limiting, helmet headers, custom input sanitization, and strict file magic-bytes/extension checks implemented.                       | `server/src/app.js`, new middlewares, custom sanitization, enhanced multer |
+| L11 | **CI/CD & Deployment**             | GitHub Actions pipeline: lint → test → build → deploy. Containerize with Docker. Deploy to Vercel (frontend) + Railway/Render (backend).                     | `.github/workflows/`, `Dockerfile`, `docker-compose.yml`                   |
+| L12 | **Super Admin Platform Analytics** | Platform-wide analytics dashboard: total schools, total users, active vs inactive trends, revenue metrics (if billing enabled).                              | New stored procs, super admin dashboard expansion                          |
