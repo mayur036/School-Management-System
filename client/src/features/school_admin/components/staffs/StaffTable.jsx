@@ -1,9 +1,7 @@
-import { Calendar, Mail } from 'lucide-react';
 
 import EmptyTableState from '@/components/shared/EmptyTableState';
-import StatusBadge from '@/components/shared/StatusBadge';
+import StatusBadge, { DepartmentBadge } from '@/components/shared/StatusBadge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import {
@@ -27,7 +25,6 @@ import {
 import { BASE, EMPTY_STATE, SCHOOL_ADMIN } from '@/lib/icons';
 import { formatDate, formatStaffId, getInitials } from '@/lib/utils';
 
-import { getDeptBadgeClass } from '../../utils/departments.utils';
 
 // ── Skeleton rows (loading state) ─────────────────────────────
 
@@ -169,35 +166,22 @@ const StaffCard = ({ member, onViewDetails, onToggleStatus }) => {
       </div>
 
       <div className="mt-0.5">
-        <Badge className="rounded-full border-none bg-purple-100 px-4 py-0.5 text-[11px] font-semibold wrap-break-word text-purple-700 hover:bg-purple-100 dark:bg-purple-950/40 dark:text-purple-300 dark:hover:bg-purple-950/40">
-          {member.department_name || 'Unassigned'}
-        </Badge>
+        <DepartmentBadge department={member.department_name} />
       </div>
 
       <div className="my-1 flex w-full items-center gap-3">
         <div className="bg-border/60 h-px flex-1" />
-        <Badge
-          className={`flex items-center gap-1.5 rounded-full border-none px-3 py-0.5 text-[11px] font-semibold ${
-            member.status === 'active'
-              ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300'
-              : 'bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300'
-          }`}
-        >
-          <span
-            className={`size-1.5 rounded-full ${member.status === 'active' ? 'bg-emerald-500' : 'bg-rose-500'}`}
-          />
-          {member.status === 'active' ? 'Active' : 'Inactive'}
-        </Badge>
+        <StatusBadge status={member.status} />
         <div className="bg-border/60 h-px flex-1" />
       </div>
 
       <div className="bg-muted/30 border-border/40 text-muted-foreground/90 hover:bg-muted/50 flex w-full items-center gap-2.5 rounded-xl border p-2.5 text-[11px] transition-colors">
-        <Mail className="size-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+        <BASE.MAIL className="size-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
         <span className="truncate font-mono">{member.email}</span>
       </div>
 
       <div className="bg-muted/30 border-border/40 text-muted-foreground/90 hover:bg-muted/50 flex w-full items-center gap-2.5 rounded-xl border p-2.5 text-[11px] transition-colors">
-        <Calendar className="size-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+        <BASE.CALENDAR className="size-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
         <div className="flex flex-col text-left leading-tight">
           <span className="text-foreground font-semibold">
             {formatDate(member.created_at, 'medium')}
@@ -317,12 +301,7 @@ const StaffTable = ({
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge
-                      className={`border font-normal ${getDeptBadgeClass(member.department_name)}`}
-                      variant="outline"
-                    >
-                      {member.department_name || 'Unassigned'}
-                    </Badge>
+                    <DepartmentBadge department={member.department_name} />
                   </TableCell>
                   <TableCell className="text-muted-foreground hidden font-mono text-xs md:table-cell">
                     {member.email}
@@ -331,7 +310,7 @@ const StaffTable = ({
                     {member.phone || '—'}
                   </TableCell>
                   <TableCell>
-                    <StatusBadge status={member.status} pulse />
+                    <StatusBadge status={member.status} />
                   </TableCell>
                   <TableCell className="text-muted-foreground hidden text-xs tabular-nums xl:table-cell">
                     {formatDate(member.created_at, 'medium')}

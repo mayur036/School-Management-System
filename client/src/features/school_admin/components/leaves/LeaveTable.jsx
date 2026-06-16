@@ -1,6 +1,6 @@
 import EmptyTableState from '@/components/shared/EmptyTableState';
+import StatusBadge, { LeaveTypeBadge } from '@/components/shared/StatusBadge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -13,25 +13,6 @@ import {
 } from '@/components/ui/table';
 import { EMPTY_STATE } from '@/lib/icons';
 import { formatDate, getInitials } from '@/lib/utils';
-
-// ── Status badge color map ────────────────────────────────────
-const statusConfig = {
-  approved: {
-    className:
-      'bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/10 dark:text-emerald-400 border-emerald-500/20',
-    dot: 'bg-emerald-500',
-  },
-  rejected: {
-    className:
-      'bg-rose-500/10 text-rose-600 hover:bg-rose-500/10 dark:text-rose-400 border-rose-500/20',
-    dot: 'bg-rose-500',
-  },
-  pending: {
-    className:
-      'bg-amber-500/10 text-amber-600 hover:bg-amber-500/10 dark:text-amber-400 border-amber-500/20',
-    dot: 'bg-amber-500',
-  },
-};
 
 // ── Skeleton Loading Rows ─────────────────────────────────────
 const SkeletonRows = ({ count = 5 }) =>
@@ -120,7 +101,6 @@ const LeaveTable = ({ leaves, isLoading, onReview }) => {
         </TableHeader>
         <TableBody>
           {leaves.map((leave) => {
-            const config = statusConfig[leave.status] || statusConfig.pending;
             const initials = getInitials({
               first_name: leave.first_name,
               last_name: leave.last_name,
@@ -148,12 +128,7 @@ const LeaveTable = ({ leaves, isLoading, onReview }) => {
 
                 {/* Leave Type */}
                 <TableCell>
-                  <Badge
-                    variant="outline"
-                    className="border-border font-normal"
-                  >
-                    {leave.leave_type}
-                  </Badge>
+                  <LeaveTypeBadge type={leave.leave_type} />
                 </TableCell>
 
                 {/* Department */}
@@ -180,15 +155,8 @@ const LeaveTable = ({ leaves, isLoading, onReview }) => {
                   {leave.reason}
                 </TableCell>
 
-                {/* Status */}
                 <TableCell>
-                  <Badge
-                    className={`flex w-fit items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-semibold ${config.className}`}
-                  >
-                    <span className={`size-1.5 rounded-full ${config.dot}`} />
-                    {leave.status.charAt(0).toUpperCase() +
-                      leave.status.slice(1)}
-                  </Badge>
+                  <StatusBadge status={leave.status} />
                 </TableCell>
 
                 <TableCell>

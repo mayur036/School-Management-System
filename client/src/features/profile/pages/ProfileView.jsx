@@ -6,9 +6,15 @@ import StatusBadge from '@/components/shared/StatusBadge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { useAuth } from '@/hooks/useAuth';
 import { BASE, STATUS } from '@/lib/icons';
-import { formatDate } from '@/lib/utils';
+import { cn, formatDate } from '@/lib/utils';
 
 import ChangePasswordDialog from '../components/ChangePasswordDialog';
 import EditProfileDialog from '../components/EditProfileDialog';
@@ -38,6 +44,7 @@ export const ProfileView = () => {
   // Modals state
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
+  const [isViewerOpen, setIsViewerOpen] = useState(false);
 
   // Local-only profile preferences (no backend persistence yet).
   const [bio, setBio] = useState('');
@@ -129,16 +136,30 @@ export const ProfileView = () => {
         <div className="relative flex flex-col gap-6 px-6 pt-8 pb-6 sm:flex-row sm:items-end sm:justify-between sm:pt-10">
           <div className="flex flex-col items-center gap-4 text-center sm:flex-row sm:text-left">
             {/* Avatar block with camera upload button */}
-            <div className="group relative">
-              <Avatar className="border-background size-24 border-4 shadow-md sm:size-28">
-                <AvatarImage
-                  src={user.avatar_url || undefined}
-                  alt={userFullName}
-                />
-                <AvatarFallback className="bg-primary/10 text-primary text-3xl font-bold">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
+            <div className="relative">
+              <div
+                onClick={() => user.avatar_url && setIsViewerOpen(true)}
+                className={cn(
+                  'group relative rounded-full',
+                  user.avatar_url ? 'cursor-pointer' : 'cursor-default'
+                )}
+              >
+                <Avatar className="border-background size-24 border-4 shadow-md sm:size-28">
+                  <AvatarImage
+                    src={user.avatar_url || undefined}
+                    alt={userFullName}
+                  />
+                  <AvatarFallback className="bg-primary/10 text-primary text-3xl font-bold">
+                    {initials}
+                  </AvatarFallback>
+                </Avatar>
+
+                {user.avatar_url && (
+                  <div className="absolute inset-0 flex items-center justify-center rounded-full border-4 border-transparent bg-black/40 text-xs font-semibold text-white opacity-0 transition-opacity select-none group-hover:opacity-100">
+                    View
+                  </div>
+                )}
+              </div>
 
               {/* Upload trigger button */}
               <input
@@ -477,6 +498,23 @@ export const ProfileView = () => {
         open={isChangePasswordOpen}
         onOpenChange={setIsChangePasswordOpen}
       />
+
+      {/* ── Profile Image Viewer Dialog ────────────────────────── */}
+      <Dialog open={isViewerOpen} onOpenChange={setIsViewerOpen}>
+        <DialogContent className="max-w-md overflow-hidden border-none bg-transparent p-0 shadow-none sm:max-w-lg">
+          <DialogTitle className="sr-only">Profile Picture</DialogTitle>
+          <DialogDescription className="sr-only">
+            Full view of profile picture
+          </DialogDescription>
+          <div className="relative flex items-center justify-center">
+            <img
+              src={user.avatar_url}
+              alt={userFullName}
+              className="max-h-[80vh] w-full rounded-lg object-contain shadow-2xl"
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -2,7 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useGetStaffScheduleQuery } from '@/features/staff/staffActivity.api';
-import { EMPTY_STATE } from '@/lib/icons';
+import { BASE, EMPTY_STATE } from '@/lib/icons';
 
 const DAYS = [
   'Monday',
@@ -225,15 +225,65 @@ export const SchedulePage = () => {
           })}
         </div>
       ) : (
-        <div className="bg-card border-border mx-auto mt-6 flex max-w-xl flex-col items-center justify-center rounded-xl border py-20 text-center shadow-sm">
-          <EMPTY_STATE.NO_DATA className="text-muted-foreground/20 mb-4 h-16 w-16" />
-          <h2 className="text-foreground text-lg font-bold">
+        // No schedule available
+        <div className="border-border from-card to-muted/20 relative mx-auto mt-8 max-w-xl overflow-hidden rounded-2xl border bg-linear-to-b p-8 text-center shadow-sm md:p-12">
+          {/* Background decorative glow spots */}
+          <div className="bg-primary/5 pointer-events-none absolute -top-24 -left-24 h-48 w-48 rounded-full blur-3xl" />
+          <div className="bg-primary/5 pointer-events-none absolute -right-24 -bottom-24 h-48 w-48 rounded-full blur-3xl" />
+
+          {/* Dotted Schedule Blueprint Graphic */}
+          <div className="relative mx-auto mb-8 flex max-w-xs flex-col items-center justify-center">
+            <div className="border-muted-foreground/20 bg-muted/5 relative w-full space-y-3 rounded-xl border border-dashed p-5">
+              <div className="border-muted-foreground/15 flex items-center justify-between border-b border-dashed pb-3">
+                <div className="bg-muted-foreground/20 h-3 w-20 rounded" />
+                <div className="bg-muted-foreground/15 h-3 w-10 rounded" />
+              </div>
+              <div className="flex items-center gap-3 py-1">
+                <div className="border-muted-foreground/20 text-muted-foreground/40 flex h-7 w-7 items-center justify-center rounded-lg border border-dashed text-[10px] font-bold">
+                  MON
+                </div>
+                <div className="flex-1 space-y-1.5">
+                  <div className="bg-muted-foreground/15 h-2 w-3/4 rounded" />
+                  <div className="bg-muted-foreground/10 h-1.5 w-1/2 rounded" />
+                </div>
+              </div>
+              <div className="flex items-center gap-3 py-1">
+                <div className="border-muted-foreground/20 text-muted-foreground/40 flex h-7 w-7 items-center justify-center rounded-lg border border-dashed text-[10px] font-bold">
+                  TUE
+                </div>
+                <div className="flex-1 space-y-1.5">
+                  <div className="bg-muted-foreground/15 h-2 w-1/2 rounded" />
+                  <div className="bg-muted-foreground/10 h-1.5 w-1/3 rounded" />
+                </div>
+              </div>
+            </div>
+
+            {/* Floating primary icon container */}
+            <div className="from-primary to-primary/80 border-primary/20 animate-float absolute -top-6 -right-3 flex h-14 w-14 items-center justify-center rounded-2xl border bg-linear-to-tr shadow-lg">
+              <EMPTY_STATE.NO_TIMETABLE className="text-primary-foreground h-7 w-7" />
+            </div>
+          </div>
+
+          <h2 className="text-foreground text-xl font-bold tracking-tight">
             No Timetable Configured
           </h2>
-          <p className="text-muted-foreground mt-1 max-w-md px-6 text-sm">
-            Your weekly schedule hasn't been set up yet by the administration.
-            Please contact your school administrator to configure your periods.
+          <p className="text-muted-foreground mx-auto mt-2 max-w-md px-4 text-sm leading-relaxed">
+            Your weekly teaching timetable has not been set up by the
+            administration yet. Once configured, your scheduled periods and
+            classrooms will appear here automatically.
           </p>
+
+          <div className="mt-8 flex flex-col items-center justify-center gap-3">
+            <div className="border-warning/30 bg-warning/5 text-warning inline-flex items-center gap-2 rounded-full border px-3.5 py-1 text-xs font-medium">
+              <span className="bg-warning h-1.5 w-1.5 animate-pulse rounded-full" />
+              Awaiting Administrator Setup
+            </div>
+
+            <div className="text-muted-foreground border-border mt-2 flex w-full items-center justify-center gap-2 border-t pt-4 text-xs">
+              <BASE.INFO className="text-primary h-3.5 w-3.5" />
+              <span>Contact school admin to assign your teaching periods</span>
+            </div>
+          </div>
         </div>
       )}
     </div>

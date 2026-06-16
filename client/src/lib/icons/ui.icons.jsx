@@ -94,4 +94,5 @@ export const EMPTY_STATE = {
   NO_DATA: PackageOpen,
   NO_FILE: FileQuestion,
   SERVER_ERROR: ServerCrash,
+  NO_TIMETABLE: CalendarClock,
 };

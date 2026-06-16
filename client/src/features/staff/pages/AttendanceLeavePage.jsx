@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 
 import AppBreadcrumb from '@/components/shared/AppBreadcrumb';
 import EmptyTableState from '@/components/shared/EmptyTableState';
-import { Badge } from '@/components/ui/badge';
+import StatusBadge from '@/components/shared/StatusBadge';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -253,24 +253,7 @@ export const AttendanceLeavePage = () => {
                             {formatDuration(row.work_duration)}
                           </TableCell>
                           <TableCell className="text-xs">
-                            <Badge
-                              className={`rounded-full border-none px-2 py-0.5 font-medium ${
-                                row.status === 'present'
-                                  ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-                                  : row.status === 'late'
-                                    ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
-                                    : row.status === 'half_day'
-                                      ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
-                                      : row.status === 'leave'
-                                        ? 'bg-purple-500/10 text-purple-600 dark:text-purple-400'
-                                        : 'bg-rose-500/10 text-rose-600 dark:text-rose-400'
-                              }`}
-                            >
-                              {row.status === 'half_day'
-                                ? 'Half Day'
-                                : row.status.charAt(0).toUpperCase() +
-                                  row.status.slice(1)}
-                            </Badge>
+                            <StatusBadge status={row.status} />
                           </TableCell>
                         </TableRow>
                       ))}
@@ -361,18 +344,7 @@ export const AttendanceLeavePage = () => {
                             {leave.reason}
                           </TableCell>
                           <TableCell className="text-xs">
-                            <Badge
-                              className={`rounded-full border-none px-2 py-0.5 font-medium ${
-                                leave.status === 'approved'
-                                  ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-                                  : leave.status === 'rejected'
-                                    ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400'
-                                    : 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
-                              }`}
-                            >
-                              {leave.status.charAt(0).toUpperCase() +
-                                leave.status.slice(1)}
-                            </Badge>
+                            <StatusBadge status={leave.status} />
                           </TableCell>
                           <TableCell
                             className="text-muted-foreground max-w-37.5 truncate text-xs italic"

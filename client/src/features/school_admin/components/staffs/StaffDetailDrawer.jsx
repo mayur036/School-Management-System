@@ -1,5 +1,5 @@
+import StatusBadge, { DepartmentBadge } from '@/components/shared/StatusBadge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Drawer,
@@ -10,7 +10,7 @@ import {
   DrawerTitle,
 } from '@/components/ui/drawer';
 import { Separator } from '@/components/ui/separator';
-import { BASE, SCHOOL_ADMIN } from '@/lib/icons';
+import { BASE } from '@/lib/icons';
 import {
   formatDate,
   formatPhoneNumber,
@@ -60,13 +60,6 @@ const StaffDetailDrawer = ({ member, open, onClose }) => {
                       {getInitials(member) || 'ST'}
                     </AvatarFallback>
                   </Avatar>
-                  <span
-                    className={`border-card absolute right-0 bottom-0 size-3.5 rounded-full border-2 sm:size-4.5 sm:border-3 ${
-                      member.status === 'active'
-                        ? 'bg-emerald-500'
-                        : 'bg-rose-500'
-                    }`}
-                  />
                 </div>
 
                 {/* Quick Info text details */}
@@ -75,26 +68,8 @@ const StaffDetailDrawer = ({ member, open, onClose }) => {
                     {member.first_name} {member.last_name}
                   </h3>
                   <div className="mt-0.5 flex flex-wrap items-center gap-1.5 sm:gap-2">
-                    <Badge className="flex items-center gap-1 rounded-full border-none bg-purple-100 px-2 py-0.5 text-[10px] font-semibold text-purple-700 hover:bg-purple-100 sm:gap-1.5 sm:text-xs dark:bg-purple-950/40 dark:text-purple-300">
-                      <SCHOOL_ADMIN.SCHOOL_PROFILE className="size-3 text-purple-700 sm:size-3.5 dark:text-purple-300" />
-                      {member.department_name || 'Unassigned'}
-                    </Badge>
-                    <Badge
-                      className={`flex items-center gap-1 rounded-full border-none px-2 py-0.5 text-[10px] font-semibold sm:gap-1.5 sm:text-xs ${
-                        member.status === 'active'
-                          ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-50 dark:bg-emerald-950/40 dark:text-emerald-300'
-                          : 'bg-rose-50 text-rose-700 hover:bg-rose-50 dark:bg-rose-950/40 dark:text-rose-300'
-                      }`}
-                    >
-                      <span
-                        className={`size-1 rounded-full sm:size-1.5 ${
-                          member.status === 'active'
-                            ? 'bg-emerald-500'
-                            : 'bg-rose-500'
-                        }`}
-                      />
-                      {member.status === 'active' ? 'Active' : 'Inactive'}
-                    </Badge>
+                    <DepartmentBadge department={member.department_name} />
+                    <StatusBadge status={member.status} />
                   </div>
                   <p className="text-muted-foreground mt-1 font-mono text-[10px] sm:text-xs">
                     Staff ID: {formatStaffId(member.staff_id)}
