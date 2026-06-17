@@ -26,29 +26,29 @@ import { formatDate } from '@/lib/utils';
 const SkeletonRows = ({ count = 5 }) =>
   Array.from({ length: count }).map((_, i) => (
     <TableRow key={i}>
-      <TableCell>
+      <TableCell className="py-3">
         <div className="flex items-center gap-3">
-          <Skeleton className="size-10 rounded-full" />
+          <Skeleton className="size-9 rounded-full animate-pulse" />
           <div className="flex flex-col gap-1.5">
-            <Skeleton className="h-4 w-32" />
-            <Skeleton className="h-3 w-24" />
+            <Skeleton className="h-4 w-32 animate-pulse" />
+            <Skeleton className="h-3 w-24 animate-pulse" />
           </div>
         </div>
       </TableCell>
-      <TableCell className="hidden md:table-cell">
-        <Skeleton className="h-4 w-36" />
+      <TableCell className="hidden py-3 md:table-cell">
+        <Skeleton className="h-4 w-36 animate-pulse" />
       </TableCell>
-      <TableCell className="hidden md:table-cell">
-        <Skeleton className="h-4 w-28" />
+      <TableCell className="hidden py-3 md:table-cell">
+        <Skeleton className="h-4 w-28 animate-pulse" />
       </TableCell>
-      <TableCell>
-        <Skeleton className="h-5 w-16" />
+      <TableCell className="py-3">
+        <Skeleton className="h-5 w-16 rounded-full animate-pulse" />
       </TableCell>
-      <TableCell className="hidden lg:table-cell">
-        <Skeleton className="h-4 w-24" />
+      <TableCell className="hidden py-3 lg:table-cell">
+        <Skeleton className="h-4 w-24 animate-pulse" />
       </TableCell>
-      <TableCell>
-        <Skeleton className="size-8" />
+      <TableCell className="py-3 text-right">
+        <Skeleton className="ml-auto h-8 w-8 rounded-lg animate-pulse" />
       </TableCell>
     </TableRow>
   ));
@@ -56,16 +56,16 @@ const SkeletonRows = ({ count = 5 }) =>
 const AdminsTable = ({ admins, isLoading, onToggleStatus, onDeleteAdmin }) => {
   if (isLoading) {
     return (
-      <div className="overflow-x-auto rounded-lg border">
+      <div className="border-border bg-card overflow-hidden rounded-xl border shadow-xs">
         <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Admin</TableHead>
-              <TableHead className="hidden md:table-cell">School</TableHead>
-              <TableHead className="hidden md:table-cell">Phone</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="hidden lg:table-cell">Joined</TableHead>
-              <TableHead className="w-12">
+          <TableHeader className="bg-muted/30">
+            <TableRow className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase hover:bg-transparent">
+              <TableHead className="h-11 py-3 text-left">Admin</TableHead>
+              <TableHead className="hidden h-11 py-3 text-left md:table-cell">School</TableHead>
+              <TableHead className="hidden h-11 py-3 text-left md:table-cell">Phone</TableHead>
+              <TableHead className="h-11 py-3 text-left">Status</TableHead>
+              <TableHead className="hidden h-11 py-3 text-left lg:table-cell">Joined</TableHead>
+              <TableHead className="h-11 py-3 text-right w-12">
                 <span className="sr-only">Actions</span>
               </TableHead>
             </TableRow>
@@ -89,24 +89,25 @@ const AdminsTable = ({ admins, isLoading, onToggleStatus, onDeleteAdmin }) => {
   }
 
   return (
-    <div className="overflow-x-auto rounded-lg border">
+    <div className="border-border bg-card overflow-hidden rounded-xl border shadow-xs">
       <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Admin</TableHead>
-            <TableHead className="hidden md:table-cell">School</TableHead>
-            <TableHead className="hidden md:table-cell">Phone</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead className="hidden lg:table-cell">Joined</TableHead>
-            <TableHead className="w-12">
-              <span className="sr-only">Actions</span>
-            </TableHead>
+        <TableHeader className="bg-muted/30">
+          <TableRow className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase hover:bg-transparent">
+            <TableHead className="h-11 py-3 text-left">Admin</TableHead>
+            <TableHead className="hidden h-11 py-3 text-left md:table-cell">School</TableHead>
+            <TableHead className="hidden h-11 py-3 text-left md:table-cell">Phone</TableHead>
+            <TableHead className="h-11 py-3 text-left">Status</TableHead>
+            <TableHead className="hidden h-11 py-3 text-left lg:table-cell">Joined</TableHead>
+            <TableHead className="h-11 py-3 text-right w-12">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {admins.map((admin) => (
-            <TableRow key={admin.staff_id}>
-              <TableCell>
+            <TableRow
+              key={admin.staff_id}
+              className="hover:bg-muted/10 border-b transition-colors last:border-0"
+            >
+              <TableCell className="text-foreground py-3.5 font-medium">
                 <div className="flex items-center gap-3">
                   <UserAvatar
                     name={`${admin.first_name} ${admin.last_name}`}
@@ -114,32 +115,32 @@ const AdminsTable = ({ admins, isLoading, onToggleStatus, onDeleteAdmin }) => {
                     size="sm"
                   />
                   <div className="flex flex-col">
-                    <span className="font-medium">{`${admin.first_name} ${admin.last_name}`}</span>
-                    <span className="text-muted-foreground text-xs">
+                    <span className="text-sm font-bold tracking-tight">{`${admin.first_name} ${admin.last_name}`}</span>
+                    <span className="text-muted-foreground text-xs font-medium mt-0.5">
                       {admin.email}
                     </span>
                   </div>
                 </div>
               </TableCell>
-              <TableCell className="hidden font-medium md:table-cell">
+              <TableCell className="hidden py-3.5 text-xs font-semibold md:table-cell">
                 {admin.school_name || '—'}
               </TableCell>
-              <TableCell className="text-muted-foreground hidden md:table-cell">
+              <TableCell className="text-muted-foreground hidden py-3.5 text-xs font-medium md:table-cell">
                 {admin.phone || '—'}
               </TableCell>
-              <TableCell>
+              <TableCell className="py-3.5 text-xs">
                 <StatusBadge status={admin.status} pulse={false} />
               </TableCell>
-              <TableCell className="text-muted-foreground hidden tabular-nums lg:table-cell">
-                {formatDate(admin.created_at, 'medium')}
+              <TableCell className="text-muted-foreground hidden py-3.5 text-xs font-medium tabular-nums lg:table-cell">
+                {formatDate(admin.created_at, 'short')}
               </TableCell>
-              <TableCell>
+              <TableCell className="py-3.5 text-right">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="cursor-pointer"
+                      className="text-muted-foreground hover:text-foreground size-8 cursor-pointer rounded-lg"
                       aria-label={`Actions for ${admin.first_name}`}
                     >
                       <BASE.MORE_V className="size-4" />

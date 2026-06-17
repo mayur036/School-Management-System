@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react';
 import AppBreadcrumb from '@/components/shared/AppBreadcrumb';
 import AppPagination from '@/components/shared/AppPagination';
 import { Button } from '@/components/ui/button';
-import { ACTIONS } from '@/lib/icons';
+import { BASE } from '@/lib/icons';
 
 import CreateSchoolAdminDialog from '../components/schools/CreateSchoolAdminDialog';
 import CreateSchoolDialog from '../components/schools/CreateSchoolDialog';
@@ -47,22 +47,30 @@ const SchoolsPage = () => {
         ]}
       />
 
-      {/* Page Title & Action */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-foreground text-3xl font-bold tracking-tight">
-            Schools Management
-          </h1>
-          <p className="text-muted-foreground mt-1 text-sm">
-            View, manage, and register new schools on the platform.
-          </p>
+      {/* Search & Actions Bar (eSkooly style) */}
+      <div className="bg-card border-border flex flex-col gap-4 rounded-xl border p-4.5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+        {/* Left: Search Input Box */}
+        <div className="flex flex-col gap-1.5 flex-1 max-w-md w-full">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80">
+            Search School
+          </span>
+          <div className="relative w-full">
+            <BASE.SEARCH className="text-muted-foreground/60 absolute top-1/2 left-3 size-4 -translate-y-1/2" />
+            <input
+              type="text"
+              className="bg-card border-border text-foreground placeholder:text-muted-foreground/60 w-full rounded-lg border py-2 pr-4 pl-9 text-xs outline-none focus:ring-1 focus:ring-primary cursor-not-allowed opacity-75"
+              placeholder="Type school name or domain..."
+              disabled
+            />
+          </div>
         </div>
+
+        {/* Right: Action Button */}
         <Button
           onClick={() => setCreateOpen(true)}
-          className="bg-primary text-primary-foreground hover:bg-primary/95 cursor-pointer gap-2 shadow-sm transition-all"
+          className="bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer h-9 px-4 text-xs font-semibold rounded-lg shadow-xs transition-colors shrink-0"
         >
-          <ACTIONS.CREATE data-icon="inline-start" />
-          Register School
+          + Register School
         </Button>
       </div>
 

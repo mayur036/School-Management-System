@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMemo, useState } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 
 import AppBreadcrumb from '@/components/shared/AppBreadcrumb';
@@ -33,8 +33,6 @@ import { useCreateStaffMutation } from '../staff.api';
 import { generateSecurePassword } from '../utils/staff.utils';
 
 const RegisterStaffPage = () => {
-  const navigate = useNavigate();
-
   // Queries & Mutations
   const { data: deptData, isLoading: deptsLoading } = useGetDepartmentsQuery();
   const departments = useMemo(
@@ -312,37 +310,9 @@ const RegisterStaffPage = () => {
       <AppBreadcrumb
         items={[
           { label: 'School Admin', to: '/school/dashboard' },
-          { label: 'Staff Directory', to: '/school/staff' },
           { label: 'Register Staff' },
         ]}
       />
-
-      {/* Page Title Header */}
-      <div className="flex flex-col gap-4 border-b pb-4 lg:flex-row lg:items-center lg:justify-between">
-        <div>
-          <h1 className="text-foreground text-3xl font-bold tracking-tight">
-            Register Staff Batch
-          </h1>
-          <p className="text-muted-foreground mt-1 text-sm">
-            Register multiple staff members at once under the same department.
-          </p>
-        </div>
-
-        {/* Security Info Badge */}
-        <Card className="max-w-xs border-blue-500/20 bg-blue-500/5 py-0 shadow-xs">
-          <CardContent className="flex items-center gap-3 p-3 text-xs">
-            <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600">
-              <BASE.SHIELD className="size-4" />
-            </div>
-            <div>
-              <p className="text-foreground font-semibold">Secure & Private</p>
-              <p className="text-muted-foreground mt-0.5">
-                All passwords are encrypted using industry standards.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
 
       {createdCredentials ? (
         /* ── Post-Creation Credential Display ──────────────── */
@@ -454,111 +424,74 @@ const RegisterStaffPage = () => {
         </Card>
       ) : (
         /* ── Stepper/Wizard Form ─────────────────────────────── */
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
-          {/* Left Panel: Vertical Stepper (Desktop) */}
-          <div className="col-span-1 hidden flex-col gap-6 border-r pr-6 lg:flex">
-            <div className="relative flex flex-col gap-8">
-              {/* Vertical Connector Line */}
-              <div className="bg-border absolute top-2 bottom-2 left-4 -z-10 w-0.5" />
-
-              {steps.map((step) => {
+        <div className="flex flex-col gap-6">
+          {/* Horizontal Stepper (Desktop & Mobile) */}
+          <div className="bg-card border-border rounded-xl border p-4 shadow-sm">
+            <div className="flex flex-row items-center justify-between gap-2 sm:gap-6">
+              {steps.map((step, idx) => {
                 const isActive = step.id === activeStep;
                 const isCompleted = step.id < activeStep;
 
                 return (
-                  <button
+                  <div
                     key={step.id}
-                    type="button"
-                    onClick={() => handleStepClick(step.id)}
-                    className="group flex cursor-pointer items-center gap-4 text-left focus:outline-none"
+                    className="flex flex-1 items-center justify-center sm:justify-start"
                   >
-                    <div
-                      className={`flex size-9 shrink-0 items-center justify-center rounded-full border text-xs font-semibold transition-all ${
-                        isActive
-                          ? 'bg-primary border-primary text-primary-foreground shadow-sm'
-                          : isCompleted
-                            ? 'bg-primary/10 border-primary text-primary'
-                            : 'bg-muted border-border text-muted-foreground group-hover:border-muted-foreground/50'
-                      }`}
+                    <button
+                      type="button"
+                      onClick={() => handleStepClick(step.id)}
+                      className="group flex cursor-pointer items-center gap-2.5 text-left focus:outline-none"
                     >
-                      {isCompleted ? (
-                        <STATUS.ACTIVE className="size-4" />
-                      ) : (
-                        step.id
-                      )}
-                    </div>
-                    <div className="flex flex-col">
-                      <span
-                        className={`text-sm font-semibold transition-colors ${
+                      <div
+                        className={`flex size-8 shrink-0 items-center justify-center rounded-full border text-xs font-bold transition-all sm:size-9 sm:text-sm ${
                           isActive
-                            ? 'text-primary'
-                            : 'text-foreground/80 group-hover:text-foreground'
+                            ? 'bg-primary border-primary text-primary-foreground shadow-sm'
+                            : isCompleted
+                              ? 'bg-primary/10 border-primary text-primary font-bold'
+                              : 'bg-muted border-border text-muted-foreground group-hover:border-muted-foreground/50'
                         }`}
                       >
-                        {step.title}
-                      </span>
-                      <span className="text-muted-foreground text-xs">
-                        {step.desc}
-                      </span>
-                    </div>
-                  </button>
+                        {isCompleted ? (
+                          <STATUS.ACTIVE className="size-4 font-bold" />
+                        ) : (
+                          step.id
+                        )}
+                      </div>
+                      <div className="hidden flex-col leading-tight sm:flex">
+                        <span
+                          className={`text-xs font-semibold transition-colors sm:text-sm ${
+                            isActive
+                              ? 'text-primary font-bold'
+                              : 'text-foreground/85 group-hover:text-foreground'
+                          }`}
+                        >
+                          {step.title}
+                        </span>
+                        <span className="text-muted-foreground mt-0.5 hidden text-[11px] md:inline">
+                          {step.desc}
+                        </span>
+                      </div>
+                    </button>
+                    {/* Horizontal Connector Line */}
+                    {idx < steps.length - 1 && (
+                      <div
+                        className={`mx-2 h-0.5 min-w-4 flex-1 sm:mx-3 sm:min-w-5 md:mx-6 ${
+                          isCompleted ? 'bg-primary' : 'bg-border'
+                        }`}
+                      />
+                    )}
+                  </div>
                 );
               })}
             </div>
+            {/* Mobile-only Step Title Subtitle */}
+            <div className="text-primary border-border/50 mt-3 border-t pt-2.5 text-center text-xs font-semibold sm:hidden">
+              Step {activeStep} of {steps.length}: {steps[activeStep - 1].title}
+            </div>
           </div>
 
-          {/* Mobile Horizontal Stepper Header */}
-          <div className="bg-card border-border flex items-center justify-between rounded-xl border p-4 shadow-xs lg:hidden">
-            {steps.map((step, idx) => {
-              const isActive = step.id === activeStep;
-              const isCompleted = step.id < activeStep;
-
-              return (
-                <div
-                  key={step.id}
-                  className="relative flex flex-1 flex-col items-center gap-1.5"
-                >
-                  {/* Step Connector Line */}
-                  {idx > 0 && (
-                    <div
-                      className={`absolute top-4 right-1/2 -z-10 h-0.5 w-full -translate-y-1/2 ${
-                        isCompleted || isActive ? 'bg-primary/45' : 'bg-border'
-                      }`}
-                    />
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => handleStepClick(step.id)}
-                    className={`flex size-8 items-center justify-center rounded-full border text-xs font-semibold ${
-                      isActive
-                        ? 'bg-primary border-primary text-primary-foreground'
-                        : isCompleted
-                          ? 'bg-primary/10 border-primary text-primary'
-                          : 'bg-muted border-border text-muted-foreground'
-                    }`}
-                  >
-                    {isCompleted ? (
-                      <STATUS.ACTIVE className="size-3.5" />
-                    ) : (
-                      step.id
-                    )}
-                  </button>
-                  <span
-                    className={`text-[10px] font-medium ${
-                      isActive
-                        ? 'text-primary font-bold'
-                        : 'text-muted-foreground'
-                    }`}
-                  >
-                    {step.title}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Right Panel: Stepper-Accordion Container */}
-          <div className="flex flex-col gap-4 lg:col-span-3">
+          {/* Form Content Panel */}
+          <div className="flex flex-col gap-4">
             {/* Step 1: Department Selection & Staff Details */}
             <Card
               className={`border-border border shadow-xs transition-all ${activeStep === 1 ? 'block' : 'hidden'}`}
@@ -623,9 +556,8 @@ const RegisterStaffPage = () => {
                     </Label>
                     <Button
                       type="button"
-                      variant="outline"
                       size="sm"
-                      className="cursor-pointer gap-1"
+                      className="bg-primary text-primary-foreground hover:bg-primary/95 cursor-pointer gap-1"
                       onClick={() =>
                         append({
                           first_name: '',
@@ -781,7 +713,7 @@ const RegisterStaffPage = () => {
               <button
                 type="button"
                 onClick={() => handleStepClick(1)}
-                className="border-border bg-card hover:bg-muted/30 flex cursor-pointer items-center justify-between rounded-xl border p-4 transition-colors"
+                className="border-border bg-card hover:bg-primary/10 flex cursor-pointer items-center justify-between rounded-xl border p-4 transition-colors"
               >
                 <div className="flex items-center gap-3">
                   <div className="bg-primary/10 text-primary flex size-8 items-center justify-center rounded-full">
@@ -913,7 +845,7 @@ const RegisterStaffPage = () => {
                 type="button"
                 disabled={activeStep < 2}
                 onClick={() => handleStepClick(2)}
-                className="border-border bg-card hover:bg-muted/30 flex cursor-pointer items-center justify-between rounded-xl border p-4 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                className="border-border bg-card hover:bg-primary/10 flex cursor-pointer items-center justify-between rounded-xl border p-4 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <div className="flex items-center gap-3">
                   <div
@@ -1018,7 +950,7 @@ const RegisterStaffPage = () => {
                 type="button"
                 disabled={activeStep < 3}
                 onClick={() => handleStepClick(3)}
-                className="border-border bg-card hover:bg-muted/30 flex cursor-pointer items-center justify-between rounded-xl border p-4 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                className="border-border bg-card hover:bg-primary/10 flex cursor-pointer items-center justify-between rounded-xl border p-4 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <div className="flex items-center gap-3">
                   <div className="bg-muted text-muted-foreground flex size-8 items-center justify-center rounded-full">
@@ -1043,11 +975,11 @@ const RegisterStaffPage = () => {
               <Button
                 variant="outline"
                 className="border-border cursor-pointer gap-2"
-                onClick={() => navigate('/school/staff')}
+                onClick={handleRegisterAnotherBatch}
                 disabled={isSubmitting}
               >
-                <STATUS.INACTIVE className="size-4" />
-                Cancel
+                <BASE.ROTATE_CCW className="size-4" />
+                Reset
               </Button>
 
               <div className="flex gap-2">

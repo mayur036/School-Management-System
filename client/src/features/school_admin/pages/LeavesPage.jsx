@@ -115,19 +115,6 @@ export const LeavesPage = () => {
         ]}
       />
 
-      {/* Page Title */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-foreground text-3xl font-bold tracking-tight">
-            Staff Leave Requests
-          </h1>
-          <p className="text-muted-foreground mt-1 text-sm">
-            Review, approve, or reject absence requests submitted by staff
-            members.
-          </p>
-        </div>
-      </div>
-
       {/* ── Main Data View (Table) ────────────────────────────── */}
       <div className="flex flex-col gap-4">
         <LeaveTable

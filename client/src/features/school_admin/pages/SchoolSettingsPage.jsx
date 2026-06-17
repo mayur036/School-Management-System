@@ -147,16 +147,7 @@ export const SchoolSettingsPage = () => {
         ]}
       />
 
-      {/* Page Header */}
-      <div>
-        <h1 className="text-foreground text-3xl font-bold tracking-tight">
-          School Settings
-        </h1>
-        <p className="text-muted-foreground mt-1 text-sm">
-          Manage your institution's profile, contact details, and operational
-          preferences.
-        </p>
-      </div>
+
 
       {isLoading ? (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">

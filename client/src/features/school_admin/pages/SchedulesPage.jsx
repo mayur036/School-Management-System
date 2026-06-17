@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 
+import AppBreadcrumb from '@/components/shared/AppBreadcrumb';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -13,14 +13,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   useDeleteStaffScheduleMutation,
@@ -29,12 +21,13 @@ import {
   useListSchoolSchedulesQuery,
 } from '@/features/school_admin/schedule.api';
 import { useGetStaffQuery } from '@/features/school_admin/staff.api';
-import { ACTIONS, BASE, EMPTY_STATE } from '@/lib/icons';
+import { BASE } from '@/lib/icons';
 
 import { BulkScheduleDialog } from '../components/schedules/BulkScheduleDialog';
 import { PeriodManager } from '../components/schedules/PeriodManager';
 import { ScheduleDialog } from '../components/schedules/ScheduleDialog';
 import { ScheduleGrid } from '../components/schedules/ScheduleGrid';
+import SchedulesTable from '../components/schedules/SchedulesTable';
 import { WorkingDaysConfig } from '../components/schedules/WorkingDaysConfig';
 
 export const SchedulesPage = () => {
@@ -59,8 +52,7 @@ export const SchedulesPage = () => {
   const { data: settingsData } = useGetSchoolSettingsQuery();
   const { data: schedulesData, isLoading: isSchedulesLoading } =
     useListSchoolSchedulesQuery();
-  const [deleteSchedule, { isLoading: isDeleting }] =
-    useDeleteStaffScheduleMutation();
+  const [deleteSchedule] = useDeleteStaffScheduleMutation();
 
   const staffMembers = staffData?.data?.staff || [];
   const periods = periodsData?.data?.periods || [];
@@ -105,53 +97,51 @@ export const SchedulesPage = () => {
     }
   };
 
-  // Table filter logic
-  const filteredSchedules = schedules.filter((item) => {
-    const matchesSearch =
-      item.subject_name.toLowerCase().includes(tableSearch.toLowerCase()) ||
-      item.class_name.toLowerCase().includes(tableSearch.toLowerCase()) ||
-      (item.room &&
-        item.room.toLowerCase().includes(tableSearch.toLowerCase()));
-
-    const matchesStaff =
-      tableStaffFilter === 'all' || item.staff_id === Number(tableStaffFilter);
-
-    const matchesDay =
-      tableDayFilter === 'all' || item.day_of_week === tableDayFilter;
-
-    return matchesSearch && matchesStaff && matchesDay;
-  });
-
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-foreground text-2xl font-bold tracking-tight">
-            Staff Timetable Manager
-          </h1>
-          <p className="text-muted-foreground text-sm">
-            Configure periods, working days, and assign weekly teaching
-            schedules for school staff.
-          </p>
+    <div className="animate-fade-in mx-auto flex w-full max-w-7xl flex-col gap-6">
+      {/* Breadcrumbs */}
+      <AppBreadcrumb
+        items={[
+          { label: 'School Admin', to: '/school/dashboard' },
+          { label: 'Timetable Schedules' },
+        ]}
+      />
+
+      {/* Search & Actions Bar (eSkooly style) */}
+      <div className="bg-card border-border flex flex-col gap-4 rounded-xl border p-4.5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+        {/* Left: Search Input Box */}
+        <div className="flex w-full max-w-md flex-1 flex-col gap-1.5">
+          <span className="text-muted-foreground/80 text-[10px] font-bold tracking-wider uppercase">
+            Search Timetable
+          </span>
+          <div className="relative w-full">
+            <BASE.SEARCH className="text-muted-foreground/60 absolute top-1/2 left-3 size-4 -translate-y-1/2" />
+            <input
+              type="text"
+              className="bg-card border-border text-foreground placeholder:text-muted-foreground/60 focus:ring-primary w-full cursor-not-allowed rounded-lg border py-2 pr-4 pl-9 text-xs opacity-75 outline-none focus:ring-1"
+              placeholder="Type subject or class..."
+              disabled
+            />
+          </div>
         </div>
 
-        <div className="flex w-full items-center gap-2 sm:w-auto">
+        {/* Right: Actions */}
+        <div className="flex w-full shrink-0 items-center gap-2 sm:w-auto">
           <Button
             variant="outline"
             onClick={() => setIsBulkOpen(true)}
-            className="h-9 flex-1 py-1.5 text-xs font-semibold sm:flex-initial"
+            className="border-border bg-card hover:bg-muted/30 h-9 cursor-pointer rounded-lg px-4 text-xs font-semibold shadow-xs transition-colors"
             disabled={staffMembers.length === 0}
           >
-            <BASE.COPY className="mr-1.5 h-4 w-4" /> Copy Template
+            Copy Template
           </Button>
 
           <Button
             onClick={handleAddSlotHeader}
-            className="h-9 flex-1 py-1.5 text-xs font-semibold sm:flex-initial"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 h-9 cursor-pointer rounded-lg px-4 text-xs font-semibold shadow-xs transition-colors"
             disabled={staffMembers.length === 0 || periods.length === 0}
           >
-            <ACTIONS.CREATE className="mr-1.5 h-4 w-4" /> Add Slot
+            + Add Slot
           </Button>
         </div>
       </div>
@@ -238,9 +228,9 @@ export const SchedulesPage = () => {
 
         {/* Tab Content: Table */}
         <TabsContent value="table" className="m-0 focus-visible:ring-0">
-          <Card className="border-border bg-card shadow-sm">
+          <div className="border-border bg-card overflow-hidden rounded-xl border shadow-xs">
             {/* Filters Bar */}
-            <CardHeader className="border-border border-b pb-3">
+            <div className="border-border border-b p-4.5">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                 {/* Search Input */}
                 <div className="flex-1">
@@ -300,111 +290,15 @@ export const SchedulesPage = () => {
                   </Select>
                 </div>
               </div>
-            </CardHeader>
+            </div>
 
-            {/* Table Records */}
-            <CardContent className="pt-4">
-              {isSchedulesLoading ? (
-                <div className="space-y-2">
-                  {[...Array(3)].map((_, i) => (
-                    <Skeleton
-                      key={i}
-                      className="bg-muted h-8 w-full animate-pulse rounded"
-                    />
-                  ))}
-                </div>
-              ) : filteredSchedules.length > 0 ? (
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader className="bg-muted/50">
-                      <TableRow>
-                        <TableHead className="text-xs font-semibold">
-                          Staff Member
-                        </TableHead>
-                        <TableHead className="text-xs font-semibold">
-                          Department
-                        </TableHead>
-                        <TableHead className="text-xs font-semibold">
-                          Subject
-                        </TableHead>
-                        <TableHead className="text-xs font-semibold">
-                          Class / Room
-                        </TableHead>
-                        <TableHead className="text-xs font-semibold">
-                          Day
-                        </TableHead>
-                        <TableHead className="text-xs font-semibold">
-                          Time Period
-                        </TableHead>
-                        <TableHead className="w-24 text-right text-xs font-semibold">
-                          Actions
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredSchedules.map((item) => (
-                        <TableRow
-                          key={item.schedule_id}
-                          className="hover:bg-muted/30"
-                        >
-                          <TableCell className="text-foreground text-xs font-semibold">
-                            {item.staff_name}
-                          </TableCell>
-                          <TableCell className="text-muted-foreground text-xs">
-                            {item.department_name || 'Staff'}
-                          </TableCell>
-                          <TableCell className="text-foreground text-xs font-semibold">
-                            {item.subject_name}
-                          </TableCell>
-                          <TableCell className="text-muted-foreground text-xs">
-                            {item.class_name}{' '}
-                            {item.room ? `· Room ${item.room}` : ''}
-                          </TableCell>
-                          <TableCell className="text-muted-foreground text-xs">
-                            {item.day_of_week}
-                          </TableCell>
-                          <TableCell className="text-muted-foreground font-mono text-xs">
-                            {item.period_name} (
-                            {item.start_time.substring(0, 5)} -{' '}
-                            {item.end_time.substring(0, 5)})
-                          </TableCell>
-                          <TableCell className="space-x-1 text-right">
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="hover:text-primary h-7 w-7 rounded p-0 text-slate-400"
-                              onClick={() => handleEditSlot(item)}
-                            >
-                              <ACTIONS.EDIT className="h-3.5 w-3.5" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="h-7 w-7 rounded p-0 text-slate-400 hover:text-red-500"
-                              disabled={isDeleting}
-                              onClick={() => handleDeleteSlot(item.schedule_id)}
-                            >
-                              <ACTIONS.DELETE className="h-3.5 w-3.5" />
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center py-16 text-center">
-                  <EMPTY_STATE.NO_DATA className="mb-2.5 h-10 w-10 text-slate-300" />
-                  <h3 className="text-foreground text-sm font-semibold">
-                    No Schedule Entries Found
-                  </h3>
-                  <p className="text-muted-foreground mt-0.5 max-w-65 text-xs">
-                    Try modifying your search or filter values to find records.
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+            <SchedulesTable
+              search={tableSearch}
+              staffFilter={tableStaffFilter}
+              dayFilter={tableDayFilter}
+              onEdit={handleEditSlot}
+            />
+          </div>
         </TabsContent>
 
         {/* Tab Content: Settings */}

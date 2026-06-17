@@ -27,23 +27,29 @@ import { formatDate } from '@/lib/utils';
 const SkeletonRows = ({ count = 5 }) =>
   Array.from({ length: count }).map((_, i) => (
     <TableRow key={i}>
-      <TableCell>
-        <Skeleton className="h-4 w-32" />
+      <TableCell className="py-3">
+        <div className="flex items-center gap-3">
+          <Skeleton className="size-9 rounded-xl animate-pulse" />
+          <div className="flex flex-col gap-1.5">
+            <Skeleton className="h-4 w-32 animate-pulse" />
+            <Skeleton className="h-3 w-20 animate-pulse" />
+          </div>
+        </div>
       </TableCell>
-      <TableCell>
-        <Skeleton className="h-4 w-16" />
+      <TableCell className="py-3">
+        <Skeleton className="h-4 w-12 animate-pulse" />
       </TableCell>
-      <TableCell className="hidden md:table-cell">
-        <Skeleton className="h-4 w-36" />
+      <TableCell className="hidden py-3 md:table-cell">
+        <Skeleton className="h-4 w-36 animate-pulse" />
       </TableCell>
-      <TableCell>
-        <Skeleton className="h-5 w-16" />
+      <TableCell className="py-3">
+        <Skeleton className="h-5 w-16 rounded-full animate-pulse" />
       </TableCell>
-      <TableCell className="hidden lg:table-cell">
-        <Skeleton className="h-4 w-24" />
+      <TableCell className="hidden py-3 lg:table-cell">
+        <Skeleton className="h-4 w-24 animate-pulse" />
       </TableCell>
-      <TableCell>
-        <Skeleton className="size-8" />
+      <TableCell className="py-3 text-right">
+        <Skeleton className="ml-auto h-8 w-8 rounded-lg animate-pulse" />
       </TableCell>
     </TableRow>
   ));
@@ -59,16 +65,16 @@ const SchoolsTable = ({
 }) => {
   if (isLoading) {
     return (
-      <div className="overflow-x-auto rounded-lg border">
+      <div className="border-border bg-card overflow-hidden rounded-xl border shadow-xs">
         <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Code</TableHead>
-              <TableHead className="hidden md:table-cell">Email</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="hidden lg:table-cell">Created</TableHead>
-              <TableHead className="w-12">
+          <TableHeader className="bg-muted/30">
+            <TableRow className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase hover:bg-transparent">
+              <TableHead className="h-11 py-3 text-left">Name</TableHead>
+              <TableHead className="h-11 py-3 text-left">Code</TableHead>
+              <TableHead className="hidden h-11 py-3 text-left md:table-cell">Email</TableHead>
+              <TableHead className="h-11 py-3 text-left">Status</TableHead>
+              <TableHead className="hidden h-11 py-3 text-left lg:table-cell">Created</TableHead>
+              <TableHead className="h-11 py-3 text-right w-12">
                 <span className="sr-only">Actions</span>
               </TableHead>
             </TableRow>
@@ -92,60 +98,58 @@ const SchoolsTable = ({
   }
 
   return (
-    <div className="overflow-x-auto rounded-lg border">
+    <div className="border-border bg-card overflow-hidden rounded-xl border shadow-xs">
       <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Code</TableHead>
-            <TableHead className="hidden md:table-cell">Email</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead className="hidden lg:table-cell">Created</TableHead>
-            <TableHead className="w-12">
-              <span className="sr-only">Actions</span>
-            </TableHead>
+        <TableHeader className="bg-muted/30">
+          <TableRow className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase hover:bg-transparent">
+            <TableHead className="h-11 py-3 text-left">Name</TableHead>
+            <TableHead className="h-11 py-3 text-left">Code</TableHead>
+            <TableHead className="hidden h-11 py-3 text-left md:table-cell">Email</TableHead>
+            <TableHead className="h-11 py-3 text-left">Status</TableHead>
+            <TableHead className="hidden h-11 py-3 text-left lg:table-cell">Created</TableHead>
+            <TableHead className="h-11 py-3 text-right w-12">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {schools.map((school) => (
             <TableRow
               key={school.school_id}
-              className="hover:bg-muted/50 group cursor-pointer transition-colors"
+              className="hover:bg-muted/10 border-b transition-colors last:border-0"
             >
-              <TableCell>
+              <TableCell className="text-foreground py-3.5 font-medium">
                 <div className="flex items-center gap-3">
                   <div className="bg-primary/10 text-primary border-primary/20 flex size-9 shrink-0 items-center justify-center rounded-xl border">
                     <BASE.BUILDING className="size-4.5" />
                   </div>
                   <div className="flex flex-col">
-                    <span className="group-hover:text-primary font-medium transition-colors">
+                    <span className="text-sm font-bold tracking-tight">
                       {school.name}
                     </span>
-                    <span className="text-muted-foreground text-xs">
+                    <span className="text-muted-foreground text-xs font-medium mt-0.5">
                       {school.domain || '—'}
                     </span>
                   </div>
                 </div>
               </TableCell>
-              <TableCell className="text-muted-foreground tabular-nums">
+              <TableCell className="text-muted-foreground py-3.5 text-xs font-medium tabular-nums">
                 {school.code || '—'}
               </TableCell>
-              <TableCell className="text-muted-foreground hidden md:table-cell">
+              <TableCell className="text-muted-foreground hidden py-3.5 text-xs font-medium md:table-cell">
                 {school.email || '—'}
               </TableCell>
-              <TableCell>
+              <TableCell className="py-3.5 text-xs">
                 <StatusBadge status={school.status} pulse={false} />
               </TableCell>
-              <TableCell className="text-muted-foreground hidden tabular-nums lg:table-cell">
-                {formatDate(school.created_at, 'medium')}
+              <TableCell className="text-muted-foreground hidden py-3.5 text-xs font-medium tabular-nums lg:table-cell">
+                {formatDate(school.created_at, 'short')}
               </TableCell>
-              <TableCell>
+              <TableCell className="py-3.5 text-right">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="cursor-pointer"
+                      className="text-muted-foreground hover:text-foreground size-8 cursor-pointer rounded-lg"
                       aria-label={`Actions for ${school.name}`}
                     >
                       <BASE.MORE_V className="size-4" />

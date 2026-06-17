@@ -42,19 +42,27 @@ const AdminsPage = () => {
         ]}
       />
 
-      {/* Page Title */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-foreground text-3xl font-bold tracking-tight">
-            School Admins
-          </h1>
-          <p className="text-muted-foreground mt-1 text-sm">
-            Manage administrators across all registered schools.
-          </p>
+      {/* Search & Actions Bar (eSkooly style) */}
+      <div className="bg-card border-border flex flex-col gap-4 rounded-xl border p-4.5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+        {/* Left: Search Input Box */}
+        <div className="flex w-full max-w-md flex-1 flex-col gap-1.5">
+          <span className="text-muted-foreground/80 text-[10px] font-bold tracking-wider uppercase">
+            Search Admin
+          </span>
+          <div className="relative w-full">
+            <BASE.SEARCH className="text-muted-foreground/60 absolute top-1/2 left-3 size-4 -translate-y-1/2" />
+            <input
+              type="text"
+              className="bg-card border-border text-foreground placeholder:text-muted-foreground/60 focus:ring-primary w-full cursor-not-allowed rounded-lg border py-2 pr-4 pl-9 text-xs opacity-75 outline-none focus:ring-1"
+              placeholder="Type admin name, email or school..."
+              disabled
+            />
+          </div>
         </div>
-        <Button className="bg-primary hover:bg-primary/90 w-fit cursor-pointer gap-2 rounded-xl font-semibold text-white shadow-sm">
-          <BASE.PLUS className="size-4" />
-          Register Admin
+
+        {/* Right: Action Button */}
+        <Button className="bg-primary text-primary-foreground hover:bg-primary/90 h-9 shrink-0 cursor-pointer rounded-lg px-4 text-xs font-semibold shadow-xs transition-colors">
+          + Register Admin
         </Button>
       </div>
 

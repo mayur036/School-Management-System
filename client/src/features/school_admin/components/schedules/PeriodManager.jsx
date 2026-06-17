@@ -5,13 +5,6 @@ import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -23,34 +16,25 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import {
   useCreateSchoolPeriodMutation,
-  useDeleteSchoolPeriodMutation,
   useGetSchoolPeriodsQuery,
   useUpdateSchoolPeriodMutation,
 } from '@/features/school_admin/schedule.api';
-import { ACTIONS, EMPTY_STATE } from '@/lib/icons';
+import { ACTIONS } from '@/lib/icons';
 import { periodSchema } from '@/schemas/schedule.schema';
+
+import PeriodsTable from './PeriodsTable';
 
 export const PeriodManager = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [editingPeriod, setEditingPeriod] = useState(null);
 
   // Queries & Mutations
-  const { data: periodsData, isLoading } = useGetSchoolPeriodsQuery();
+  const { data: periodsData } = useGetSchoolPeriodsQuery();
   const [createPeriod, { isLoading: isCreating }] =
     useCreateSchoolPeriodMutation();
   const [updatePeriod, { isLoading: isUpdating }] =
     useUpdateSchoolPeriodMutation();
-  const [deletePeriod, { isLoading: isDeleting }] =
-    useDeleteSchoolPeriodMutation();
 
   const periods = periodsData?.data?.periods || [];
 
@@ -130,136 +114,32 @@ export const PeriodManager = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (
-      !window.confirm(
-        'Are you sure you want to delete this period? This will fail if schedules reference it.'
-      )
-    ) {
-      return;
-    }
-    try {
-      const res = await deletePeriod(id).unwrap();
-      toast.success(res.message || 'Period deleted successfully');
-    } catch (err) {
-      toast.error(err?.data?.message || 'Failed to delete period');
-    }
-  };
+
 
   return (
-    <Card className="border-border bg-card shadow-sm">
-      <CardHeader className="border-border flex flex-row items-center justify-between border-b pb-3">
-        <div>
-          <CardTitle className="text-foreground text-base font-semibold">
-            School Periods (Bell Schedule)
-          </CardTitle>
-          <CardDescription className="text-xs">
-            Manage periods, class timings, and breaks for your school.
-          </CardDescription>
+    <>
+      <div className="border-border bg-card overflow-hidden rounded-xl border shadow-xs">
+        <div className="border-border border-b p-4.5 bg-card">
+          <div className="flex flex-row items-center justify-between">
+            <div>
+              <h3 className="text-foreground text-sm font-bold tracking-tight">
+                School Periods (Bell Schedule)
+              </h3>
+              <p className="text-muted-foreground text-xs font-medium mt-0.5">
+                Manage periods, class timings, and breaks for your school.
+              </p>
+            </div>
+            <Button
+              onClick={openCreateDialog}
+              className="bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer h-9 px-4 text-xs font-semibold rounded-lg shadow-xs transition-colors"
+            >
+              <ACTIONS.CREATE className="mr-1.5 size-4" /> Add Period
+            </Button>
+          </div>
         </div>
-        <Button
-          onClick={openCreateDialog}
-          size="sm"
-          className="h-8 text-xs font-semibold"
-        >
-          <ACTIONS.CREATE className="mr-1.5 h-3.5 w-3.5" /> Add Period
-        </Button>
-      </CardHeader>
-      <CardContent className="pt-4">
-        {isLoading ? (
-          <div className="space-y-2 py-4">
-            <div className="bg-muted h-6 w-full animate-pulse rounded" />
-            <div className="bg-muted h-6 w-full animate-pulse rounded" />
-            <div className="bg-muted h-6 w-full animate-pulse rounded" />
-          </div>
-        ) : periods.length > 0 ? (
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader className="bg-muted/50">
-                <TableRow>
-                  <TableHead className="w-16 text-center text-xs font-semibold">
-                    Order
-                  </TableHead>
-                  <TableHead className="text-xs font-semibold">Name</TableHead>
-                  <TableHead className="text-xs font-semibold">
-                    Start Time
-                  </TableHead>
-                  <TableHead className="text-xs font-semibold">
-                    End Time
-                  </TableHead>
-                  <TableHead className="w-24 text-center text-xs font-semibold">
-                    Type
-                  </TableHead>
-                  <TableHead className="w-24 text-right text-xs font-semibold">
-                    Actions
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {periods.map((period) => (
-                  <TableRow
-                    key={period.period_id}
-                    className="hover:bg-muted/30"
-                  >
-                    <TableCell className="text-center font-mono text-xs font-medium">
-                      {period.period_order}
-                    </TableCell>
-                    <TableCell className="text-foreground text-xs font-semibold">
-                      {period.period_name}
-                    </TableCell>
-                    <TableCell className="text-muted-foreground font-mono text-xs font-medium">
-                      {period.start_time.substring(0, 5)}
-                    </TableCell>
-                    <TableCell className="text-muted-foreground font-mono text-xs font-medium">
-                      {period.end_time.substring(0, 5)}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      {period.is_break ? (
-                        <span className="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-medium text-amber-800 ring-1 ring-amber-600/20 ring-inset dark:bg-amber-950/35 dark:text-amber-300">
-                          Break
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-medium text-blue-700 ring-1 ring-blue-700/10 ring-inset dark:bg-blue-950/35 dark:text-blue-300">
-                          Class
-                        </span>
-                      )}
-                    </TableCell>
-                    <TableCell className="space-x-1 text-right">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="hover:text-primary h-7 w-7 rounded p-0 text-slate-400"
-                        onClick={() => openEditDialog(period)}
-                      >
-                        <ACTIONS.EDIT className="h-3.5 w-3.5" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-7 w-7 rounded p-0 text-slate-400 hover:text-red-500"
-                        disabled={isDeleting}
-                        onClick={() => handleDelete(period.period_id)}
-                      >
-                        <ACTIONS.DELETE className="h-3.5 w-3.5" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-10 text-center">
-            <EMPTY_STATE.NO_DATA className="mb-2 h-8 w-8 text-slate-300" />
-            <h4 className="text-foreground text-sm font-semibold">
-              No Periods Set
-            </h4>
-            <p className="text-muted-foreground mt-0.5 max-w-60 text-xs">
-              Get started by defining your school schedule periods.
-            </p>
-          </div>
-        )}
-      </CardContent>
+        
+        <PeriodsTable onEdit={openEditDialog} />
+      </div>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent className="max-w-96 rounded-lg">
@@ -403,6 +283,6 @@ export const PeriodManager = () => {
           </form>
         </DialogContent>
       </Dialog>
-    </Card>
+    </>
   );
 };

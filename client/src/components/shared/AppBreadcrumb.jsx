@@ -9,6 +9,7 @@ const getBreadcrumbIcon = (label = '') => {
   if (l.includes('student')) return BASE.GRADUATION_CAP;
   if (l.includes('class')) return BASE.GRID_VIEW;
   if (l.includes('department')) return BASE.GRID_VIEW;
+  if (l.includes('register')) return BASE.USER_PLUS;
   if (
     l.includes('staff') ||
     l.includes('admin') ||
@@ -56,15 +57,15 @@ const AppBreadcrumb = ({ items = [] }) => {
   const Icon = getBreadcrumbIcon(targetLabel);
 
   return (
-    <div className="bg-card border-border flex w-full items-center justify-between rounded-[14px] border px-5 py-3.5 shadow-sm select-none dark:shadow-none">
+    <div className="bg-card border-border flex w-full items-center justify-between rounded-lg border px-3 py-2.5 select-none sm:px-5 sm:py-3.5">
       {/* Left: Navigation Path with Inline Category Icon */}
-      <div className="flex items-center text-xs font-medium sm:text-sm">
+      <div className="mr-2 flex min-w-0 flex-wrap items-center gap-y-1 text-xs font-medium sm:text-sm">
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
           const isMainCategory = index === iconIndex;
 
           return (
-            <div key={index} className="flex items-center">
+            <div key={index} className="flex items-center whitespace-nowrap">
               {isLast ? (
                 <span
                   className={
@@ -94,7 +95,7 @@ const AppBreadcrumb = ({ items = [] }) => {
                 </Link>
               )}
               {!isLast && (
-                <BASE.CHEVRON_RIGHT className="text-muted-foreground/45 mx-2.5 size-3.5 shrink-0" />
+                <BASE.CHEVRON_RIGHT className="text-muted-foreground/45 mx-2 size-3.5 shrink-0" />
               )}
             </div>
           );
@@ -106,10 +107,11 @@ const AppBreadcrumb = ({ items = [] }) => {
         variant="ghost"
         size="sm"
         onClick={() => window.location.reload()}
-        className="bg-primary-light hover:bg-primary/15 active:bg-primary/25 text-primary border-primary/20 h-8 shrink-0 cursor-pointer gap-1.5 rounded-lg border px-3 text-xs font-semibold transition-colors"
+        className="bg-primary-light hover:bg-primary/15 active:bg-primary/25 text-primary border-primary/20 h-8 shrink-0 cursor-pointer gap-0 rounded-lg border px-2 text-xs font-semibold transition-colors sm:gap-1.5 sm:px-3"
+        aria-label="Reload page"
       >
         <BASE.REFRESH className="size-3.5" />
-        Reload
+        <span className="hidden sm:inline">Reload</span>
       </Button>
     </div>
   );

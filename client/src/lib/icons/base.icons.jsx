@@ -65,6 +65,7 @@ import {
   Upload,
   User,
   UserCheck,
+  UserRoundPlus,
   Users,
   Wrench,
   X,
@@ -160,6 +161,7 @@ export const BASE = {
   USER: User,
   USERS: Users,
   USER_CHECK: UserCheck,
+  USER_PLUS: UserRoundPlus,
 
   // Brand / Org
   GRADUATION_CAP: GraduationCap,

@@ -29,30 +29,30 @@ import { formatDate, formatStaffId, getInitials } from '@/lib/utils';
 const SkeletonRows = ({ count = 5 }) =>
   Array.from({ length: count }).map((_, i) => (
     <TableRow key={i}>
-      <TableCell className="flex items-center gap-3">
-        <Skeleton className="size-10 rounded-full" />
+      <TableCell className="py-3 flex items-center gap-3">
+        <Skeleton className="size-9 rounded-full animate-pulse" />
         <div className="flex flex-col gap-1.5">
-          <Skeleton className="h-4 w-32" />
-          <Skeleton className="h-3 w-20" />
+          <Skeleton className="h-4 w-32 animate-pulse" />
+          <Skeleton className="h-3 w-20 animate-pulse" />
         </div>
       </TableCell>
-      <TableCell>
-        <Skeleton className="h-5 w-24" />
+      <TableCell className="py-3">
+        <Skeleton className="h-5 w-24 rounded-full animate-pulse" />
       </TableCell>
-      <TableCell className="hidden md:table-cell">
-        <Skeleton className="h-4 w-36" />
+      <TableCell className="hidden py-3 md:table-cell">
+        <Skeleton className="h-4 w-36 animate-pulse" />
       </TableCell>
-      <TableCell className="hidden lg:table-cell">
-        <Skeleton className="h-4 w-24" />
+      <TableCell className="hidden py-3 lg:table-cell">
+        <Skeleton className="h-4 w-24 animate-pulse" />
       </TableCell>
-      <TableCell>
-        <Skeleton className="h-5 w-16" />
+      <TableCell className="py-3">
+        <Skeleton className="h-5 w-16 rounded-full animate-pulse" />
       </TableCell>
-      <TableCell className="hidden xl:table-cell">
-        <Skeleton className="h-4 w-20" />
+      <TableCell className="hidden py-3 xl:table-cell">
+        <Skeleton className="h-4 w-20 animate-pulse" />
       </TableCell>
-      <TableCell>
-        <Skeleton className="size-8" />
+      <TableCell className="py-3 text-right">
+        <Skeleton className="ml-auto h-8 w-8 rounded-lg animate-pulse" />
       </TableCell>
     </TableRow>
   ));
@@ -204,17 +204,17 @@ const StaffTable = ({
 }) => {
   if (isLoading) {
     return viewMode === 'list' ? (
-      <div className="bg-card overflow-x-auto rounded-lg border">
+      <div className="border-border bg-card overflow-hidden rounded-xl border shadow-xs">
         <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Staff Member</TableHead>
-              <TableHead>Department</TableHead>
-              <TableHead className="hidden md:table-cell">Email</TableHead>
-              <TableHead className="hidden lg:table-cell">Phone</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="hidden xl:table-cell">Registered</TableHead>
-              <TableHead className="w-12">
+          <TableHeader className="bg-muted/30">
+            <TableRow className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase hover:bg-transparent">
+              <TableHead className="h-11 py-3 text-left">Staff Member</TableHead>
+              <TableHead className="h-11 py-3 text-left">Department</TableHead>
+              <TableHead className="hidden h-11 py-3 text-left md:table-cell">Email</TableHead>
+              <TableHead className="hidden h-11 py-3 text-left lg:table-cell">Phone</TableHead>
+              <TableHead className="h-11 py-3 text-left">Status</TableHead>
+              <TableHead className="hidden h-11 py-3 text-left xl:table-cell">Registered</TableHead>
+              <TableHead className="h-11 py-3 text-right w-12">
                 <span className="sr-only">Actions</span>
               </TableHead>
             </TableRow>
@@ -259,28 +259,29 @@ const StaffTable = ({
   return (
     <>
       {/* Desktop/Tablet List View */}
-      <div className="bg-card hidden overflow-x-auto rounded-lg border md:block">
+      <div className="border-border bg-card hidden overflow-hidden rounded-xl border shadow-xs md:block">
         <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Staff Member</TableHead>
-              <TableHead>Department</TableHead>
-              <TableHead className="hidden md:table-cell">Email</TableHead>
-              <TableHead className="hidden lg:table-cell">Phone</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="hidden xl:table-cell">Registered</TableHead>
-              <TableHead className="w-12">
-                <span className="sr-only">Actions</span>
-              </TableHead>
+          <TableHeader className="bg-muted/30">
+            <TableRow className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase hover:bg-transparent">
+              <TableHead className="h-11 py-3 text-left">Staff Member</TableHead>
+              <TableHead className="h-11 py-3 text-left">Department</TableHead>
+              <TableHead className="hidden h-11 py-3 text-left md:table-cell">Email</TableHead>
+              <TableHead className="hidden h-11 py-3 text-left lg:table-cell">Phone</TableHead>
+              <TableHead className="h-11 py-3 text-left">Status</TableHead>
+              <TableHead className="hidden h-11 py-3 text-left xl:table-cell">Registered</TableHead>
+              <TableHead className="h-11 py-3 text-right w-12">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {staff.map((member) => {
               const initials = getInitials(member);
               return (
-                <TableRow key={member.staff_id}>
-                  <TableCell className="flex items-center gap-3">
-                    <Avatar className="border-border size-10 border">
+                <TableRow
+                  key={member.staff_id}
+                  className="hover:bg-muted/10 border-b transition-colors last:border-0"
+                >
+                  <TableCell className="text-foreground py-3.5 font-medium flex items-center gap-3">
+                    <Avatar className="border-border size-9 border">
                       <AvatarImage
                         src={member.avatar_url}
                         alt={`${member.first_name} ${member.last_name}`}
@@ -290,36 +291,36 @@ const StaffTable = ({
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
-                      <span className="text-foreground font-medium">
+                      <span className="text-sm font-bold tracking-tight">
                         {member.first_name} {member.last_name}
                       </span>
-                      <span className="text-muted-foreground mt-0.5 font-mono text-[10px]">
+                      <span className="text-muted-foreground mt-0.5 font-mono text-[10px] font-medium">
                         Staff ID: {formatStaffId(member.staff_id)}
                       </span>
                     </div>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="py-3.5 text-xs">
                     <DepartmentBadge department={member.department_name} />
                   </TableCell>
-                  <TableCell className="text-muted-foreground hidden font-mono text-xs md:table-cell">
+                  <TableCell className="text-muted-foreground hidden py-3.5 font-mono text-xs font-medium md:table-cell">
                     {member.email}
                   </TableCell>
-                  <TableCell className="text-muted-foreground hidden font-mono text-xs lg:table-cell">
+                  <TableCell className="text-muted-foreground hidden py-3.5 font-mono text-xs font-medium lg:table-cell">
                     {member.phone || '—'}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="py-3.5 text-xs">
                     <StatusBadge status={member.status} />
                   </TableCell>
-                  <TableCell className="text-muted-foreground hidden text-xs tabular-nums xl:table-cell">
-                    {formatDate(member.created_at, 'medium')}
+                  <TableCell className="text-muted-foreground hidden py-3.5 text-xs font-medium tabular-nums xl:table-cell">
+                    {formatDate(member.created_at, 'short')}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="py-3.5 text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="cursor-pointer"
+                          className="text-muted-foreground hover:text-foreground size-8 cursor-pointer rounded-lg"
                           aria-label={`Actions for ${member.first_name} ${member.last_name}`}
                         >
                           <BASE.MORE_V className="size-4" />

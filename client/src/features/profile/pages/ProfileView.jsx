@@ -129,7 +129,7 @@ export const ProfileView = () => {
       />
 
       {/* ── Hero Profile Header Card ────────────────────────── */}
-      <div className="border-border bg-card border-l-primary relative overflow-hidden rounded-2xl border border-l-4 shadow-sm">
+      <div className="border-border bg-card relative overflow-hidden rounded-xl border shadow-sm">
         {/* Neutral Header Background Accent */}
         <div className="bg-muted/30 absolute top-0 left-0 h-24 w-full" />
 

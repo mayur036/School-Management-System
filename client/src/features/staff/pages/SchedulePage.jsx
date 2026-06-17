@@ -1,3 +1,4 @@
+import AppBreadcrumb from '@/components/shared/AppBreadcrumb';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -64,24 +65,13 @@ export const SchedulePage = () => {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-foreground text-2xl font-bold tracking-tight">
-            My Weekly Timetable
-          </h1>
-          <p className="text-muted-foreground text-sm">
-            View your scheduled teaching periods, timeslots, and classroom
-            assignments.
-          </p>
-        </div>
-        <Badge
-          variant="outline"
-          className="border-primary/20 text-primary bg-primary/5 w-fit px-3.5 py-1 text-xs font-semibold"
-        >
-          {totalClasses} Scheduled Sessions
-        </Badge>
-      </div>
+      {/* Breadcrumbs */}
+      <AppBreadcrumb
+        items={[
+          { label: 'Staff', to: '/staff/dashboard' },
+          { label: 'Weekly Timetable' },
+        ]}
+      />
 
       {isLoading ? (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
