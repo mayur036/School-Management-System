@@ -6,8 +6,8 @@ const departmentModel = {
     callProcedureOne('sp_create_department', [schoolId, name]),
 
   /** List departments of one school. */
-  listDepartments: (schoolId) =>
-    callProcedure('sp_list_departments', [schoolId]),
+  listDepartments: (schoolId, search = '', status = 'all', sortBy = 'name', sortOrder = 'ASC') =>
+    callProcedure('sp_list_departments', [schoolId, search, status, sortBy, sortOrder]),
 
   /** Activate/deactivate a department. */
   updateDepartmentStatus: (schoolId, departmentId, status) =>

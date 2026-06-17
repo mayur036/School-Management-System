@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { EMPTY_STATE } from '@/lib/icons';
+import { BASE, EMPTY_STATE } from '@/lib/icons';
 import { formatDate, getInitials } from '@/lib/utils';
 
 // ── Skeleton Loading Rows ─────────────────────────────────────
@@ -49,7 +49,18 @@ const SkeletonRows = ({ count = 5 }) =>
   ));
 
 // ── Main Table Component ──────────────────────────────────────
-const LeaveTable = ({ leaves, isLoading, onReview }) => {
+const LeaveTable = ({ leaves, isLoading, onReview, sortBy, sortOrder, onSort }) => {
+  const renderSortChevron = (column) => {
+    if (sortBy !== column) {
+      return <BASE.CHEVRON_SORT className="size-3 text-muted-foreground/55" />;
+    }
+    return sortOrder === 'ASC' ? (
+      <BASE.CHEVRON_UP className="size-3" />
+    ) : (
+      <BASE.CHEVRON_DOWN className="size-3" />
+    );
+  };
+
   if (isLoading) {
     return (
       <div className="border-border bg-card overflow-hidden rounded-xl border shadow-xs">
@@ -88,12 +99,54 @@ const LeaveTable = ({ leaves, isLoading, onReview }) => {
       <Table>
         <TableHeader className="bg-muted/30">
           <TableRow className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase hover:bg-transparent">
-            <TableHead className="h-11 py-3 text-left">Staff Member</TableHead>
-            <TableHead className="h-11 py-3 text-left">Leave Type</TableHead>
+            {/* Staff Member */}
+            <TableHead
+              className="h-11 py-3 text-left cursor-pointer select-none hover:bg-muted/20"
+              onClick={() => onSort?.('staff_name')}
+            >
+              <div className="flex items-center gap-1">
+                Staff Member
+                {renderSortChevron('staff_name')}
+              </div>
+            </TableHead>
+
+            {/* Leave Type */}
+            <TableHead
+              className="h-11 py-3 text-left cursor-pointer select-none hover:bg-muted/20"
+              onClick={() => onSort?.('leave_type')}
+            >
+              <div className="flex items-center gap-1">
+                Leave Type
+                {renderSortChevron('leave_type')}
+              </div>
+            </TableHead>
+
             <TableHead className="h-11 py-3 text-left hidden md:table-cell">Department</TableHead>
-            <TableHead className="h-11 py-3 text-left hidden lg:table-cell">Duration</TableHead>
+
+            {/* Duration */}
+            <TableHead
+              className="h-11 py-3 text-left hidden lg:table-cell cursor-pointer select-none hover:bg-muted/20"
+              onClick={() => onSort?.('total_days')}
+            >
+              <div className="flex items-center gap-1">
+                Duration
+                {renderSortChevron('total_days')}
+              </div>
+            </TableHead>
+
             <TableHead className="h-11 py-3 text-left hidden xl:table-cell">Reason</TableHead>
-            <TableHead className="h-11 py-3 text-left">Status</TableHead>
+
+            {/* Status */}
+            <TableHead
+              className="h-11 py-3 text-left cursor-pointer select-none hover:bg-muted/20"
+              onClick={() => onSort?.('status')}
+            >
+              <div className="flex items-center gap-1">
+                Status
+                {renderSortChevron('status')}
+              </div>
+            </TableHead>
+
             <TableHead className="h-11 py-3 text-right w-16">Actions</TableHead>
           </TableRow>
         </TableHeader>

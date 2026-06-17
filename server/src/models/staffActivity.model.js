@@ -39,8 +39,8 @@ const staffActivityModel = {
       createdBy,
     ]),
 
-  listSchoolLeaveRequests: (schoolId) =>
-    callProcedure('sp_list_school_leave_requests', [schoolId]),
+  listSchoolLeaveRequests: (schoolId, search = '', status = 'all', sortBy = '', sortOrder = '') =>
+    callProcedure('sp_list_school_leave_requests', [schoolId, search, status, sortBy, sortOrder]),
 
   reviewLeaveRequest: (leaveId, status, comments, reviewedBy) =>
     callProcedureOne('sp_review_leave_request', [

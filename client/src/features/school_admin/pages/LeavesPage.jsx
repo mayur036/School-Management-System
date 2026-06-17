@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
@@ -27,19 +27,37 @@ import {
   useListSchoolLeaveRequestsQuery,
   useReviewLeaveRequestMutation,
 } from '@/features/staff/staffActivity.api';
+import { BASE } from '@/lib/icons';
 import { formatDate } from '@/lib/utils';
 import { reviewLeaveSchema } from '@/schemas/staff.schema';
 
 import LeaveTable from '../components/leaves/LeaveTable';
 
 export const LeavesPage = () => {
+  // Controls State
+  const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('created_at');
+  const [sortOrder, setSortOrder] = useState('DESC');
+
   // Dialog state
   const [selectedLeave, setSelectedLeave] = useState(null);
   const [isReviewOpen, setIsReviewOpen] = useState(false);
 
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(searchTerm), 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
   // Queries
   const { data: leavesData, isLoading: isLeavesLoading } =
-    useListSchoolLeaveRequestsQuery(undefined, { pollingInterval: 30000 });
+    useListSchoolLeaveRequestsQuery({
+      search: debouncedSearch,
+      status: statusFilter,
+      sort_by: sortBy,
+      sort_order: sortOrder,
+    }, { pollingInterval: 30000 });
 
   // Mutations
   const [reviewLeave, { isLoading: isSubmitting }] =
@@ -79,6 +97,16 @@ export const LeavesPage = () => {
     setCurrentPage(1);
   };
 
+  const handleSort = (column) => {
+    if (sortBy === column) {
+      setSortOrder(sortOrder === 'ASC' ? 'DESC' : 'ASC');
+    } else {
+      setSortBy(column);
+      setSortOrder('ASC');
+    }
+    setCurrentPage(1);
+  };
+
   const onReviewSubmit = async (values) => {
     if (!selectedLeave) return;
     try {
@@ -115,12 +143,65 @@ export const LeavesPage = () => {
         ]}
       />
 
+      {/* Search & Actions Bar (eSkooly style) */}
+      <div className="bg-card border-border flex flex-col gap-4 rounded-xl border p-4.5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+        {/* Left: Search Input Box & Filters */}
+        <div className="flex flex-col gap-4 flex-1 max-w-4xl sm:flex-row sm:items-end">
+          {/* Search */}
+          <div className="flex flex-col gap-1.5 flex-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80">
+              Search Leave Requests
+            </span>
+            <div className="relative w-full">
+              <BASE.SEARCH className="text-muted-foreground/60 absolute top-1/2 left-3 size-4 -translate-y-1/2" />
+              <input
+                type="text"
+                className="bg-card border-border text-foreground placeholder:text-muted-foreground/60 w-full rounded-lg border py-2 pr-4 pl-9 text-xs outline-none focus:ring-1 focus:ring-primary"
+                placeholder="Type employee name or leave type..."
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage(1);
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Status Filter */}
+          <div className="flex flex-col gap-1.5 w-full sm:w-48">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80">
+              Status
+            </span>
+            <Select
+              value={statusFilter}
+              onValueChange={(val) => {
+                setStatusFilter(val);
+                setCurrentPage(1);
+              }}
+            >
+              <SelectTrigger className="bg-card border-border text-foreground h-9 text-xs">
+                <SelectValue placeholder="All Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all" className="text-xs">All Status</SelectItem>
+                <SelectItem value="pending" className="text-xs">Pending</SelectItem>
+                <SelectItem value="approved" className="text-xs">Approved</SelectItem>
+                <SelectItem value="rejected" className="text-xs">Rejected</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </div>
+
       {/* ── Main Data View (Table) ────────────────────────────── */}
       <div className="flex flex-col gap-4">
         <LeaveTable
           leaves={paginatedLeaves}
           isLoading={isLeavesLoading}
           onReview={handleOpenReview}
+          sortBy={sortBy}
+          sortOrder={sortOrder}
+          onSort={handleSort}
         />
 
         {!isLeavesLoading && (

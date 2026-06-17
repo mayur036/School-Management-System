@@ -25,9 +25,16 @@ const createDepartment = asyncHandler(async (req, res) => {
  * @access  Private (school_admin)
  */
 const listDepartments = asyncHandler(async (req, res) => {
-  const departments = await departmentModel.listDepartments(req.user.school_id);
+  const { search, status, sort_by, sort_order } = req.query;
+  const departments = await departmentModel.listDepartments(
+    req.user.school_id,
+    search,
+    status,
+    sort_by,
+    sort_order
+  );
 
-  if (departments.length === 0) {
+  if (departments.length === 0 && !search && (!status || status === 'all')) {
     throw new ApiError(404, 'No department found under your school');
   }
 

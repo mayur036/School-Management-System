@@ -3,7 +3,6 @@ import { toast } from 'sonner';
 
 import AppBreadcrumb from '@/components/shared/AppBreadcrumb';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -118,9 +117,10 @@ export const SchedulesPage = () => {
             <BASE.SEARCH className="text-muted-foreground/60 absolute top-1/2 left-3 size-4 -translate-y-1/2" />
             <input
               type="text"
-              className="bg-card border-border text-foreground placeholder:text-muted-foreground/60 focus:ring-primary w-full cursor-not-allowed rounded-lg border py-2 pr-4 pl-9 text-xs opacity-75 outline-none focus:ring-1"
+              className="bg-card border-border text-foreground placeholder:text-muted-foreground/60 focus:ring-primary w-full rounded-lg border py-2 pr-4 pl-9 text-xs outline-none focus:ring-1"
               placeholder="Type subject or class..."
-              disabled
+              value={tableSearch}
+              onChange={(e) => setTableSearch(e.target.value)}
             />
           </div>
         </div>
@@ -232,16 +232,6 @@ export const SchedulesPage = () => {
             {/* Filters Bar */}
             <div className="border-border border-b p-4.5">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                {/* Search Input */}
-                <div className="flex-1">
-                  <Input
-                    placeholder="Search by subject, class, or room..."
-                    value={tableSearch}
-                    onChange={(e) => setTableSearch(e.target.value)}
-                    className="h-9 text-xs"
-                  />
-                </div>
-
                 {/* Filter Staff */}
                 <div className="w-full sm:w-44">
                   <Select

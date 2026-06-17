@@ -3,7 +3,7 @@ import { baseApi } from '@/app/baseApi';
 export const schoolAdminsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getSchoolAdmins: builder.query({
-      query: () => ({ url: '/school-admins', method: 'GET' }),
+      query: (params) => ({ url: '/school-admins', method: 'GET', params }),
       providesTags: (result) =>
         result?.data?.admins
           ? [

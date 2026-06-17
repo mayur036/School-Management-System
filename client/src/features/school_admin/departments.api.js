@@ -3,7 +3,7 @@ import { baseApi } from '@/app/baseApi';
 export const departmentsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getDepartments: builder.query({
-      query: () => ({ url: '/departments', method: 'GET' }),
+      query: (params) => ({ url: '/departments', method: 'GET', params }),
       providesTags: (result) =>
         result?.data?.departments
           ? [

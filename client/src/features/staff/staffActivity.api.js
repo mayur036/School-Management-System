@@ -78,7 +78,7 @@ export const staffActivityApi = baseApi.injectEndpoints({
 
     // --- School Admin Staff Management Queries/Mutations ---
     listSchoolLeaveRequests: builder.query({
-      query: () => ({ url: '/school-admin/leaves', method: 'GET' }),
+      query: (params) => ({ url: '/school-admin/leaves', method: 'GET', params }),
       providesTags: (result) =>
         result?.data?.leaves
           ? [

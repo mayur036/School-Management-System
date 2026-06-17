@@ -201,6 +201,9 @@ const StaffTable = ({
   viewMode = 'list',
   onViewDetails,
   onToggleStatus,
+  sortBy,
+  sortOrder,
+  onSort,
 }) => {
   if (isLoading) {
     return viewMode === 'list' ? (
@@ -263,12 +266,72 @@ const StaffTable = ({
         <Table>
           <TableHeader className="bg-muted/30">
             <TableRow className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase hover:bg-transparent">
-              <TableHead className="h-11 py-3 text-left">Staff Member</TableHead>
-              <TableHead className="h-11 py-3 text-left">Department</TableHead>
-              <TableHead className="hidden h-11 py-3 text-left md:table-cell">Email</TableHead>
+              <TableHead
+                className="h-11 py-3 text-left cursor-pointer select-none hover:bg-muted/20"
+                onClick={() => onSort?.('first_name')}
+              >
+                <div className="flex items-center gap-1">
+                  Staff Member
+                  {sortBy === 'first_name' ? (
+                    sortOrder === 'ASC' ? <BASE.CHEVRON_UP className="size-3" /> : <BASE.CHEVRON_DOWN className="size-3" />
+                  ) : (
+                    <BASE.CHEVRON_SORT className="size-3 text-muted-foreground/55" />
+                  )}
+                </div>
+              </TableHead>
+              <TableHead
+                className="h-11 py-3 text-left cursor-pointer select-none hover:bg-muted/20"
+                onClick={() => onSort?.('department_name')}
+              >
+                <div className="flex items-center gap-1">
+                  Department
+                  {sortBy === 'department_name' ? (
+                    sortOrder === 'ASC' ? <BASE.CHEVRON_UP className="size-3" /> : <BASE.CHEVRON_DOWN className="size-3" />
+                  ) : (
+                    <BASE.CHEVRON_SORT className="size-3 text-muted-foreground/55" />
+                  )}
+                </div>
+              </TableHead>
+              <TableHead
+                className="hidden h-11 py-3 text-left md:table-cell cursor-pointer select-none hover:bg-muted/20"
+                onClick={() => onSort?.('email')}
+              >
+                <div className="flex items-center gap-1">
+                  Email
+                  {sortBy === 'email' ? (
+                    sortOrder === 'ASC' ? <BASE.CHEVRON_UP className="size-3" /> : <BASE.CHEVRON_DOWN className="size-3" />
+                  ) : (
+                    <BASE.CHEVRON_SORT className="size-3 text-muted-foreground/55" />
+                  )}
+                </div>
+              </TableHead>
               <TableHead className="hidden h-11 py-3 text-left lg:table-cell">Phone</TableHead>
-              <TableHead className="h-11 py-3 text-left">Status</TableHead>
-              <TableHead className="hidden h-11 py-3 text-left xl:table-cell">Registered</TableHead>
+              <TableHead
+                className="h-11 py-3 text-left cursor-pointer select-none hover:bg-muted/20"
+                onClick={() => onSort?.('status')}
+              >
+                <div className="flex items-center gap-1">
+                  Status
+                  {sortBy === 'status' ? (
+                    sortOrder === 'ASC' ? <BASE.CHEVRON_UP className="size-3" /> : <BASE.CHEVRON_DOWN className="size-3" />
+                  ) : (
+                    <BASE.CHEVRON_SORT className="size-3 text-muted-foreground/55" />
+                  )}
+                </div>
+              </TableHead>
+              <TableHead
+                className="hidden h-11 py-3 text-left xl:table-cell cursor-pointer select-none hover:bg-muted/20"
+                onClick={() => onSort?.('created_at')}
+              >
+                <div className="flex items-center gap-1">
+                  Registered
+                  {sortBy === 'created_at' ? (
+                    sortOrder === 'ASC' ? <BASE.CHEVRON_UP className="size-3" /> : <BASE.CHEVRON_DOWN className="size-3" />
+                  ) : (
+                    <BASE.CHEVRON_SORT className="size-3 text-muted-foreground/55" />
+                  )}
+                </div>
+              </TableHead>
               <TableHead className="h-11 py-3 text-right w-12">Actions</TableHead>
             </TableRow>
           </TableHeader>

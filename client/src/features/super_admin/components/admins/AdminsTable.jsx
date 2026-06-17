@@ -53,7 +53,7 @@ const SkeletonRows = ({ count = 5 }) =>
     </TableRow>
   ));
 
-const AdminsTable = ({ admins, isLoading, onToggleStatus, onDeleteAdmin }) => {
+const AdminsTable = ({ admins, isLoading, onToggleStatus, onDeleteAdmin, sortBy, sortOrder, onSort }) => {
   if (isLoading) {
     return (
       <div className="border-border bg-card overflow-hidden rounded-xl border shadow-xs">
@@ -93,11 +93,59 @@ const AdminsTable = ({ admins, isLoading, onToggleStatus, onDeleteAdmin }) => {
       <Table>
         <TableHeader className="bg-muted/30">
           <TableRow className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase hover:bg-transparent">
-            <TableHead className="h-11 py-3 text-left">Admin</TableHead>
-            <TableHead className="hidden h-11 py-3 text-left md:table-cell">School</TableHead>
+            <TableHead
+              className="h-11 py-3 text-left cursor-pointer select-none hover:bg-muted/20"
+              onClick={() => onSort?.('first_name')}
+            >
+              <div className="flex items-center gap-1">
+                Admin
+                {sortBy === 'first_name' ? (
+                  sortOrder === 'ASC' ? <BASE.CHEVRON_UP className="size-3" /> : <BASE.CHEVRON_DOWN className="size-3" />
+                ) : (
+                  <BASE.CHEVRON_SORT className="size-3 text-muted-foreground/55" />
+                )}
+              </div>
+            </TableHead>
+            <TableHead
+              className="hidden h-11 py-3 text-left md:table-cell cursor-pointer select-none hover:bg-muted/20"
+              onClick={() => onSort?.('school_name')}
+            >
+              <div className="flex items-center gap-1">
+                School
+                {sortBy === 'school_name' ? (
+                  sortOrder === 'ASC' ? <BASE.CHEVRON_UP className="size-3" /> : <BASE.CHEVRON_DOWN className="size-3" />
+                ) : (
+                  <BASE.CHEVRON_SORT className="size-3 text-muted-foreground/55" />
+                )}
+              </div>
+            </TableHead>
             <TableHead className="hidden h-11 py-3 text-left md:table-cell">Phone</TableHead>
-            <TableHead className="h-11 py-3 text-left">Status</TableHead>
-            <TableHead className="hidden h-11 py-3 text-left lg:table-cell">Joined</TableHead>
+            <TableHead
+              className="h-11 py-3 text-left cursor-pointer select-none hover:bg-muted/20"
+              onClick={() => onSort?.('status')}
+            >
+              <div className="flex items-center gap-1">
+                Status
+                {sortBy === 'status' ? (
+                  sortOrder === 'ASC' ? <BASE.CHEVRON_UP className="size-3" /> : <BASE.CHEVRON_DOWN className="size-3" />
+                ) : (
+                  <BASE.CHEVRON_SORT className="size-3 text-muted-foreground/55" />
+                )}
+              </div>
+            </TableHead>
+            <TableHead
+              className="hidden h-11 py-3 text-left lg:table-cell cursor-pointer select-none hover:bg-muted/20"
+              onClick={() => onSort?.('created_at')}
+            >
+              <div className="flex items-center gap-1">
+                Joined
+                {sortBy === 'created_at' ? (
+                  sortOrder === 'ASC' ? <BASE.CHEVRON_UP className="size-3" /> : <BASE.CHEVRON_DOWN className="size-3" />
+                ) : (
+                  <BASE.CHEVRON_SORT className="size-3 text-muted-foreground/55" />
+                )}
+              </div>
+            </TableHead>
             <TableHead className="h-11 py-3 text-right w-12">Actions</TableHead>
           </TableRow>
         </TableHeader>

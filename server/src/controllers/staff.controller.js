@@ -220,7 +220,15 @@ const createStaff = asyncHandler(async (req, res) => {
  * @access  Private (school_admin)
  */
 const listStaff = asyncHandler(async (req, res) => {
-  const staff = await staffModel.listStaff(req.user.school_id);
+  const { search, department_id, status, sort_by, sort_order } = req.query;
+  const staff = await staffModel.listStaff(
+    req.user.school_id,
+    search,
+    department_id ? Number(department_id) : 0,
+    status,
+    sort_by,
+    sort_order
+  );
   return ok(res, { staff }, 'Staff retrieved successfully');
 });
 
@@ -436,8 +444,13 @@ const assignTaskToStaff = asyncHandler(async (req, res) => {
  * @access  Private (school_admin)
  */
 const listSchoolLeaveRequests = asyncHandler(async (req, res) => {
+  const { search, status, sort_by, sort_order } = req.query;
   const leaves = await staffActivityModel.listSchoolLeaveRequests(
-    req.user.school_id
+    req.user.school_id,
+    search,
+    status,
+    sort_by,
+    sort_order
   );
   return ok(res, { leaves }, 'Leave requests retrieved successfully');
 });

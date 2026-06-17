@@ -3,7 +3,7 @@ import { baseApi } from '@/app/baseApi';
 export const staffApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getStaff: builder.query({
-      query: () => ({ url: '/staff', method: 'GET' }),
+      query: (params) => ({ url: '/staff', method: 'GET', params }),
       transformResponse: (response) => {
         if (response?.data?.staff) {
           return {

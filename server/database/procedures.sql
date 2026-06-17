@@ -58,11 +58,31 @@ BEGIN
   SELECT * FROM schools WHERE school_id = LAST_INSERT_ID();
 END $$
 
--- sp_list_schools : all schools (newest first)
+-- sp_list_schools : all schools (newest first, supports search/filter/sort)
 DROP PROCEDURE IF EXISTS sp_list_schools $$
-CREATE PROCEDURE sp_list_schools()
+CREATE PROCEDURE sp_list_schools(
+  IN p_search VARCHAR(100),
+  IN p_status VARCHAR(20),
+  IN p_sort_by VARCHAR(50),
+  IN p_sort_order VARCHAR(4)
+)
 BEGIN
-  SELECT * FROM schools ORDER BY created_at DESC;
+  SELECT * FROM schools
+  WHERE (p_search IS NULL OR p_search = '' OR
+         name LIKE CONCAT('%', p_search, '%') OR
+         code LIKE CONCAT('%', p_search, '%') OR
+         email LIKE CONCAT('%', p_search, '%'))
+    AND (p_status IS NULL OR p_status = '' OR p_status = 'all' OR status = p_status)
+  ORDER BY
+    CASE WHEN p_sort_by = 'name' AND p_sort_order = 'DESC' THEN name END DESC,
+    CASE WHEN p_sort_by = 'name' AND (p_sort_order = 'ASC' OR p_sort_order IS NULL OR p_sort_order = '') THEN name END ASC,
+    CASE WHEN p_sort_by = 'code' AND p_sort_order = 'DESC' THEN code END DESC,
+    CASE WHEN p_sort_by = 'code' AND (p_sort_order = 'ASC' OR p_sort_order IS NULL OR p_sort_order = '') THEN code END ASC,
+    CASE WHEN p_sort_by = 'status' AND p_sort_order = 'DESC' THEN status END DESC,
+    CASE WHEN p_sort_by = 'status' AND (p_sort_order = 'ASC' OR p_sort_order IS NULL OR p_sort_order = '') THEN status END ASC,
+    CASE WHEN p_sort_by = 'created_at' AND p_sort_order = 'ASC' THEN created_at END ASC,
+    CASE WHEN p_sort_by = 'created_at' AND (p_sort_order = 'DESC' OR p_sort_order IS NULL OR p_sort_order = '') THEN created_at END DESC,
+    CASE WHEN (p_sort_by IS NULL OR p_sort_by = '') THEN created_at END DESC;
 END $$
 
 -- sp_get_school : single school by id
@@ -126,9 +146,15 @@ BEGIN
   WHERE s.staff_id = LAST_INSERT_ID();
 END $$
 
--- sp_list_all_school_admins : list all admins globally with their school info
+-- sp_list_all_school_admins : list all admins globally with their school info (supports search/filter/sort)
 DROP PROCEDURE IF EXISTS sp_list_all_school_admins $$
-CREATE PROCEDURE sp_list_all_school_admins()
+CREATE PROCEDURE sp_list_all_school_admins(
+  IN p_search VARCHAR(100),
+  IN p_school_id INT,
+  IN p_status VARCHAR(20),
+  IN p_sort_by VARCHAR(50),
+  IN p_sort_order VARCHAR(4)
+)
 BEGIN
   SELECT
     s.staff_id, s.role_id, r.role_name, s.school_id, sch.name AS school_name, s.department_id,
@@ -138,7 +164,26 @@ BEGIN
   JOIN roles r ON r.role_id = s.role_id
   LEFT JOIN schools sch ON sch.school_id = s.school_id
   WHERE r.role_name = 'school_admin'
-  ORDER BY s.created_at DESC;
+    AND (p_search IS NULL OR p_search = '' OR
+         s.first_name LIKE CONCAT('%', p_search, '%') OR
+         s.last_name LIKE CONCAT('%', p_search, '%') OR
+         s.email LIKE CONCAT('%', p_search, '%') OR
+         s.phone LIKE CONCAT('%', p_search, '%') OR
+         sch.name LIKE CONCAT('%', p_search, '%'))
+    AND (p_school_id IS NULL OR p_school_id = 0 OR s.school_id = p_school_id)
+    AND (p_status IS NULL OR p_status = '' OR p_status = 'all' OR s.status = p_status)
+  ORDER BY
+    CASE WHEN p_sort_by = 'first_name' AND p_sort_order = 'DESC' THEN s.first_name END DESC,
+    CASE WHEN p_sort_by = 'first_name' AND (p_sort_order = 'ASC' OR p_sort_order IS NULL OR p_sort_order = '') THEN s.first_name END ASC,
+    CASE WHEN p_sort_by = 'email' AND p_sort_order = 'DESC' THEN s.email END DESC,
+    CASE WHEN p_sort_by = 'email' AND (p_sort_order = 'ASC' OR p_sort_order IS NULL OR p_sort_order = '') THEN s.email END ASC,
+    CASE WHEN p_sort_by = 'status' AND p_sort_order = 'DESC' THEN s.status END DESC,
+    CASE WHEN p_sort_by = 'status' AND (p_sort_order = 'ASC' OR p_sort_order IS NULL OR p_sort_order = '') THEN s.status END ASC,
+    CASE WHEN p_sort_by = 'school_name' AND p_sort_order = 'DESC' THEN sch.name END DESC,
+    CASE WHEN p_sort_by = 'school_name' AND (p_sort_order = 'ASC' OR p_sort_order IS NULL OR p_sort_order = '') THEN sch.name END ASC,
+    CASE WHEN p_sort_by = 'created_at' AND p_sort_order = 'ASC' THEN s.created_at END ASC,
+    CASE WHEN p_sort_by = 'created_at' AND (p_sort_order = 'DESC' OR p_sort_order IS NULL OR p_sort_order = '') THEN s.created_at END DESC,
+    CASE WHEN (p_sort_by IS NULL OR p_sort_by = '') THEN s.created_at END DESC;
 END $$
 
 -- sp_delete_school_admin : permanently delete a school admin
@@ -170,13 +215,28 @@ BEGIN
   SELECT * FROM departments WHERE department_id = LAST_INSERT_ID();
 END $$
 
--- sp_list_departments : departments of one school
+-- sp_list_departments : departments of one school (supports search/filter/sort)
 DROP PROCEDURE IF EXISTS sp_list_departments $$
-CREATE PROCEDURE sp_list_departments(IN p_school_id INT)
+CREATE PROCEDURE sp_list_departments(
+  IN p_school_id INT,
+  IN p_search VARCHAR(100),
+  IN p_status VARCHAR(20),
+  IN p_sort_by VARCHAR(50),
+  IN p_sort_order VARCHAR(4)
+)
 BEGIN
   SELECT * FROM departments
   WHERE school_id = p_school_id
-  ORDER BY name ASC;
+    AND (p_search IS NULL OR p_search = '' OR name LIKE CONCAT('%', p_search, '%'))
+    AND (p_status IS NULL OR p_status = '' OR p_status = 'all' OR status = p_status)
+  ORDER BY
+    CASE WHEN p_sort_by = 'name' AND p_sort_order = 'DESC' THEN name END DESC,
+    CASE WHEN p_sort_by = 'name' AND (p_sort_order = 'ASC' OR p_sort_order IS NULL OR p_sort_order = '') THEN name END ASC,
+    CASE WHEN p_sort_by = 'status' AND p_sort_order = 'DESC' THEN status END DESC,
+    CASE WHEN p_sort_by = 'status' AND (p_sort_order = 'ASC' OR p_sort_order IS NULL OR p_sort_order = '') THEN status END ASC,
+    CASE WHEN p_sort_by = 'created_at' AND p_sort_order = 'DESC' THEN created_at END DESC,
+    CASE WHEN p_sort_by = 'created_at' AND (p_sort_order = 'ASC' OR p_sort_order IS NULL OR p_sort_order = '') THEN created_at END ASC,
+    CASE WHEN (p_sort_by IS NULL OR p_sort_by = '') THEN name END ASC;
 END $$
 
 -- ============================================================
@@ -217,12 +277,19 @@ BEGIN
   WHERE s.staff_id = LAST_INSERT_ID();
 END $$
 
--- sp_list_staff : all staff of one school (with role + department names)
+-- sp_list_staff : all staff of one school (supports search/filter/sort)
 DROP PROCEDURE IF EXISTS sp_list_staff $$
-CREATE PROCEDURE sp_list_staff(IN p_school_id INT)
+CREATE PROCEDURE sp_list_staff(
+  IN p_school_id INT,
+  IN p_search VARCHAR(100),
+  IN p_department_id INT,
+  IN p_status VARCHAR(20),
+  IN p_sort_by VARCHAR(50),
+  IN p_sort_order VARCHAR(4)
+)
 BEGIN
   SELECT
-    s.staff_id, s.role_id, r.role_name, s.school_id, sch.name AS school_name,sch.status AS school_status, s.department_id,
+    s.staff_id, s.role_id, r.role_name, s.school_id, sch.name AS school_name, sch.status AS school_status, s.department_id,
     d.name AS department_name, s.first_name, s.last_name, s.email,
     s.phone, s.avatar_url, s.status, s.created_at
   FROM staff s
@@ -230,7 +297,26 @@ BEGIN
   LEFT JOIN departments d ON d.department_id = s.department_id
   LEFT JOIN schools sch ON sch.school_id = s.school_id
   WHERE s.school_id = p_school_id
-  ORDER BY s.created_at DESC;
+    AND r.role_name = 'staff'
+    AND (p_search IS NULL OR p_search = '' OR
+         s.first_name LIKE CONCAT('%', p_search, '%') OR
+         s.last_name LIKE CONCAT('%', p_search, '%') OR
+         s.email LIKE CONCAT('%', p_search, '%') OR
+         s.phone LIKE CONCAT('%', p_search, '%'))
+    AND (p_department_id IS NULL OR p_department_id = 0 OR s.department_id = p_department_id)
+    AND (p_status IS NULL OR p_status = '' OR p_status = 'all' OR s.status = p_status)
+  ORDER BY
+    CASE WHEN p_sort_by = 'first_name' AND p_sort_order = 'DESC' THEN s.first_name END DESC,
+    CASE WHEN p_sort_by = 'first_name' AND (p_sort_order = 'ASC' OR p_sort_order IS NULL OR p_sort_order = '') THEN s.first_name END ASC,
+    CASE WHEN p_sort_by = 'email' AND p_sort_order = 'DESC' THEN s.email END DESC,
+    CASE WHEN p_sort_by = 'email' AND (p_sort_order = 'ASC' OR p_sort_order IS NULL OR p_sort_order = '') THEN s.email END ASC,
+    CASE WHEN p_sort_by = 'status' AND p_sort_order = 'DESC' THEN s.status END DESC,
+    CASE WHEN p_sort_by = 'status' AND (p_sort_order = 'ASC' OR p_sort_order IS NULL OR p_sort_order = '') THEN s.status END ASC,
+    CASE WHEN p_sort_by = 'department_name' AND p_sort_order = 'DESC' THEN d.name END DESC,
+    CASE WHEN p_sort_by = 'department_name' AND (p_sort_order = 'ASC' OR p_sort_order IS NULL OR p_sort_order = '') THEN d.name END ASC,
+    CASE WHEN p_sort_by = 'created_at' AND p_sort_order = 'ASC' THEN s.created_at END ASC,
+    CASE WHEN p_sort_by = 'created_at' AND (p_sort_order = 'DESC' OR p_sort_order IS NULL OR p_sort_order = '') THEN s.created_at END DESC,
+    CASE WHEN (p_sort_by IS NULL OR p_sort_by = '') THEN s.created_at END DESC;
 END $$
 
 -- sp_get_staff : single staff member (own profile / detail)
@@ -780,9 +866,15 @@ BEGIN
   END IF;
 END $$
 
--- sp_list_school_leave_requests : list leaves for approval
+-- sp_list_school_leave_requests : list leaves for approval (supports search/filter/sort)
 DROP PROCEDURE IF EXISTS sp_list_school_leave_requests $$
-CREATE PROCEDURE sp_list_school_leave_requests(IN p_school_id INT)
+CREATE PROCEDURE sp_list_school_leave_requests(
+  IN p_school_id INT,
+  IN p_search VARCHAR(100),
+  IN p_status VARCHAR(20),
+  IN p_sort_by VARCHAR(50),
+  IN p_sort_order VARCHAR(4)
+)
 BEGIN
   SELECT l.*,
          s.first_name, s.last_name, s.avatar_url, s.email, d.name AS department_name,
@@ -792,7 +884,25 @@ BEGIN
   LEFT JOIN departments d ON d.department_id = s.department_id
   LEFT JOIN staff r ON r.staff_id = l.reviewed_by
   WHERE s.school_id = p_school_id
-  ORDER BY CASE l.status WHEN 'pending' THEN 1 ELSE 2 END, l.created_at DESC;
+    AND (p_search IS NULL OR p_search = '' OR
+         s.first_name LIKE CONCAT('%', p_search, '%') OR
+         s.last_name LIKE CONCAT('%', p_search, '%') OR
+         s.email LIKE CONCAT('%', p_search, '%') OR
+         l.leave_type LIKE CONCAT('%', p_search, '%'))
+    AND (p_status IS NULL OR p_status = '' OR p_status = 'all' OR l.status = p_status)
+  ORDER BY
+    CASE WHEN p_sort_by = 'staff_name' AND p_sort_order = 'DESC' THEN CONCAT(s.first_name, ' ', s.last_name) END DESC,
+    CASE WHEN p_sort_by = 'staff_name' AND (p_sort_order = 'ASC' OR p_sort_order IS NULL OR p_sort_order = '') THEN CONCAT(s.first_name, ' ', s.last_name) END ASC,
+    CASE WHEN p_sort_by = 'leave_type' AND p_sort_order = 'DESC' THEN l.leave_type END DESC,
+    CASE WHEN p_sort_by = 'leave_type' AND (p_sort_order = 'ASC' OR p_sort_order IS NULL OR p_sort_order = '') THEN l.leave_type END ASC,
+    CASE WHEN p_sort_by = 'total_days' AND p_sort_order = 'DESC' THEN l.total_days END DESC,
+    CASE WHEN p_sort_by = 'total_days' AND (p_sort_order = 'ASC' OR p_sort_order IS NULL OR p_sort_order = '') THEN l.total_days END ASC,
+    CASE WHEN p_sort_by = 'status' AND p_sort_order = 'DESC' THEN l.status END DESC,
+    CASE WHEN p_sort_by = 'status' AND (p_sort_order = 'ASC' OR p_sort_order IS NULL OR p_sort_order = '') THEN l.status END ASC,
+    CASE WHEN p_sort_by = 'created_at' AND p_sort_order = 'ASC' THEN l.created_at END ASC,
+    CASE WHEN p_sort_by = 'created_at' AND (p_sort_order = 'DESC' OR p_sort_order IS NULL OR p_sort_order = '') THEN l.created_at END DESC,
+    CASE WHEN (p_sort_by IS NULL OR p_sort_by = '') THEN CASE l.status WHEN 'pending' THEN 1 ELSE 2 END END ASC,
+    CASE WHEN (p_sort_by IS NULL OR p_sort_by = '') THEN l.created_at END DESC;
 END $$
 
 -- sp_review_leave_request : approve or reject leave
@@ -993,12 +1103,15 @@ BEGIN
   WHERE ss.schedule_id = p_schedule_id;
 END $$
 
--- sp_list_school_schedules : list all schedules in school with period info
--- Supports optional filtering by staff_id (pass 0 or NULL to skip)
+-- sp_list_school_schedules : list all schedules in school with period info (supports search/filter/sort)
 DROP PROCEDURE IF EXISTS sp_list_school_schedules $$
 CREATE PROCEDURE sp_list_school_schedules(
   IN p_school_id INT,
-  IN p_staff_id  INT
+  IN p_staff_id  INT,
+  IN p_day_of_week VARCHAR(20),
+  IN p_search VARCHAR(100),
+  IN p_sort_by VARCHAR(50),
+  IN p_sort_order VARCHAR(4)
 )
 BEGIN
   SELECT
@@ -1013,18 +1126,54 @@ BEGIN
   LEFT JOIN departments d ON d.department_id = s.department_id
   WHERE s.school_id = p_school_id
     AND (p_staff_id IS NULL OR p_staff_id = 0 OR ss.staff_id = p_staff_id)
+    AND (p_day_of_week IS NULL OR p_day_of_week = '' OR ss.day_of_week = p_day_of_week)
+    AND (p_search IS NULL OR p_search = '' OR
+         ss.subject_name LIKE CONCAT('%', p_search, '%') OR
+         ss.class_name LIKE CONCAT('%', p_search, '%') OR
+         ss.room LIKE CONCAT('%', p_search, '%'))
   ORDER BY
-    CONCAT(s.first_name, ' ', s.last_name),
-    CASE ss.day_of_week
-      WHEN 'Monday' THEN 1
-      WHEN 'Tuesday' THEN 2
-      WHEN 'Wednesday' THEN 3
-      WHEN 'Thursday' THEN 4
-      WHEN 'Friday' THEN 5
-      WHEN 'Saturday' THEN 6
-      WHEN 'Sunday' THEN 7
-    END,
-    sp.period_order;
+    CASE WHEN p_sort_by = 'subject_name' AND p_sort_order = 'DESC' THEN ss.subject_name END DESC,
+    CASE WHEN p_sort_by = 'subject_name' AND (p_sort_order = 'ASC' OR p_sort_order IS NULL OR p_sort_order = '') THEN ss.subject_name END ASC,
+    CASE WHEN p_sort_by = 'class_name' AND p_sort_order = 'DESC' THEN ss.class_name END DESC,
+    CASE WHEN p_sort_by = 'class_name' AND (p_sort_order = 'ASC' OR p_sort_order IS NULL OR p_sort_order = '') THEN ss.class_name END ASC,
+    CASE WHEN p_sort_by = 'staff_name' AND p_sort_order = 'DESC' THEN CONCAT(s.first_name, ' ', s.last_name) END DESC,
+    CASE WHEN p_sort_by = 'staff_name' AND (p_sort_order = 'ASC' OR p_sort_order IS NULL OR p_sort_order = '') THEN CONCAT(s.first_name, ' ', s.last_name) END ASC,
+    CASE WHEN p_sort_by = 'day_of_week' AND p_sort_order = 'DESC' THEN
+      CASE ss.day_of_week
+        WHEN 'Monday' THEN 1
+        WHEN 'Tuesday' THEN 2
+        WHEN 'Wednesday' THEN 3
+        WHEN 'Thursday' THEN 4
+        WHEN 'Friday' THEN 5
+        WHEN 'Saturday' THEN 6
+        WHEN 'Sunday' THEN 7
+      END
+    END DESC,
+    CASE WHEN p_sort_by = 'day_of_week' AND (p_sort_order = 'ASC' OR p_sort_order IS NULL OR p_sort_order = '') THEN
+      CASE ss.day_of_week
+        WHEN 'Monday' THEN 1
+        WHEN 'Tuesday' THEN 2
+        WHEN 'Wednesday' THEN 3
+        WHEN 'Thursday' THEN 4
+        WHEN 'Friday' THEN 5
+        WHEN 'Saturday' THEN 6
+        WHEN 'Sunday' THEN 7
+      END
+    END ASC,
+    -- Default sorting (staff_name ASC, day_of_week ASC, period_order ASC)
+    CASE WHEN (p_sort_by IS NULL OR p_sort_by = '') THEN CONCAT(s.first_name, ' ', s.last_name) END ASC,
+    CASE WHEN (p_sort_by IS NULL OR p_sort_by = '') THEN
+      CASE ss.day_of_week
+        WHEN 'Monday' THEN 1
+        WHEN 'Tuesday' THEN 2
+        WHEN 'Wednesday' THEN 3
+        WHEN 'Thursday' THEN 4
+        WHEN 'Friday' THEN 5
+        WHEN 'Saturday' THEN 6
+        WHEN 'Sunday' THEN 7
+      END
+    END ASC,
+    CASE WHEN (p_sort_by IS NULL OR p_sort_by = '') THEN sp.period_order END ASC;
 END $$
 
 -- sp_delete_staff_schedule : delete a schedule slot

@@ -2,7 +2,14 @@ import { asyncHandler } from '../utils/apiResponse.js';
 import { callProcedure, callProcedureOne } from '../utils/callProcedure.js';
 
 export const listAllSchoolAdmins = asyncHandler(async (req, res) => {
-  const admins = await callProcedure('sp_list_all_school_admins');
+  const { search, school_id, status, sort_by, sort_order } = req.query;
+  const admins = await callProcedure('sp_list_all_school_admins', [
+    search || '',
+    school_id ? Number(school_id) : 0,
+    status || 'all',
+    sort_by || 'created_at',
+    sort_order || 'DESC'
+  ]);
   res.status(200).json({ status: 'success', data: { admins } });
 });
 

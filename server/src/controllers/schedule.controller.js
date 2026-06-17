@@ -189,9 +189,16 @@ const updateSchedule = asyncHandler(async (req, res) => {
 const listSchoolSchedules = asyncHandler(async (req, res) => {
   const schoolId = req.user.school_id;
   const staffIdQuery = req.query.staff_id;
-  const staffId = staffIdQuery ? parseInt(staffIdQuery, 10) : null;
+  const staffId = staffIdQuery ? parseInt(staffIdQuery, 10) : 0;
+  const { day_of_week, search, sort_by, sort_order } = req.query;
 
-  const schedules = await scheduleModel.listSchoolSchedules(schoolId, staffId);
+  const schedules = await scheduleModel.listSchoolSchedules(schoolId, {
+    staffId,
+    day_of_week,
+    search,
+    sortBy: sort_by,
+    sortOrder: sort_order,
+  });
 
   return ok(res, { schedules }, 'Schedules retrieved successfully');
 });

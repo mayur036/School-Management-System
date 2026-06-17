@@ -91,8 +91,15 @@ const scheduleModel = {
       room,
     ]),
 
-  listSchoolSchedules: (schoolId, staffId) =>
-    callProcedure('sp_list_school_schedules', [schoolId, staffId]),
+  listSchoolSchedules: (schoolId, { staffId = 0, day_of_week = '', search = '', sortBy = '', sortOrder = '' } = {}) =>
+    callProcedure('sp_list_school_schedules', [
+      schoolId,
+      staffId || 0,
+      day_of_week || '',
+      search || '',
+      sortBy || '',
+      sortOrder || '',
+    ]),
 
   deleteStaffSchedule: (scheduleId, schoolId) =>
     callProcedureOne('sp_delete_staff_schedule', [scheduleId, schoolId]),

@@ -5,7 +5,7 @@ export const schoolsApi = baseApi.injectEndpoints({
     // ── Schools ──────────────────────────────────────────────
 
     getSchools: builder.query({
-      query: () => ({ url: '/schools', method: 'GET' }),
+      query: (params) => ({ url: '/schools', method: 'GET', params }),
       providesTags: (result) =>
         result?.data?.schools
           ? [
