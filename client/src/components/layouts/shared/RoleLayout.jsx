@@ -34,7 +34,7 @@ const RoleLayoutContent = ({ config }) => {
           LogoutIcon={LogoutIcon}
           fallbackInitials={fallbackInitials}
         />
-        <main className="bg-muted/10 flex-1 p-4 md:p-6">
+        <main className="bg-muted flex-1 p-4 md:p-6">
           <Outlet />
         </main>
       </SidebarInset>

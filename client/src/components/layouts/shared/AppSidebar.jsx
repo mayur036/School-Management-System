@@ -42,24 +42,24 @@ const NavItem = ({ to, label, Icon, end }) => {
           to={to}
           onClick={handleClick}
           className={cn(
-            'group relative flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-300',
+            'group relative flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium',
             isActive
               ? 'bg-primary/10 text-primary font-semibold'
               : 'text-foreground/80 hover:bg-sidebar-accent/50 hover:text-foreground'
           )}
         >
           {isActive && (
-            <span className="bg-primary absolute top-1/2 left-0 h-5 w-0.75 -translate-y-1/2 rounded-r-full transition-all duration-300" />
+            <span className="bg-primary absolute top-1/2 left-0 h-5 w-0.75 -translate-y-1/2 rounded-r-full" />
           )}
           <Icon
             className={cn(
-              'size-4.5 shrink-0 transition-all duration-300',
+              'size-4.5 shrink-0',
               isActive
-                ? 'text-primary scale-105'
-                : 'text-muted-foreground group-hover:text-foreground group-hover:scale-105'
+                ? 'text-primary'
+                : 'text-muted-foreground group-hover:text-foreground'
             )}
           />
-          <span className="transition-transform duration-300 group-hover:translate-x-0.5">
+          <span>
             {label}
           </span>
         </Link>
@@ -159,10 +159,10 @@ const AppSidebar = ({ groups, profilePath = '/', fallbackInitials = 'U' }) => {
         {user && (
           <Link
             to={profilePath}
-            className="group/footer border-border/0 hover:border-border/40 hover:bg-sidebar-accent/50 text-sidebar-foreground flex cursor-pointer items-center gap-3 rounded-lg border px-2.5 py-2 transition-all duration-200 hover:shadow-xs"
+            className="group/footer border-border/0 hover:border-border/40 hover:bg-sidebar-accent/50 text-sidebar-foreground flex cursor-pointer items-center gap-3 rounded-lg border px-2.5 py-2"
           >
             <div className="relative">
-              <Avatar className="size-8 border transition-transform duration-200 group-hover/footer:scale-105">
+              <Avatar className="size-8 border">
                 <AvatarImage
                   src={user.avatar_url || undefined}
                   alt={`${user.first_name} ${user.last_name}`}
@@ -174,14 +174,14 @@ const AppSidebar = ({ groups, profilePath = '/', fallbackInitials = 'U' }) => {
               <span className="ring-background absolute right-0 bottom-0 block size-2.5 rounded-full bg-green-500 ring-2" />
             </div>
             <div className="flex min-w-0 flex-col leading-none">
-              <span className="group-hover/footer:text-primary truncate text-sm font-semibold transition-colors">
+              <span className="group-hover/footer:text-primary truncate text-sm font-semibold">
                 {user.first_name} {user.last_name}
               </span>
               <span className="text-muted-foreground mt-1 truncate text-[10px]">
                 {user.email}
               </span>
             </div>
-            <BASE.CHEVRON_RIGHT className="text-muted-foreground/45 ml-auto size-3.5 shrink-0 transition-transform duration-200 group-hover/footer:translate-x-0.5" />
+            <BASE.CHEVRON_RIGHT className="text-muted-foreground/45 ml-auto size-3.5 shrink-0" />
           </Link>
         )}
       </SidebarFooter>

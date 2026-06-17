@@ -1,8 +1,6 @@
-import { useTheme } from 'next-themes';
 import { Link, useLocation } from 'react-router-dom';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -12,12 +10,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
 import { useSidebar } from '@/components/ui/sidebar';
 import { useAuth } from '@/hooks/useAuth';
 import { useLogout } from '@/hooks/useLogout';
 import { BASE } from '@/lib/icons';
-import { cn } from '@/lib/utils';
 
 const PAGE_INFOS = {
   '/school/dashboard': {
@@ -64,7 +60,6 @@ const AppHeader = ({
   const { user } = useAuth();
   const { handleLogout, isLoggingOut } = useLogout();
   const { pathname } = useLocation();
-  const { theme, setTheme } = useTheme();
   const { toggleSidebar } = useSidebar();
 
   const getPageInfo = () => {
@@ -124,48 +119,8 @@ const AppHeader = ({
         </div>
       </div>
 
-      {/* Search Input (Desktop) */}
-      <div className="hidden max-w-sm flex-1 justify-center px-4 md:flex">
-        <div className="relative w-full">
-          <Input
-            type="text"
-            placeholder="Search schools, admins, staff..."
-            className="bg-muted/40 h-9 w-full rounded-lg pr-10 text-xs transition-all"
-          />
-          <BASE.SEARCH className="text-muted-foreground/60 pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2" />
-        </div>
-      </div>
-
       {/* Right Actions */}
       <div className="flex items-center gap-2 sm:gap-3">
-        {/* Sliding Theme Toggle Switch */}
-        <button
-          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-          className="bg-muted/45 border-border/20 relative flex h-8 w-14 cursor-pointer items-center rounded-full border p-1 transition-colors"
-          title="Toggle dark mode"
-        >
-          <div
-            className={cn(
-              'bg-background text-foreground flex size-6 items-center justify-center rounded-full shadow-sm transition-all duration-300',
-              theme === 'dark' ? 'translate-x-6' : 'translate-x-0'
-            )}
-          >
-            {theme === 'dark' ? (
-              <BASE.MOON className="size-3.5" />
-            ) : (
-              <BASE.SUN className="size-3.5" />
-            )}
-          </div>
-        </button>
-
-        {/* Notifications */}
-        <button className="hover:bg-muted/50 text-muted-foreground hover:text-foreground relative flex size-9 cursor-pointer items-center justify-center rounded-full transition-colors">
-          <BASE.BELL className="size-4.5" />
-          <Badge className="bg-destructive text-muted border-background absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full border p-0 text-[9px] font-bold">
-            3
-          </Badge>
-        </button>
-
         {/* User Profile */}
         {user && (
           <DropdownMenu>
