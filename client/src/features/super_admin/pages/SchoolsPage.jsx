@@ -1,20 +1,9 @@
 import { useMemo, useState } from 'react';
-import { toast } from 'sonner';
 
 import AppBreadcrumb from '@/components/shared/AppBreadcrumb';
 import AppPagination from '@/components/shared/AppPagination';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
-import { useDataTable } from '@/hooks/useDataTable';
-import { ACTIONS, BASE } from '@/lib/icons';
+import { ACTIONS } from '@/lib/icons';
 
 import CreateSchoolAdminDialog from '../components/schools/CreateSchoolAdminDialog';
 import CreateSchoolDialog from '../components/schools/CreateSchoolDialog';
@@ -22,7 +11,6 @@ import EditSchoolDialog from '../components/schools/EditSchoolDialog';
 import SchoolsTable from '../components/schools/SchoolsTable';
 import SchoolStatusToggle from '../components/schools/SchoolStatusToggle';
 import { useGetSchoolsQuery } from '../schools.api';
-import { exportSchoolsToCsv } from '../utils/schools.utils';
 
 const SchoolsPage = () => {
   // Queries
@@ -35,39 +23,18 @@ const SchoolsPage = () => {
   const [editSchool, setEditSchool] = useState(null);
   const [createOpen, setCreateOpen] = useState(false);
 
-  // Use the custom useDataTable hook
-  const {
-    searchQuery,
-    setSearchQuery,
-    statusFilter,
-    setStatusFilter,
-    currentPage,
-    setCurrentPage,
-    itemsPerPage,
-    handleItemsPerPageChange,
-    filteredData: filteredSchools,
-    paginatedData: paginatedSchools,
-  } = useDataTable({
-    data: schools,
-    searchFilter: (school, q) => {
-      const nameStr = (school.name ?? '').toLowerCase();
-      const domainStr = (school.domain ?? '').toLowerCase();
-      const idStr = String(school.school_id).toLowerCase();
-      return nameStr.includes(q) || domainStr.includes(q) || idStr.includes(q);
-    },
-  });
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  const handleExport = () => {
-    if (!filteredSchools.length) {
-      toast.error('No schools found to export');
-      return;
-    }
-    try {
-      exportSchoolsToCsv(filteredSchools);
-      toast.success('Schools exported successfully');
-    } catch {
-      toast.error('Failed to export schools');
-    }
+  const paginatedSchools = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    return schools.slice(start, start + itemsPerPage);
+  }, [schools, currentPage, itemsPerPage]);
+
+  const handleItemsPerPageChange = (size) => {
+    setItemsPerPage(size);
+    setCurrentPage(1);
   };
 
   return (
@@ -99,70 +66,6 @@ const SchoolsPage = () => {
         </Button>
       </div>
 
-
-
-      {/* ── Controls & Actions Bar ────────────────────────────── */}
-      <div className="bg-card border-border flex flex-col gap-3 rounded-xl border p-4 sm:flex-row sm:items-center sm:justify-between">
-        {/* Search */}
-        <div className="relative max-w-md flex-1">
-          <BASE.SEARCH className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
-          <Input
-            className="bg-muted/40 border-border pl-9"
-            placeholder="Search schools by name or domain..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-
-        {/* Action Controls */}
-        <div className="flex flex-wrap items-center gap-2">
-          {/* Filter Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                className="border-border bg-card cursor-pointer gap-2"
-              >
-                <BASE.FILTER data-icon="inline-start" />
-                Filter
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>Filter Status</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuCheckboxItem
-                checked={statusFilter === 'all'}
-                onCheckedChange={() => setStatusFilter('all')}
-              >
-                All Statuses
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={statusFilter === 'active'}
-                onCheckedChange={() => setStatusFilter('active')}
-              >
-                Active Only
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={statusFilter === 'inactive'}
-                onCheckedChange={() => setStatusFilter('inactive')}
-              >
-                Inactive Only
-              </DropdownMenuCheckboxItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          {/* Export CSV */}
-          <Button
-            variant="outline"
-            className="border-border bg-card cursor-pointer gap-2"
-            onClick={handleExport}
-          >
-            <BASE.DOWNLOAD data-icon="inline-start" />
-            Export
-          </Button>
-        </div>
-      </div>
-
       {/* Error state */}
       {error && (
         <div className="bg-destructive/10 text-destructive rounded-lg p-4 text-sm">
@@ -183,7 +86,7 @@ const SchoolsPage = () => {
         {!isLoading && (
           <AppPagination
             currentPage={currentPage}
-            totalItems={filteredSchools.length}
+            totalItems={schools.length}
             itemsPerPage={itemsPerPage}
             onPageChange={setCurrentPage}
             onItemsPerPageChange={handleItemsPerPageChange}

@@ -1,29 +1,15 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { toast } from 'sonner';
 
 import AppBreadcrumb from '@/components/shared/AppBreadcrumb';
 import AppPagination from '@/components/shared/AppPagination';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
-import { useDataTable } from '@/hooks/useDataTable';
 import { ACTIONS, BASE } from '@/lib/icons';
-import { formatStaffId } from '@/lib/utils';
 
 import StaffDetailDrawer from '../components/staffs/StaffDetailDrawer';
 import StaffStatusToggle from '../components/staffs/StaffStatusToggle';
 import StaffTable from '../components/staffs/StaffTable';
-import { useGetDepartmentsQuery } from '../departments.api';
 import { useGetStaffQuery } from '../staff.api';
-import { exportStaffToCsv } from '../utils/staff.utils';
 
 const StaffPage = () => {
   // Queries
@@ -32,74 +18,27 @@ const StaffPage = () => {
     isLoading: staffLoading,
     error: staffError,
   } = useGetStaffQuery();
-  const { data: deptData } = useGetDepartmentsQuery();
 
   const staff = useMemo(() => staffData?.data?.staff ?? [], [staffData]);
-  const departments = useMemo(
-    () => deptData?.data?.departments ?? [],
-    [deptData]
-  );
 
-  const [deptFilter, setDeptFilter] = useState('all');
   const [viewMode, setViewMode] = useState('list'); // 'list' or 'grid'
 
   // Active item states for dialogs & drawer details
   const [toggleMember, setToggleMember] = useState(null);
   const [detailMember, setDetailMember] = useState(null);
 
-  // Use the custom useDataTable hook
-  const {
-    searchQuery,
-    setSearchQuery,
-    statusFilter,
-    setStatusFilter,
-    currentPage,
-    setCurrentPage,
-    itemsPerPage,
-    handleItemsPerPageChange,
-    filteredData: filteredStaff,
-    paginatedData: paginatedStaff,
-  } = useDataTable({
-    data: staff,
-    searchFilter: (member, q) => {
-      const matchesDept =
-        deptFilter === 'all' || String(member.department_id) === deptFilter;
-      if (!matchesDept) return false;
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
-      const fullName = `${member.first_name} ${member.last_name}`.toLowerCase();
-      const idStr = formatStaffId(member.staff_id);
-      const emailStr = (member.email ?? '').toLowerCase();
-      const deptStr = (member.department_name ?? '').toLowerCase();
+  const paginatedStaff = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    return staff.slice(start, start + itemsPerPage);
+  }, [staff, currentPage, itemsPerPage]);
 
-      return (
-        fullName.includes(q) ||
-        idStr.includes(q) ||
-        emailStr.includes(q) ||
-        deptStr.includes(q)
-      );
-    },
-  });
-
-  // Reset page when deptFilter changes
-  useEffect(() => {
+  const handleItemsPerPageChange = (size) => {
+    setItemsPerPage(size);
     setCurrentPage(1);
-  }, [deptFilter, setCurrentPage]);
-
-  const handleExport = () => {
-    if (!filteredStaff.length) {
-      toast.error('No staff records found to export');
-      return;
-    }
-    try {
-      exportStaffToCsv(filteredStaff);
-      toast.success('Directory exported successfully');
-    } catch {
-      toast.error('Failed to export directory');
-    }
-  };
-
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
   };
 
   return (
@@ -133,88 +72,10 @@ const StaffPage = () => {
         </Button>
       </div>
 
-
-
       {/* ── Controls & Actions Bar ────────────────────────────── */}
-      <div className="bg-card border-border flex flex-col gap-3 rounded-xl border p-4 sm:flex-row sm:items-center sm:justify-between">
-        {/* Search */}
-        <div className="relative max-w-md flex-1">
-          <BASE.SEARCH className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
-          <Input
-            className="bg-muted/40 border-border pl-9"
-            placeholder="Search staff by name, email, or department..."
-            value={searchQuery}
-            onChange={handleSearchChange}
-          />
-        </div>
-
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
         {/* Action Controls */}
         <div className="flex flex-wrap items-center gap-2">
-          {/* Filter Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                className="border-border bg-card cursor-pointer gap-2"
-              >
-                <BASE.FILTER data-icon="inline-start" />
-                Filter
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>Filter Status</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuCheckboxItem
-                checked={statusFilter === 'all'}
-                onCheckedChange={() => setStatusFilter('all')}
-              >
-                All Statuses
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={statusFilter === 'active'}
-                onCheckedChange={() => setStatusFilter('active')}
-              >
-                Active Only
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={statusFilter === 'inactive'}
-                onCheckedChange={() => setStatusFilter('inactive')}
-              >
-                Inactive Only
-              </DropdownMenuCheckboxItem>
-
-              <DropdownMenuSeparator className="my-1" />
-              <DropdownMenuLabel>Filter Department</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuCheckboxItem
-                checked={deptFilter === 'all'}
-                onCheckedChange={() => setDeptFilter('all')}
-              >
-                All Departments
-              </DropdownMenuCheckboxItem>
-              {departments.map((dept) => (
-                <DropdownMenuCheckboxItem
-                  key={dept.department_id}
-                  checked={deptFilter === String(dept.department_id)}
-                  onCheckedChange={() =>
-                    setDeptFilter(String(dept.department_id))
-                  }
-                >
-                  {dept.name}
-                </DropdownMenuCheckboxItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          {/* Export CSV */}
-          <Button
-            variant="outline"
-            className="border-border bg-card cursor-pointer gap-2"
-            onClick={handleExport}
-          >
-            <BASE.DOWNLOAD data-icon="inline-start" />
-            Export
-          </Button>
 
           {/* Grid / List Layout Switcher */}
           <div className="border-border bg-muted/40 hidden items-center rounded-lg border p-0.5 sm:flex">
@@ -261,7 +122,7 @@ const StaffPage = () => {
         {!staffLoading && (
           <AppPagination
             currentPage={currentPage}
-            totalItems={filteredStaff.length}
+            totalItems={staff.length}
             itemsPerPage={itemsPerPage}
             onPageChange={setCurrentPage}
             onItemsPerPageChange={handleItemsPerPageChange}
