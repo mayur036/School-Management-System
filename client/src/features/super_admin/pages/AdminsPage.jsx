@@ -19,9 +19,8 @@ import { BASE } from '@/lib/icons';
 import AdminsTable from '../components/admins/AdminsTable';
 import AdminStatusToggle from '../components/admins/AdminStatusToggle';
 import DeleteAdminAlert from '../components/admins/DeleteAdminAlert';
-import SuperAdminsStatCards from '../components/admins/SuperAdminsStatCards';
 import { useGetSchoolAdminsQuery } from '../schoolAdmins.api';
-import { computeAdminStats, exportAdminsToCsv } from '../utils/admins.utils';
+import { exportAdminsToCsv } from '../utils/admins.utils';
 
 const AdminsPage = () => {
   const { data, isLoading, error } = useGetSchoolAdminsQuery();
@@ -30,9 +29,6 @@ const AdminsPage = () => {
   // Dialog states
   const [statusAdmin, setStatusAdmin] = useState(null);
   const [deleteAdmin, setDeleteAdmin] = useState(null);
-
-  // Real-time headline stats
-  const stats = useMemo(() => computeAdminStats(admins), [admins]);
 
   // Use the custom useDataTable hook
   const {
@@ -97,8 +93,7 @@ const AdminsPage = () => {
         </Button>
       </div>
 
-      {/* ── Stats Summary Grid ────────────────────────────────── */}
-      <SuperAdminsStatCards stats={stats} isLoading={isLoading} />
+
 
       {/* ── Controls & Actions Bar ────────────────────────────── */}
       <div className="bg-card border-border flex flex-col gap-3 rounded-xl border p-4 sm:flex-row sm:items-center sm:justify-between">

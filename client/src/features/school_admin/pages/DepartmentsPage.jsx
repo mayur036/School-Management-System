@@ -18,7 +18,6 @@ import { cn } from '@/lib/utils';
 
 import CreateDepartmentDialog from '../components/departments/CreateDepartmentDialog';
 import DepartmentsGrid from '../components/departments/DepartmentsGrid';
-import DepartmentsStatCard from '../components/departments/DepartmentsStatCard';
 import DepartmentsTable from '../components/departments/DepartmentsTable';
 import DepartmentStatusToggle from '../components/departments/DepartmentStatusToggle';
 import {
@@ -26,7 +25,6 @@ import {
   DEPARTMENT_STATUS_FILTERS,
 } from '../constants/departments.constants';
 import { useGetDepartmentsQuery } from '../departments.api';
-import { computeDepartmentStats } from '../utils/departments.utils';
 import { countStaffByDepartmentId } from '../utils/staff.utils';
 
 const DepartmentsPage = () => {
@@ -58,10 +56,6 @@ const DepartmentsPage = () => {
 
   // Staff count per department + page summary metrics
   const staffCounts = useMemo(() => countStaffByDepartmentId(staff), [staff]);
-  const stats = useMemo(
-    () => computeDepartmentStats(departments, staff),
-    [departments, staff]
-  );
 
   // Filter and Sort Logic
   const processedDepartments = useMemo(() => {
@@ -150,8 +144,7 @@ const DepartmentsPage = () => {
         </div>
       </div>
 
-      {/* stats Summary Row */}
-      <DepartmentsStatCard stats={stats} isLoading={deptLoading} />
+
       {/* Error state */}
       {deptError && (
         <div className="bg-destructive/10 text-destructive rounded-lg p-4 text-sm">

@@ -6,19 +6,12 @@ const StatCard = ({
   label,
   value,
   subtext,
-  accentClassName,
   iconChipClassName,
   valueClassName = 'text-base sm:text-2xl',
   subtextClassName = 'text-muted-foreground',
   className,
 }) => (
-  <Card
-    className={cn(
-      'border-border bg-card border border-l-4',
-      accentClassName,
-      className
-    )}
-  >
+  <Card className={cn('border-border bg-card border', className)}>
     <CardContent className="flex flex-row items-center gap-2.5 p-2.5 sm:gap-4 sm:p-4">
       <div
         className={cn(

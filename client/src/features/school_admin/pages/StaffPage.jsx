@@ -19,12 +19,11 @@ import { ACTIONS, BASE } from '@/lib/icons';
 import { formatStaffId } from '@/lib/utils';
 
 import StaffDetailDrawer from '../components/staffs/StaffDetailDrawer';
-import StaffStatCard from '../components/staffs/StaffStatCard';
 import StaffStatusToggle from '../components/staffs/StaffStatusToggle';
 import StaffTable from '../components/staffs/StaffTable';
 import { useGetDepartmentsQuery } from '../departments.api';
 import { useGetStaffQuery } from '../staff.api';
-import { computeStaffStats, exportStaffToCsv } from '../utils/staff.utils';
+import { exportStaffToCsv } from '../utils/staff.utils';
 
 const StaffPage = () => {
   // Queries
@@ -47,12 +46,6 @@ const StaffPage = () => {
   // Active item states for dialogs & drawer details
   const [toggleMember, setToggleMember] = useState(null);
   const [detailMember, setDetailMember] = useState(null);
-
-  // Real-time headline stats
-  const stats = useMemo(
-    () => computeStaffStats(staff, departments),
-    [staff, departments]
-  );
 
   // Use the custom useDataTable hook
   const {
@@ -140,8 +133,7 @@ const StaffPage = () => {
         </Button>
       </div>
 
-      {/* ── Stats Summary Grid ────────────────────────────────── */}
-      <StaffStatCard stats={stats} isLoading={staffLoading} />
+
 
       {/* ── Controls & Actions Bar ────────────────────────────── */}
       <div className="bg-card border-border flex flex-col gap-3 rounded-xl border p-4 sm:flex-row sm:items-center sm:justify-between">

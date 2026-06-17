@@ -36,17 +36,11 @@ import { ACTIONS, EMPTY_STATE, STAFF } from '@/lib/icons';
 import { formatDate } from '@/lib/utils';
 
 import LeaveRequestDialog from '../components/LeaveRequestDialog';
-import StaffAttendanceStatCard from '../components/StaffAttendanceStatCard';
-import StaffLeaveStatCard from '../components/StaffLeaveStatCard';
 import {
   ATTENDANCE_COLUMNS,
   LEAVE_COLUMNS,
   MONTHS,
 } from '../constants/staffActivity.constants';
-import {
-  computeStaffAttendanceStats,
-  computeStaffLeavesStats,
-} from '../utils/staffActivity.utils';
 
 const formatDuration = (durationStr) => {
   if (!durationStr) return '-';
@@ -92,16 +86,6 @@ export const AttendanceLeavePage = () => {
     [attendanceData]
   );
   const leaves = useMemo(() => leavesData?.data?.leaves || [], [leavesData]);
-
-  const leaveStats = useMemo(
-    () => computeStaffLeavesStats(leaves, attendance),
-    [leaves, attendance]
-  );
-
-  const attendanceStats = useMemo(
-    () => computeStaffAttendanceStats(attendance),
-    [attendance]
-  );
 
   return (
     <div className="animate-fade-in mx-auto flex w-full max-w-7xl flex-col gap-6">
@@ -155,12 +139,6 @@ export const AttendanceLeavePage = () => {
 
         {/* Tab 1: Attendance Logs */}
         <TabsContent value="attendance" className="space-y-4">
-          {/* Attendance Stats */}
-          <StaffAttendanceStatCard
-            stats={attendanceStats}
-            isLoading={isAttendanceLoading}
-          />
-
           {/* Attendance History Card */}
           <Card className="border-border bg-card shadow-sm">
             <CardHeader className="border-border flex flex-col gap-4 border-b pb-3 sm:flex-row sm:items-center sm:justify-between">
@@ -273,9 +251,6 @@ export const AttendanceLeavePage = () => {
 
         {/* Tab 2: Leaves Management */}
         <TabsContent value="leaves" className="space-y-6">
-          {/* Leave Balances Grid */}
-          <StaffLeaveStatCard stats={leaveStats} isLoading={isLeavesLoading} />
-
           {/* Leave History Card */}
           <Card className="border-border bg-card shadow-sm">
             <CardHeader className="border-border flex flex-col gap-4 border-b pb-3 sm:flex-row sm:items-center sm:justify-between">

@@ -21,9 +21,8 @@ import CreateSchoolDialog from '../components/schools/CreateSchoolDialog';
 import EditSchoolDialog from '../components/schools/EditSchoolDialog';
 import SchoolsTable from '../components/schools/SchoolsTable';
 import SchoolStatusToggle from '../components/schools/SchoolStatusToggle';
-import SuperAdminSchoolStatCards from '../components/schools/SuperAdminSchoolStatCards';
 import { useGetSchoolsQuery } from '../schools.api';
-import { computeSchoolStats, exportSchoolsToCsv } from '../utils/schools.utils';
+import { exportSchoolsToCsv } from '../utils/schools.utils';
 
 const SchoolsPage = () => {
   // Queries
@@ -35,9 +34,6 @@ const SchoolsPage = () => {
   const [adminSchool, setAdminSchool] = useState(null);
   const [editSchool, setEditSchool] = useState(null);
   const [createOpen, setCreateOpen] = useState(false);
-
-  // Real-time headline stats
-  const stats = useMemo(() => computeSchoolStats(schools), [schools]);
 
   // Use the custom useDataTable hook
   const {
@@ -103,8 +99,7 @@ const SchoolsPage = () => {
         </Button>
       </div>
 
-      {/* ── Stats Summary Grid ────────────────────────────────── */}
-      <SuperAdminSchoolStatCards stats={stats} isLoading={isLoading} />
+
 
       {/* ── Controls & Actions Bar ────────────────────────────── */}
       <div className="bg-card border-border flex flex-col gap-3 rounded-xl border p-4 sm:flex-row sm:items-center sm:justify-between">

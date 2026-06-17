@@ -47,7 +47,7 @@ const StaffDashboardstatCard = ({ stats = {}, isLoading }) => {
         {[1, 2, 3, 4].map((i) => (
           <Card
             key={i}
-            className="border-border bg-card border-l-muted border border-l-4"
+            className="border-border bg-card border"
           >
             <CardContent className="flex flex-row items-center gap-2.5 p-2.5 sm:gap-4 sm:p-4">
               <Skeleton className="size-8 shrink-0 rounded-xl sm:size-10" />

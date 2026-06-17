@@ -41,10 +41,8 @@ import { BASE } from '@/lib/icons';
 import { formatDate } from '@/lib/utils';
 import { reviewLeaveSchema } from '@/schemas/staff.schema';
 
-import LeaveStatCard from '../components/leaves/LeaveStatCard';
 import LeaveTable from '../components/leaves/LeaveTable';
 import {
-  computeLeaveStats,
   exportLeavesToCsv,
   getLeaveTypes,
 } from '../utils/leaves.utils';
@@ -67,9 +65,6 @@ export const LeavesPage = () => {
 
   const leaves = useMemo(() => leavesData?.data?.leaves || [], [leavesData]);
   const leaveTypes = useMemo(() => getLeaveTypes(leaves), [leaves]);
-
-  // Stats
-  const stats = useMemo(() => computeLeaveStats(leaves), [leaves]);
 
   // Form setup
   const {
@@ -196,8 +191,7 @@ export const LeavesPage = () => {
         </div>
       </div>
 
-      {/* ── Stats Summary Grid ────────────────────────────────── */}
-      <LeaveStatCard stats={stats} isLoading={isLeavesLoading} />
+
 
       {/* ── Controls & Actions Bar ────────────────────────────── */}
       <div className="bg-card border-border flex flex-col gap-3 rounded-xl border p-4 sm:flex-row sm:items-center sm:justify-between">
