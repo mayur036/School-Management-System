@@ -3,86 +3,184 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { GUEST } from '@/lib/icons';
 
+import { Eyebrow, FeatureCard, SectionHeading } from '../components/marketing';
+
+const FEATURES = [
+  {
+    icon: GUEST.SECURITY,
+    title: 'Multi-Tenant Isolation',
+    desc: 'Strict data scoping per school. Super admins oversee platform health while each school manages its own records in complete isolation.',
+  },
+  {
+    icon: GUEST.SCHEDULE,
+    title: 'Schedules & Periods',
+    desc: 'Define period structures and working days, then build school-wide weekly timetables — single entries or bulk in one pass.',
+  },
+  {
+    icon: GUEST.ATTENDANCE,
+    title: 'Attendance & Clocking',
+    desc: 'Staff clock in and out with real-time status, while admins get a clear, auditable view of daily attendance.',
+  },
+  {
+    icon: GUEST.TASKS,
+    title: 'Tasks & Duties',
+    desc: 'Assign duties to staff, track progress through pending, in-progress and completed states, and keep everyone aligned.',
+  },
+  {
+    icon: GUEST.USER_CHECK,
+    title: 'Leave Management',
+    desc: 'Staff request leave in seconds; admins review, approve or reject with a full history of every decision.',
+  },
+  {
+    icon: GUEST.USERS,
+    title: 'Staff Directory',
+    desc: 'Register academic and support staff under custom departments, toggle active status, and manage secure access.',
+  },
+];
+
+const STATS = [
+  { value: '3', label: 'Distinct roles' },
+  { value: '100%', label: 'Tenant-isolated' },
+  { value: '24/7', label: 'Secure access' },
+  { value: '9', label: 'Core modules' },
+];
+
+const ROLES = [
+  {
+    icon: GUEST.BUILDING,
+    title: 'Super Admin',
+    desc: 'Spins up new schools and provisions their primary administrators across the platform.',
+  },
+  {
+    icon: GUEST.DASHBOARD,
+    title: 'School Admin',
+    desc: 'Manages departments, staff, schedules, tasks and leave reviews for their own school.',
+  },
+  {
+    icon: GUEST.USER_CHECK,
+    title: 'Staff',
+    desc: 'Clocks in, views weekly schedules, requests leave and updates assigned tasks.',
+  },
+];
+
 export const Home = () => {
   return (
-    <div className="dark:via-background flex min-h-screen flex-col bg-linear-to-br from-indigo-50/50 via-white to-sky-50/50 dark:from-zinc-950 dark:to-zinc-900">
-      {/* Top Navbar */}
-      <header className="border-border/40 bg-background/80 sticky top-0 z-50 w-full border-b backdrop-blur-md">
-        <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6">
-          <div className="flex items-center gap-2">
-            <GUEST.BUILDING className="text-primary h-5 w-5" />
-            <span className="text-foreground text-base font-bold tracking-tight">
-              CampusCore
-            </span>
-          </div>
-          <Button size="sm" asChild>
-            <Link to="/login">Sign In</Link>
-          </Button>
-        </div>
-      </header>
-
-      {/* Main Hero Content */}
-      <main className="flex flex-1 items-center">
-        <div className="mx-auto max-w-4xl px-4 py-16 text-center sm:px-6 lg:px-8">
-          <BadgeSecondary text="Platform Overview" />
-          <h1 className="text-foreground mt-4 text-3xl font-extrabold tracking-tight sm:text-5xl">
-            Unified School Management System
+    <>
+      {/* Hero */}
+      <section className="relative overflow-hidden">
+        <div className="from-primary/5 pointer-events-none absolute inset-0 bg-linear-to-b to-transparent" />
+        <div className="relative mx-auto max-w-4xl px-4 py-20 text-center sm:px-6 sm:py-28 lg:px-8">
+          <Eyebrow>Platform Overview</Eyebrow>
+          <h1 className="text-foreground mt-5 text-4xl font-extrabold tracking-tight text-balance sm:text-5xl lg:text-6xl">
+            Run your entire school from one secure place
           </h1>
-          <p className="text-muted-foreground mx-auto mt-4 max-w-xl text-base sm:text-lg">
-            A secure, multi-tenant portal for Super Admins, School
-            Administrators, and Department Staff to manage academic operations.
+          <p className="text-muted-foreground mx-auto mt-5 max-w-2xl text-base leading-relaxed text-pretty sm:text-lg">
+            CampusCore is a multi-tenant management platform for Super Admins,
+            School Administrators and Department Staff — covering scheduling,
+            attendance, tasks and leave in a single, role-aware system.
           </p>
-          <div className="mt-8 flex justify-center gap-3">
+          <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Button size="lg" asChild>
-              <Link to="/login">Sign In to Dashboard</Link>
+              <Link to="/login">
+                Sign In to Dashboard
+                <GUEST.ARROW_RIGHT className="size-4" />
+              </Link>
+            </Button>
+            <Button size="lg" variant="outline" asChild>
+              <Link to="/features">Explore Features</Link>
             </Button>
           </div>
+        </div>
+      </section>
 
-          {/* Features Grid */}
-          <div className="mt-16 grid gap-6 text-left sm:grid-cols-3">
-            <CardFeature
-              icon={GUEST.SECURITY}
-              title="Multi-Tenant Isolation"
-              desc="Ensures strict data scoping per school tenant. Super admins oversee platform health while school admins manage their own records."
-            />
-            <CardFeature
-              icon={GUEST.BUILDING}
-              title="Institution Control"
-              desc="Super administrators can spin up new school templates and configure primary administrators with full role isolation."
-            />
-            <CardFeature
-              icon={GUEST.USER_CHECK}
-              title="Employee Directory"
-              desc="Register academic or support staff under custom departments, toggle active status, and maintain secure system authorizations."
-            />
+      {/* Stats */}
+      <section className="border-border/60 border-y">
+        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-px px-4 sm:px-6 lg:grid-cols-4 lg:px-8">
+          {STATS.map((stat) => (
+            <div key={stat.label} className="px-2 py-8 text-center">
+              <div className="text-foreground text-3xl font-bold tracking-tight tabular-nums">
+                {stat.value}
+              </div>
+              <div className="text-muted-foreground mt-1 text-xs font-medium tracking-wide uppercase">
+                {stat.label}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Features */}
+      <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+        <SectionHeading
+          eyebrow="Everything included"
+          title="One platform, every workflow"
+          description="From the first school onboarding to a staff member clocking out, every operation is handled in a single, coherent system."
+        />
+        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {FEATURES.map((feature) => (
+            <FeatureCard key={feature.title} {...feature} />
+          ))}
+        </div>
+      </section>
+
+      {/* Roles */}
+      <section className="bg-muted/30 border-border/60 border-y">
+        <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+          <SectionHeading
+            eyebrow="Built for every role"
+            title="The right view for everyone"
+            description="Access and capabilities adapt to who is signed in — no clutter, no guesswork."
+          />
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            {ROLES.map(({ icon: Icon, title, desc }) => (
+              <div
+                key={title}
+                className="bg-card border-border/60 rounded-xl border p-6 text-center"
+              >
+                <div className="bg-primary/10 text-primary mx-auto flex size-12 items-center justify-center rounded-xl">
+                  <Icon className="size-6" />
+                </div>
+                <h3 className="text-foreground mt-4 text-lg font-bold">
+                  {title}
+                </h3>
+                <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
+                  {desc}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
-      </main>
+      </section>
 
-      {/* Footer */}
-      <footer className="border-border/40 text-muted-foreground border-t py-6 text-center text-xs">
-        &copy; {new Date().getFullYear()} CampusCore. All rights reserved.
-      </footer>
-    </div>
+      {/* CTA */}
+      <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+        <div className="from-primary relative overflow-hidden rounded-2xl bg-linear-to-br to-indigo-700 px-6 py-14 text-center sm:px-12">
+          <div className="bg-size-[16px_16px] pointer-events-none absolute inset-0 bg-[radial-gradient(#ffffff20_1px,transparent_1px)]" />
+          <div className="relative mx-auto max-w-2xl">
+            <h2 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+              Ready to manage your school the simple way?
+            </h2>
+            <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-white/80 sm:text-base">
+              Sign in to your dashboard, or reach out and we'll help you get your
+              institution set up.
+            </p>
+            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <Button size="lg" variant="secondary" asChild>
+                <Link to="/login">Sign In</Link>
+              </Button>
+              <Button
+                size="lg"
+                asChild
+                className="border border-white/30 bg-transparent text-white hover:bg-white/10"
+              >
+                <Link to="/contact">Contact Us</Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </>
   );
 };
-
-const BadgeSecondary = ({ text }) => (
-  <span className="bg-primary/10 text-primary rounded-full px-3 py-1 text-xs font-semibold tracking-wider uppercase">
-    {text}
-  </span>
-);
-
-const CardFeature = ({ icon: Icon, title, desc }) => (
-  <div className="bg-card border-border/60 hover:bg-muted/5 rounded-xl border p-5 shadow-xs transition-colors">
-    <div className="bg-primary/10 text-primary flex h-9 w-9 items-center justify-center rounded-lg">
-      <Icon className="h-5 w-5" />
-    </div>
-    <h3 className="text-foreground mt-4 text-base leading-tight font-bold">
-      {title}
-    </h3>
-    <p className="text-muted-foreground mt-2 text-xs leading-relaxed">{desc}</p>
-  </div>
-);
 
 export default Home;

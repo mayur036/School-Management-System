@@ -5,6 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## What this is
 
 A multi-tenant **CampusCore** School Management System. Roles live in a single `staff` table:
+
 - **Super Admin (`super_admin`)**: Manages schools and school admins.
 - **School Admin (`school_admin`)**: Tenant admin. Manages departments/staff, creates schedules, assigns duties/tasks, reviews leaves.
 - **Staff (`staff`)**: School/departmental employees. Can clock in/out, view weekly schedule, request leave, update assigned tasks, view policies/payslips.
@@ -37,8 +38,8 @@ There is **no test suite** in this repo yet. "Done when" checks in PROJECT_PLAN.
 
 The DB is **not** migrated by app code. Run the three scripts in `server/database/` **in order**, in MySQL Workbench:
 
-1. `schema.sql` — 8 tables: `roles`, `schools`, `departments`, `staff`, `staff_schedules`, `staff_attendance`, `leave_requests`, `staff_tasks` + FKs + indexes
-2. `procedures.sql` — 37 stored procedures (all `sp_*`)
+1. `schema.sql` — 9 tables: `roles`, `schools`, `departments`, `staff`, `school_periods`, `staff_schedules`, `staff_attendance`, `leave_requests`, `staff_tasks` + FKs + indexes
+2. `procedures.sql` — 49 stored procedures (all `sp_*`)
 3. `seed.sql` — 3 roles + first super admin (`superadmin@sms.com` / `Admin@123`)
 
 All three are idempotent and safe to re-run.
@@ -68,7 +69,7 @@ Procedures also validate tenancy where relevant (e.g. staff must belong to the p
   - `schoolAdminManager.routes.js` — list/delete school admins (super_admin only)
   - `department.routes.js` — create/list departments (school_admin only)
   - `staff.routes.js` — profile endpoints (all roles), staff portal endpoints (staff only), staff CRUD (school_admin only)
-  - `schoolAdmin.routes.js` — task assignment, leave review, schedule management, school settings profile (school_admin only)
+  - `schoolAdmin.routes.js` — task assignment, leave review, schedule periods + working-days settings, school-wide schedule grid (single + bulk), school settings profile (school_admin only)
 - **Auth/guards**: `protect` (middleware/auth.js) reads the JWT from the `token` httpOnly cookie _or_ a `Bearer` header, verifies it, and attaches `req.user` (claims: `staff_id`, `role_name`, `school_id`, `department_id`, names, email). `authorize('super_admin' | 'school_admin' | ...)` guards by role.
 - **Tenant scoping is mandatory and never trusts the request body.** For school_admin/staff routes, the `school_id` comes from `req.user.school_id` (the token), never from params/body. Cross-school access returns 404.
 - **Validation**: `validate(zodSchema)` middleware runs zod schemas from `src/schema/*.schema.js`.
@@ -96,7 +97,7 @@ Procedures also validate tenancy where relevant (e.g. staff must belong to the p
 
 All server state flows through **one** `baseApi` (`src/app/baseApi.js`) using a **custom axios `baseQuery`** (not `fetchBaseQuery`), so auth rides on the httpOnly cookie via `withCredentials` — no token header is attached client-side. Each feature adds endpoints with `baseApi.injectEndpoints(...)` in its own `feature.api.js`.
 
-- **Tag types registered**: `'User'`, `'School'`, `'Department'`, `'Staff'`, `'SchoolAdmin'`, `'StaffSchedule'`, `'StaffAttendance'`, `'StaffLeave'`
+- **Tag types registered**: `'User'`, `'School'`, `'Department'`, `'Staff'`, `'SchoolAdmin'`, `'StaffSchedule'`, `'StaffAttendance'`, `'StaffLeave'`, `'SchoolPeriod'`, `'SchoolSettings'`
 - **Cache coherence is tag-driven**: every list query sets `providesTags`; every mutation sets `invalidatesTags` for the matching `tagType` so lists refetch automatically. Add new `tagTypes` to `baseApi` as features land.
 - `authSlice` holds `{ user, isAuthenticated }`. `app/store.js` combines `baseApi.reducer` + `auth`. `providers/AppProviders.jsx` wires the store, theme, and a `SessionBootstrap` that calls `getMe` on load.
 - **Routing** (`App.jsx`): role-based, namespaced URLs `/super/*`, `/school/*`, `/staff/*`. Guards: `GuestRoute` (logged-out only) → `ProtectedRoute` (any auth) → `RoleRoute allow={[ROLES...]}` → per-role layout. `lib/roles.js` `roleHome(role)` is the single source for post-login redirect targets. `useAuth` must finish the first `/auth/me` before guards decide (`isAuthLoading`).
@@ -107,6 +108,7 @@ All server state flows through **one** `baseApi` (`src/app/baseApi.js`) using a 
   - `features/super_admin/schools.api.js` — school CRUD + status toggle + update school
   - `features/super_admin/schoolAdmins.api.js` — school admin creation
   - `features/school_admin/school.api.js` — school settings endpoints (profile + preferences)
+  - `features/school_admin/schedule.api.js` — period CRUD, working-days settings, and school-wide schedule grid (single + bulk create)
   - `features/school_admin/departments.api.js` — department CRUD
   - `features/school_admin/staff.api.js` — staff CRUD + status toggle
   - `features/profile/profile.api.js` — avatar upload, profile update, password change
@@ -134,12 +136,13 @@ All server state flows through **one** `baseApi` (`src/app/baseApi.js`) using a 
 ## API surface
 
 See PROJECT_PLAN.md §8 for the full endpoint map. Shape:
+
 - `/api/auth/*` (all roles: login, logout, forgot-password, reset-password, me)
 - `/api/schools/*` (super_admin only)
 - `/api/school-admins/*` (super_admin only: list, status toggle, delete)
 - `/api/departments` (school_admin only)
 - `/api/staff/*` (school_admin CRUD; plus `/me`, `/me/password`, `/me/avatar` for all; and `/me/dashboard-stats`, `/me/schedule`, `/me/attendance/*`, `/me/leaves`, `/me/tasks/*` for staff)
-- `/api/school-admin/*` (school_admin management: tasks, leaves, schedules — CRUD + review)
+- `/api/school-admin/*` (school_admin management: tasks, leaves, schedule periods, working-days settings, schedules grid — CRUD + review)
 
 ## Current implementation status
 

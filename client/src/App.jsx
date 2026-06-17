@@ -10,13 +10,17 @@ import RoleRoute from '@/components/routes/RoleRoute';
 import FullScreenLoader from '@/helper/FullScreenLoader';
 import { ROLES } from '@/lib/roles';
 
+import PublicLayout from './components/layouts/public';
 import SchoolAdminLayout from './components/layouts/school_admin';
 import StaffLayout from './components/layouts/staff';
 import SuperAdminLayout from './components/layouts/super_admin';
 import GuestRoute from './components/routes/GuestRoute';
 
-// Pages
+// Public / marketing pages
 const Home = lazy(() => import('./features/guest/pages/Home'));
+const About = lazy(() => import('./features/guest/pages/About'));
+const Features = lazy(() => import('./features/guest/pages/Features'));
+const Contact = lazy(() => import('./features/guest/pages/Contact'));
 const LoginPage = lazy(() => import('./features/auth/pages/LoginPage'));
 const ForgotPasswordPage = lazy(
   () => import('./features/auth/pages/ForgotPasswordPage')
@@ -74,7 +78,17 @@ const router = createBrowserRouter([
   {
     element: <GuestRoute />,
     children: [
-      { index: true, element: <Home /> },
+      // Public marketing site (shared navbar + footer)
+      {
+        element: <PublicLayout />,
+        children: [
+          { index: true, element: <Home /> },
+          { path: 'about', element: <About /> },
+          { path: 'features', element: <Features /> },
+          { path: 'contact', element: <Contact /> },
+        ],
+      },
+      // Auth pages (no marketing chrome)
       { path: 'login', element: <LoginPage /> },
       { path: 'forgot-password', element: <ForgotPasswordPage /> },
       { path: 'reset-password', element: <ResetPasswordPage /> },
