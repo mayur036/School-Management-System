@@ -114,30 +114,28 @@ export const PeriodManager = () => {
     }
   };
 
-
-
   return (
     <>
       <div className="border-border bg-card overflow-hidden rounded-xl border shadow-xs">
-        <div className="border-border border-b p-4.5 bg-card">
+        <div className="border-border bg-card border-b p-4.5">
           <div className="flex flex-row items-center justify-between">
             <div>
               <h3 className="text-foreground text-sm font-bold tracking-tight">
                 School Periods (Bell Schedule)
               </h3>
-              <p className="text-muted-foreground text-xs font-medium mt-0.5">
+              <p className="text-muted-foreground mt-0.5 text-xs font-medium">
                 Manage periods, class timings, and breaks for your school.
               </p>
             </div>
             <Button
               onClick={openCreateDialog}
-              className="bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer h-9 px-4 text-xs font-semibold rounded-lg shadow-xs transition-colors"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 h-9 cursor-pointer rounded-lg px-4 text-xs font-semibold shadow-xs transition-colors"
             >
               <ACTIONS.CREATE className="mr-1.5 size-4" /> Add Period
             </Button>
           </div>
         </div>
-        
+
         <PeriodsTable onEdit={openEditDialog} />
       </div>
 

@@ -155,14 +155,14 @@ export const Home = () => {
       {/* CTA */}
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="from-primary relative overflow-hidden rounded-2xl bg-linear-to-br to-indigo-700 px-6 py-14 text-center sm:px-12">
-          <div className="bg-size-[16px_16px] pointer-events-none absolute inset-0 bg-[radial-gradient(#ffffff20_1px,transparent_1px)]" />
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(#ffffff20_1px,transparent_1px)] bg-size-[16px_16px]" />
           <div className="relative mx-auto max-w-2xl">
             <h2 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
               Ready to manage your school the simple way?
             </h2>
             <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-white/80 sm:text-base">
-              Sign in to your dashboard, or reach out and we'll help you get your
-              institution set up.
+              Sign in to your dashboard, or reach out and we'll help you get
+              your institution set up.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Button size="lg" variant="secondary" asChild>

@@ -14,8 +14,12 @@ const schoolModel = {
       createdBy,
     ]),
 
-  listSchools: (search = '', status = 'all', sortBy = 'created_at', sortOrder = 'DESC') =>
-    callProcedure('sp_list_schools', [search, status, sortBy, sortOrder]),
+  listSchools: (
+    search = '',
+    status = 'all',
+    sortBy = 'created_at',
+    sortOrder = 'DESC'
+  ) => callProcedure('sp_list_schools', [search, status, sortBy, sortOrder]),
 
   getSchool: (schoolId) => callProcedureOne('sp_get_school', [schoolId]),
 

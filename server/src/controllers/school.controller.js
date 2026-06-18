@@ -38,7 +38,12 @@ const createSchool = asyncHandler(async (req, res) => {
  */
 const listSchools = asyncHandler(async (req, res) => {
   const { search, status, sort_by, sort_order } = req.query;
-  const schools = await schoolModel.listSchools(search, status, sort_by, sort_order);
+  const schools = await schoolModel.listSchools(
+    search,
+    status,
+    sort_by,
+    sort_order
+  );
   return ok(res, { schools }, 'Schools retrieved successfully');
 });
 

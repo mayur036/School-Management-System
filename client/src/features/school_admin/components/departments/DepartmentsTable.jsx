@@ -91,43 +91,55 @@ const DepartmentsTable = ({
         <TableHeader className="bg-muted/30">
           <TableRow className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase hover:bg-transparent">
             <TableHead
-              className="h-11 py-3 text-left cursor-pointer select-none hover:bg-muted/20"
+              className="hover:bg-muted/20 h-11 cursor-pointer py-3 text-left select-none"
               onClick={() => onSort?.('name')}
             >
               <div className="flex items-center gap-1">
                 Department Name
                 {sortBy === 'name' ? (
-                  sortOrder === 'ASC' ? <BASE.CHEVRON_UP className="size-3" /> : <BASE.CHEVRON_DOWN className="size-3" />
+                  sortOrder === 'ASC' ? (
+                    <BASE.CHEVRON_UP className="size-3" />
+                  ) : (
+                    <BASE.CHEVRON_DOWN className="size-3" />
+                  )
                 ) : (
-                  <BASE.CHEVRON_SORT className="size-3 text-muted-foreground/55" />
+                  <BASE.CHEVRON_SORT className="text-muted-foreground/55 size-3" />
                 )}
               </div>
             </TableHead>
             <TableHead className="h-11 py-3 text-left">Description</TableHead>
             <TableHead className="h-11 py-3 text-left">Staff</TableHead>
             <TableHead
-              className="h-11 py-3 text-left cursor-pointer select-none hover:bg-muted/20"
+              className="hover:bg-muted/20 h-11 cursor-pointer py-3 text-left select-none"
               onClick={() => onSort?.('status')}
             >
               <div className="flex items-center gap-1">
                 Status
                 {sortBy === 'status' ? (
-                  sortOrder === 'ASC' ? <BASE.CHEVRON_UP className="size-3" /> : <BASE.CHEVRON_DOWN className="size-3" />
+                  sortOrder === 'ASC' ? (
+                    <BASE.CHEVRON_UP className="size-3" />
+                  ) : (
+                    <BASE.CHEVRON_DOWN className="size-3" />
+                  )
                 ) : (
-                  <BASE.CHEVRON_SORT className="size-3 text-muted-foreground/55" />
+                  <BASE.CHEVRON_SORT className="text-muted-foreground/55 size-3" />
                 )}
               </div>
             </TableHead>
             <TableHead
-              className="h-11 py-3 text-left cursor-pointer select-none hover:bg-muted/20"
+              className="hover:bg-muted/20 h-11 cursor-pointer py-3 text-left select-none"
               onClick={() => onSort?.('created_at')}
             >
               <div className="flex items-center gap-1">
                 Created Date
                 {sortBy === 'created_at' ? (
-                  sortOrder === 'ASC' ? <BASE.CHEVRON_UP className="size-3" /> : <BASE.CHEVRON_DOWN className="size-3" />
+                  sortOrder === 'ASC' ? (
+                    <BASE.CHEVRON_UP className="size-3" />
+                  ) : (
+                    <BASE.CHEVRON_DOWN className="size-3" />
+                  )
                 ) : (
-                  <BASE.CHEVRON_SORT className="size-3 text-muted-foreground/55" />
+                  <BASE.CHEVRON_SORT className="text-muted-foreground/55 size-3" />
                 )}
               </div>
             </TableHead>

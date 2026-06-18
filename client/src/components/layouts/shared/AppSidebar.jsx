@@ -59,9 +59,7 @@ const NavItem = ({ to, label, Icon, end }) => {
                 : 'text-muted-foreground group-hover:text-foreground'
             )}
           />
-          <span>
-            {label}
-          </span>
+          <span>{label}</span>
         </Link>
       </SidebarMenuButton>
     </SidebarMenuItem>

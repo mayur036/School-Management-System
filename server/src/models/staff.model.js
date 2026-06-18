@@ -24,8 +24,22 @@ const staffModel = {
     ]),
 
   // List all staff of one school.
-  listStaff: (schoolId, search = '', departmentId = 0, status = 'all', sortBy = 'created_at', sortOrder = 'DESC') =>
-    callProcedure('sp_list_staff', [schoolId, search, departmentId, status, sortBy, sortOrder]),
+  listStaff: (
+    schoolId,
+    search = '',
+    departmentId = 0,
+    status = 'all',
+    sortBy = 'created_at',
+    sortOrder = 'DESC'
+  ) =>
+    callProcedure('sp_list_staff', [
+      schoolId,
+      search,
+      departmentId,
+      status,
+      sortBy,
+      sortOrder,
+    ]),
 
   // Get a single staff member by id.
   getStaff: (staffId) => callProcedureOne('sp_get_staff', [staffId]),

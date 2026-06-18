@@ -29,7 +29,7 @@ const SkeletonRows = ({ count = 5 }) =>
     <TableRow key={i}>
       <TableCell className="py-3">
         <div className="flex items-center gap-3">
-          <Skeleton className="size-9 rounded-xl animate-pulse" />
+          <Skeleton className="size-9 animate-pulse rounded-xl" />
           <div className="flex flex-col gap-1.5">
             <Skeleton className="h-4 w-32 animate-pulse" />
             <Skeleton className="h-3 w-20 animate-pulse" />
@@ -43,13 +43,13 @@ const SkeletonRows = ({ count = 5 }) =>
         <Skeleton className="h-4 w-36 animate-pulse" />
       </TableCell>
       <TableCell className="py-3">
-        <Skeleton className="h-5 w-16 rounded-full animate-pulse" />
+        <Skeleton className="h-5 w-16 animate-pulse rounded-full" />
       </TableCell>
       <TableCell className="hidden py-3 lg:table-cell">
         <Skeleton className="h-4 w-24 animate-pulse" />
       </TableCell>
       <TableCell className="py-3 text-right">
-        <Skeleton className="ml-auto h-8 w-8 rounded-lg animate-pulse" />
+        <Skeleton className="ml-auto h-8 w-8 animate-pulse rounded-lg" />
       </TableCell>
     </TableRow>
   ));
@@ -74,10 +74,14 @@ const SchoolsTable = ({
             <TableRow className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase hover:bg-transparent">
               <TableHead className="h-11 py-3 text-left">Name</TableHead>
               <TableHead className="h-11 py-3 text-left">Code</TableHead>
-              <TableHead className="hidden h-11 py-3 text-left md:table-cell">Email</TableHead>
+              <TableHead className="hidden h-11 py-3 text-left md:table-cell">
+                Email
+              </TableHead>
               <TableHead className="h-11 py-3 text-left">Status</TableHead>
-              <TableHead className="hidden h-11 py-3 text-left lg:table-cell">Created</TableHead>
-              <TableHead className="h-11 py-3 text-right w-12">
+              <TableHead className="hidden h-11 py-3 text-left lg:table-cell">
+                Created
+              </TableHead>
+              <TableHead className="h-11 w-12 py-3 text-right">
                 <span className="sr-only">Actions</span>
               </TableHead>
             </TableRow>
@@ -106,59 +110,77 @@ const SchoolsTable = ({
         <TableHeader className="bg-muted/30">
           <TableRow className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase hover:bg-transparent">
             <TableHead
-              className="h-11 py-3 text-left cursor-pointer select-none hover:bg-muted/20"
+              className="hover:bg-muted/20 h-11 cursor-pointer py-3 text-left select-none"
               onClick={() => onSort?.('name')}
             >
               <div className="flex items-center gap-1">
                 Name
                 {sortBy === 'name' ? (
-                  sortOrder === 'ASC' ? <BASE.CHEVRON_UP className="size-3" /> : <BASE.CHEVRON_DOWN className="size-3" />
+                  sortOrder === 'ASC' ? (
+                    <BASE.CHEVRON_UP className="size-3" />
+                  ) : (
+                    <BASE.CHEVRON_DOWN className="size-3" />
+                  )
                 ) : (
-                  <BASE.CHEVRON_SORT className="size-3 text-muted-foreground/55" />
+                  <BASE.CHEVRON_SORT className="text-muted-foreground/55 size-3" />
                 )}
               </div>
             </TableHead>
             <TableHead
-              className="h-11 py-3 text-left cursor-pointer select-none hover:bg-muted/20"
+              className="hover:bg-muted/20 h-11 cursor-pointer py-3 text-left select-none"
               onClick={() => onSort?.('code')}
             >
               <div className="flex items-center gap-1">
                 Code
                 {sortBy === 'code' ? (
-                  sortOrder === 'ASC' ? <BASE.CHEVRON_UP className="size-3" /> : <BASE.CHEVRON_DOWN className="size-3" />
+                  sortOrder === 'ASC' ? (
+                    <BASE.CHEVRON_UP className="size-3" />
+                  ) : (
+                    <BASE.CHEVRON_DOWN className="size-3" />
+                  )
                 ) : (
-                  <BASE.CHEVRON_SORT className="size-3 text-muted-foreground/55" />
+                  <BASE.CHEVRON_SORT className="text-muted-foreground/55 size-3" />
                 )}
               </div>
             </TableHead>
-            <TableHead className="hidden h-11 py-3 text-left md:table-cell">Email</TableHead>
+            <TableHead className="hidden h-11 py-3 text-left md:table-cell">
+              Email
+            </TableHead>
             <TableHead
-              className="h-11 py-3 text-left cursor-pointer select-none hover:bg-muted/20"
+              className="hover:bg-muted/20 h-11 cursor-pointer py-3 text-left select-none"
               onClick={() => onSort?.('status')}
             >
               <div className="flex items-center gap-1">
                 Status
                 {sortBy === 'status' ? (
-                  sortOrder === 'ASC' ? <BASE.CHEVRON_UP className="size-3" /> : <BASE.CHEVRON_DOWN className="size-3" />
+                  sortOrder === 'ASC' ? (
+                    <BASE.CHEVRON_UP className="size-3" />
+                  ) : (
+                    <BASE.CHEVRON_DOWN className="size-3" />
+                  )
                 ) : (
-                  <BASE.CHEVRON_SORT className="size-3 text-muted-foreground/55" />
+                  <BASE.CHEVRON_SORT className="text-muted-foreground/55 size-3" />
                 )}
               </div>
             </TableHead>
             <TableHead
-              className="hidden h-11 py-3 text-left lg:table-cell cursor-pointer select-none hover:bg-muted/20"
+              className="hover:bg-muted/20 hidden h-11 cursor-pointer py-3 text-left select-none lg:table-cell"
               onClick={() => onSort?.('created_at')}
             >
               <div className="flex items-center gap-1">
                 Created
                 {sortBy === 'created_at' ? (
-                  sortOrder === 'ASC' ? <BASE.CHEVRON_UP className="size-3" /> : <BASE.CHEVRON_DOWN className="size-3" />
+                  sortOrder === 'ASC' ? (
+                    <BASE.CHEVRON_UP className="size-3" />
+                  ) : (
+                    <BASE.CHEVRON_DOWN className="size-3" />
+                  )
                 ) : (
-                  <BASE.CHEVRON_SORT className="size-3 text-muted-foreground/55" />
+                  <BASE.CHEVRON_SORT className="text-muted-foreground/55 size-3" />
                 )}
               </div>
             </TableHead>
-            <TableHead className="h-11 py-3 text-right w-12">Actions</TableHead>
+            <TableHead className="h-11 w-12 py-3 text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -176,7 +198,7 @@ const SchoolsTable = ({
                     <span className="text-sm font-bold tracking-tight">
                       {school.name}
                     </span>
-                    <span className="text-muted-foreground text-xs font-medium mt-0.5">
+                    <span className="text-muted-foreground mt-0.5 text-xs font-medium">
                       {school.domain || '—'}
                     </span>
                   </div>

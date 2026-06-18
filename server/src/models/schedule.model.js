@@ -91,7 +91,16 @@ const scheduleModel = {
       room,
     ]),
 
-  listSchoolSchedules: (schoolId, { staffId = 0, day_of_week = '', search = '', sortBy = '', sortOrder = '' } = {}) =>
+  listSchoolSchedules: (
+    schoolId,
+    {
+      staffId = 0,
+      day_of_week = '',
+      search = '',
+      sortBy = '',
+      sortOrder = '',
+    } = {}
+  ) =>
     callProcedure('sp_list_school_schedules', [
       schoolId,
       staffId || 0,

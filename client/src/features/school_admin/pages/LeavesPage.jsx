@@ -52,12 +52,15 @@ export const LeavesPage = () => {
 
   // Queries
   const { data: leavesData, isLoading: isLeavesLoading } =
-    useListSchoolLeaveRequestsQuery({
-      search: debouncedSearch,
-      status: statusFilter,
-      sort_by: sortBy,
-      sort_order: sortOrder,
-    }, { pollingInterval: 30000 });
+    useListSchoolLeaveRequestsQuery(
+      {
+        search: debouncedSearch,
+        status: statusFilter,
+        sort_by: sortBy,
+        sort_order: sortOrder,
+      },
+      { pollingInterval: 30000 }
+    );
 
   // Mutations
   const [reviewLeave, { isLoading: isSubmitting }] =
@@ -146,17 +149,17 @@ export const LeavesPage = () => {
       {/* Search & Actions Bar (eSkooly style) */}
       <div className="bg-card border-border flex flex-col gap-4 rounded-xl border p-4.5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
         {/* Left: Search Input Box & Filters */}
-        <div className="flex flex-col gap-4 flex-1 max-w-4xl sm:flex-row sm:items-end">
+        <div className="flex max-w-4xl flex-1 flex-col gap-4 sm:flex-row sm:items-end">
           {/* Search */}
-          <div className="flex flex-col gap-1.5 flex-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80">
+          <div className="flex flex-1 flex-col gap-1.5">
+            <span className="text-muted-foreground/80 text-[10px] font-bold tracking-wider uppercase">
               Search Leave Requests
             </span>
             <div className="relative w-full">
               <BASE.SEARCH className="text-muted-foreground/60 absolute top-1/2 left-3 size-4 -translate-y-1/2" />
               <input
                 type="text"
-                className="bg-card border-border text-foreground placeholder:text-muted-foreground/60 w-full rounded-lg border py-2 pr-4 pl-9 text-xs outline-none focus:ring-1 focus:ring-primary"
+                className="bg-card border-border text-foreground placeholder:text-muted-foreground/60 focus:ring-primary w-full rounded-lg border py-2 pr-4 pl-9 text-xs outline-none focus:ring-1"
                 placeholder="Type employee name or leave type..."
                 value={searchTerm}
                 onChange={(e) => {
@@ -168,8 +171,8 @@ export const LeavesPage = () => {
           </div>
 
           {/* Status Filter */}
-          <div className="flex flex-col gap-1.5 w-full sm:w-48">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80">
+          <div className="flex w-full flex-col gap-1.5 sm:w-48">
+            <span className="text-muted-foreground/80 text-[10px] font-bold tracking-wider uppercase">
               Status
             </span>
             <Select
@@ -183,10 +186,18 @@ export const LeavesPage = () => {
                 <SelectValue placeholder="All Status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all" className="text-xs">All Status</SelectItem>
-                <SelectItem value="pending" className="text-xs">Pending</SelectItem>
-                <SelectItem value="approved" className="text-xs">Approved</SelectItem>
-                <SelectItem value="rejected" className="text-xs">Rejected</SelectItem>
+                <SelectItem value="all" className="text-xs">
+                  All Status
+                </SelectItem>
+                <SelectItem value="pending" className="text-xs">
+                  Pending
+                </SelectItem>
+                <SelectItem value="approved" className="text-xs">
+                  Approved
+                </SelectItem>
+                <SelectItem value="rejected" className="text-xs">
+                  Rejected
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>

@@ -84,16 +84,16 @@ const SchoolsPage = () => {
       {/* Search & Actions Bar (eSkooly style) */}
       <div className="bg-card border-border flex flex-col gap-4 rounded-xl border p-4.5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
         {/* Left: Search Input Box & Filter */}
-        <div className="flex flex-col gap-4 flex-1 max-w-2xl sm:flex-row sm:items-end">
-          <div className="flex flex-col gap-1.5 flex-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80">
+        <div className="flex max-w-2xl flex-1 flex-col gap-4 sm:flex-row sm:items-end">
+          <div className="flex flex-1 flex-col gap-1.5">
+            <span className="text-muted-foreground/80 text-[10px] font-bold tracking-wider uppercase">
               Search School
             </span>
             <div className="relative w-full">
               <BASE.SEARCH className="text-muted-foreground/60 absolute top-1/2 left-3 size-4 -translate-y-1/2" />
               <input
                 type="text"
-                className="bg-card border-border text-foreground placeholder:text-muted-foreground/60 w-full rounded-lg border py-2 pr-4 pl-9 text-xs outline-none focus:ring-1 focus:ring-primary"
+                className="bg-card border-border text-foreground placeholder:text-muted-foreground/60 focus:ring-primary w-full rounded-lg border py-2 pr-4 pl-9 text-xs outline-none focus:ring-1"
                 placeholder="Type school name or domain..."
                 value={searchTerm}
                 onChange={(e) => {
@@ -105,8 +105,8 @@ const SchoolsPage = () => {
           </div>
 
           {/* Status Filter */}
-          <div className="flex flex-col gap-1.5 w-full sm:w-40">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80">
+          <div className="flex w-full flex-col gap-1.5 sm:w-40">
+            <span className="text-muted-foreground/80 text-[10px] font-bold tracking-wider uppercase">
               Status
             </span>
             <Select
@@ -120,9 +120,15 @@ const SchoolsPage = () => {
                 <SelectValue placeholder="All Status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all" className="text-xs">All Status</SelectItem>
-                <SelectItem value="active" className="text-xs">Active</SelectItem>
-                <SelectItem value="inactive" className="text-xs">Inactive</SelectItem>
+                <SelectItem value="all" className="text-xs">
+                  All Status
+                </SelectItem>
+                <SelectItem value="active" className="text-xs">
+                  Active
+                </SelectItem>
+                <SelectItem value="inactive" className="text-xs">
+                  Inactive
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -131,7 +137,7 @@ const SchoolsPage = () => {
         {/* Right: Action Button */}
         <Button
           onClick={() => setCreateOpen(true)}
-          className="bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer h-9 px-4 text-xs font-semibold rounded-lg shadow-xs transition-colors shrink-0"
+          className="bg-primary text-primary-foreground hover:bg-primary/90 h-9 shrink-0 cursor-pointer rounded-lg px-4 text-xs font-semibold shadow-xs transition-colors"
         >
           + Register School
         </Button>

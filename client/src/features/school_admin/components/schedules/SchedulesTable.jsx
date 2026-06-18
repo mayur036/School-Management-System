@@ -51,7 +51,12 @@ const SkeletonRows = ({ count = 5 }) =>
     </TableRow>
   ));
 
-export const SchedulesTable = ({ search = '', staffFilter = 'all', dayFilter = 'all', onEdit }) => {
+export const SchedulesTable = ({
+  search = '',
+  staffFilter = 'all',
+  dayFilter = 'all',
+  onEdit,
+}) => {
   // Local debounced search & sorting states
   const [debouncedSearch, setDebouncedSearch] = useState(search);
   const [sortBy, setSortBy] = useState('staff_name');
@@ -73,7 +78,8 @@ export const SchedulesTable = ({ search = '', staffFilter = 'all', dayFilter = '
     sort_order: sortOrder,
   });
 
-  const [deleteSchedule, { isLoading: isDeleting }] = useDeleteStaffScheduleMutation();
+  const [deleteSchedule, { isLoading: isDeleting }] =
+    useDeleteStaffScheduleMutation();
 
   const schedules = schedulesData?.data?.schedules || [];
 
@@ -99,7 +105,7 @@ export const SchedulesTable = ({ search = '', staffFilter = 'all', dayFilter = '
 
   const renderSortChevron = (column) => {
     if (sortBy !== column) {
-      return <BASE.CHEVRON_SORT className="size-3 text-muted-foreground/55" />;
+      return <BASE.CHEVRON_SORT className="text-muted-foreground/55 size-3" />;
     }
     return sortOrder === 'ASC' ? (
       <BASE.CHEVRON_UP className="size-3" />
@@ -150,7 +156,7 @@ export const SchedulesTable = ({ search = '', staffFilter = 'all', dayFilter = '
           <TableRow className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase hover:bg-transparent">
             {/* Staff Member Header */}
             <TableHead
-              className="h-11 py-3 text-left cursor-pointer select-none hover:bg-muted/20"
+              className="hover:bg-muted/20 h-11 cursor-pointer py-3 text-left select-none"
               onClick={() => handleSort('staff_name')}
             >
               <div className="flex items-center gap-1">
@@ -164,7 +170,7 @@ export const SchedulesTable = ({ search = '', staffFilter = 'all', dayFilter = '
 
             {/* Subject Header */}
             <TableHead
-              className="h-11 py-3 text-left cursor-pointer select-none hover:bg-muted/20"
+              className="hover:bg-muted/20 h-11 cursor-pointer py-3 text-left select-none"
               onClick={() => handleSort('subject_name')}
             >
               <div className="flex items-center gap-1">
@@ -175,7 +181,7 @@ export const SchedulesTable = ({ search = '', staffFilter = 'all', dayFilter = '
 
             {/* Class / Room Header */}
             <TableHead
-              className="h-11 py-3 text-left cursor-pointer select-none hover:bg-muted/20"
+              className="hover:bg-muted/20 h-11 cursor-pointer py-3 text-left select-none"
               onClick={() => handleSort('class_name')}
             >
               <div className="flex items-center gap-1">
@@ -186,7 +192,7 @@ export const SchedulesTable = ({ search = '', staffFilter = 'all', dayFilter = '
 
             {/* Day Header */}
             <TableHead
-              className="h-11 py-3 text-left cursor-pointer select-none hover:bg-muted/20"
+              className="hover:bg-muted/20 h-11 cursor-pointer py-3 text-left select-none"
               onClick={() => handleSort('day_of_week')}
             >
               <div className="flex items-center gap-1">
@@ -215,14 +221,14 @@ export const SchedulesTable = ({ search = '', staffFilter = 'all', dayFilter = '
                 {item.subject_name}
               </TableCell>
               <TableCell className="text-muted-foreground py-3.5 text-xs font-medium">
-                {item.class_name}{' '}
-                {item.room ? `· Room ${item.room}` : ''}
+                {item.class_name} {item.room ? `· Room ${item.room}` : ''}
               </TableCell>
               <TableCell className="text-muted-foreground py-3.5 text-xs font-medium">
                 {item.day_of_week}
               </TableCell>
               <TableCell className="text-muted-foreground py-3.5 font-mono text-xs font-medium">
-                {item.period_name} ({item.start_time.substring(0, 5)} - {item.end_time.substring(0, 5)})
+                {item.period_name} ({item.start_time.substring(0, 5)} -{' '}
+                {item.end_time.substring(0, 5)})
               </TableCell>
               <TableCell className="py-3.5 text-right">
                 <div className="flex items-center justify-end gap-1">

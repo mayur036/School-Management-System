@@ -8,7 +8,7 @@ export const listAllSchoolAdmins = asyncHandler(async (req, res) => {
     school_id ? Number(school_id) : 0,
     status || 'all',
     sort_by || 'created_at',
-    sort_order || 'DESC'
+    sort_order || 'DESC',
   ]);
   res.status(200).json({ status: 'success', data: { admins } });
 });

@@ -29,15 +29,15 @@ import { formatDate, formatStaffId, getInitials } from '@/lib/utils';
 const SkeletonRows = ({ count = 5 }) =>
   Array.from({ length: count }).map((_, i) => (
     <TableRow key={i}>
-      <TableCell className="py-3 flex items-center gap-3">
-        <Skeleton className="size-9 rounded-full animate-pulse" />
+      <TableCell className="flex items-center gap-3 py-3">
+        <Skeleton className="size-9 animate-pulse rounded-full" />
         <div className="flex flex-col gap-1.5">
           <Skeleton className="h-4 w-32 animate-pulse" />
           <Skeleton className="h-3 w-20 animate-pulse" />
         </div>
       </TableCell>
       <TableCell className="py-3">
-        <Skeleton className="h-5 w-24 rounded-full animate-pulse" />
+        <Skeleton className="h-5 w-24 animate-pulse rounded-full" />
       </TableCell>
       <TableCell className="hidden py-3 md:table-cell">
         <Skeleton className="h-4 w-36 animate-pulse" />
@@ -46,13 +46,13 @@ const SkeletonRows = ({ count = 5 }) =>
         <Skeleton className="h-4 w-24 animate-pulse" />
       </TableCell>
       <TableCell className="py-3">
-        <Skeleton className="h-5 w-16 rounded-full animate-pulse" />
+        <Skeleton className="h-5 w-16 animate-pulse rounded-full" />
       </TableCell>
       <TableCell className="hidden py-3 xl:table-cell">
         <Skeleton className="h-4 w-20 animate-pulse" />
       </TableCell>
       <TableCell className="py-3 text-right">
-        <Skeleton className="ml-auto h-8 w-8 rounded-lg animate-pulse" />
+        <Skeleton className="ml-auto h-8 w-8 animate-pulse rounded-lg" />
       </TableCell>
     </TableRow>
   ));
@@ -211,13 +211,21 @@ const StaffTable = ({
         <Table>
           <TableHeader className="bg-muted/30">
             <TableRow className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase hover:bg-transparent">
-              <TableHead className="h-11 py-3 text-left">Staff Member</TableHead>
+              <TableHead className="h-11 py-3 text-left">
+                Staff Member
+              </TableHead>
               <TableHead className="h-11 py-3 text-left">Department</TableHead>
-              <TableHead className="hidden h-11 py-3 text-left md:table-cell">Email</TableHead>
-              <TableHead className="hidden h-11 py-3 text-left lg:table-cell">Phone</TableHead>
+              <TableHead className="hidden h-11 py-3 text-left md:table-cell">
+                Email
+              </TableHead>
+              <TableHead className="hidden h-11 py-3 text-left lg:table-cell">
+                Phone
+              </TableHead>
               <TableHead className="h-11 py-3 text-left">Status</TableHead>
-              <TableHead className="hidden h-11 py-3 text-left xl:table-cell">Registered</TableHead>
-              <TableHead className="h-11 py-3 text-right w-12">
+              <TableHead className="hidden h-11 py-3 text-left xl:table-cell">
+                Registered
+              </TableHead>
+              <TableHead className="h-11 w-12 py-3 text-right">
                 <span className="sr-only">Actions</span>
               </TableHead>
             </TableRow>
@@ -245,7 +253,7 @@ const StaffTable = ({
   // Grid / Card view rendering
   if (viewMode === 'grid') {
     return (
-      <div className="grid grid-cols-2 gap-x-3 gap-y-12 pt-10 sm:grid-cols-2 md:grid-cols-3 sm:gap-x-6 sm:gap-y-16 lg:grid-cols-4 xl:grid-cols-5">
+      <div className="grid grid-cols-2 gap-x-3 gap-y-12 pt-10 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-16 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
         {staff.map((member) => (
           <StaffCard
             key={member.staff_id}
@@ -267,72 +275,96 @@ const StaffTable = ({
           <TableHeader className="bg-muted/30">
             <TableRow className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase hover:bg-transparent">
               <TableHead
-                className="h-11 py-3 text-left cursor-pointer select-none hover:bg-muted/20"
+                className="hover:bg-muted/20 h-11 cursor-pointer py-3 text-left select-none"
                 onClick={() => onSort?.('first_name')}
               >
                 <div className="flex items-center gap-1">
                   Staff Member
                   {sortBy === 'first_name' ? (
-                    sortOrder === 'ASC' ? <BASE.CHEVRON_UP className="size-3" /> : <BASE.CHEVRON_DOWN className="size-3" />
+                    sortOrder === 'ASC' ? (
+                      <BASE.CHEVRON_UP className="size-3" />
+                    ) : (
+                      <BASE.CHEVRON_DOWN className="size-3" />
+                    )
                   ) : (
-                    <BASE.CHEVRON_SORT className="size-3 text-muted-foreground/55" />
+                    <BASE.CHEVRON_SORT className="text-muted-foreground/55 size-3" />
                   )}
                 </div>
               </TableHead>
               <TableHead
-                className="h-11 py-3 text-left cursor-pointer select-none hover:bg-muted/20"
+                className="hover:bg-muted/20 h-11 cursor-pointer py-3 text-left select-none"
                 onClick={() => onSort?.('department_name')}
               >
                 <div className="flex items-center gap-1">
                   Department
                   {sortBy === 'department_name' ? (
-                    sortOrder === 'ASC' ? <BASE.CHEVRON_UP className="size-3" /> : <BASE.CHEVRON_DOWN className="size-3" />
+                    sortOrder === 'ASC' ? (
+                      <BASE.CHEVRON_UP className="size-3" />
+                    ) : (
+                      <BASE.CHEVRON_DOWN className="size-3" />
+                    )
                   ) : (
-                    <BASE.CHEVRON_SORT className="size-3 text-muted-foreground/55" />
+                    <BASE.CHEVRON_SORT className="text-muted-foreground/55 size-3" />
                   )}
                 </div>
               </TableHead>
               <TableHead
-                className="hidden h-11 py-3 text-left md:table-cell cursor-pointer select-none hover:bg-muted/20"
+                className="hover:bg-muted/20 hidden h-11 cursor-pointer py-3 text-left select-none md:table-cell"
                 onClick={() => onSort?.('email')}
               >
                 <div className="flex items-center gap-1">
                   Email
                   {sortBy === 'email' ? (
-                    sortOrder === 'ASC' ? <BASE.CHEVRON_UP className="size-3" /> : <BASE.CHEVRON_DOWN className="size-3" />
+                    sortOrder === 'ASC' ? (
+                      <BASE.CHEVRON_UP className="size-3" />
+                    ) : (
+                      <BASE.CHEVRON_DOWN className="size-3" />
+                    )
                   ) : (
-                    <BASE.CHEVRON_SORT className="size-3 text-muted-foreground/55" />
+                    <BASE.CHEVRON_SORT className="text-muted-foreground/55 size-3" />
                   )}
                 </div>
               </TableHead>
-              <TableHead className="hidden h-11 py-3 text-left lg:table-cell">Phone</TableHead>
+              <TableHead className="hidden h-11 py-3 text-left lg:table-cell">
+                Phone
+              </TableHead>
               <TableHead
-                className="h-11 py-3 text-left cursor-pointer select-none hover:bg-muted/20"
+                className="hover:bg-muted/20 h-11 cursor-pointer py-3 text-left select-none"
                 onClick={() => onSort?.('status')}
               >
                 <div className="flex items-center gap-1">
                   Status
                   {sortBy === 'status' ? (
-                    sortOrder === 'ASC' ? <BASE.CHEVRON_UP className="size-3" /> : <BASE.CHEVRON_DOWN className="size-3" />
+                    sortOrder === 'ASC' ? (
+                      <BASE.CHEVRON_UP className="size-3" />
+                    ) : (
+                      <BASE.CHEVRON_DOWN className="size-3" />
+                    )
                   ) : (
-                    <BASE.CHEVRON_SORT className="size-3 text-muted-foreground/55" />
+                    <BASE.CHEVRON_SORT className="text-muted-foreground/55 size-3" />
                   )}
                 </div>
               </TableHead>
               <TableHead
-                className="hidden h-11 py-3 text-left xl:table-cell cursor-pointer select-none hover:bg-muted/20"
+                className="hover:bg-muted/20 hidden h-11 cursor-pointer py-3 text-left select-none xl:table-cell"
                 onClick={() => onSort?.('created_at')}
               >
                 <div className="flex items-center gap-1">
                   Registered
                   {sortBy === 'created_at' ? (
-                    sortOrder === 'ASC' ? <BASE.CHEVRON_UP className="size-3" /> : <BASE.CHEVRON_DOWN className="size-3" />
+                    sortOrder === 'ASC' ? (
+                      <BASE.CHEVRON_UP className="size-3" />
+                    ) : (
+                      <BASE.CHEVRON_DOWN className="size-3" />
+                    )
                   ) : (
-                    <BASE.CHEVRON_SORT className="size-3 text-muted-foreground/55" />
+                    <BASE.CHEVRON_SORT className="text-muted-foreground/55 size-3" />
                   )}
                 </div>
               </TableHead>
-              <TableHead className="h-11 py-3 text-right w-12">Actions</TableHead>
+              <TableHead className="h-11 w-12 py-3 text-right">
+                Actions
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -343,7 +375,7 @@ const StaffTable = ({
                   key={member.staff_id}
                   className="hover:bg-muted/10 border-b transition-colors last:border-0"
                 >
-                  <TableCell className="text-foreground py-3.5 font-medium flex items-center gap-3">
+                  <TableCell className="text-foreground flex items-center gap-3 py-3.5 font-medium">
                     <Avatar className="border-border size-9 border">
                       <AvatarImage
                         src={member.avatar_url}

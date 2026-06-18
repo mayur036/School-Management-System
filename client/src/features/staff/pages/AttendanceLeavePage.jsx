@@ -50,7 +50,10 @@ const formatDuration = (durationStr) => {
 // Skeleton rows (loading state)
 const AttendanceSkeletonRows = ({ count = 5 }) =>
   Array.from({ length: count }).map((_, i) => (
-    <TableRow key={i} className="hover:bg-transparent border-b transition-colors last:border-0">
+    <TableRow
+      key={i}
+      className="border-b transition-colors last:border-0 hover:bg-transparent"
+    >
       <TableCell className="py-3">
         <Skeleton className="h-4 w-28 animate-pulse" />
       </TableCell>
@@ -64,14 +67,17 @@ const AttendanceSkeletonRows = ({ count = 5 }) =>
         <Skeleton className="h-4 w-20 animate-pulse" />
       </TableCell>
       <TableCell className="py-3">
-        <Skeleton className="h-5 w-16 rounded-full animate-pulse" />
+        <Skeleton className="h-5 w-16 animate-pulse rounded-full" />
       </TableCell>
     </TableRow>
   ));
 
 const LeaveSkeletonRows = ({ count = 5 }) =>
   Array.from({ length: count }).map((_, i) => (
-    <TableRow key={i} className="hover:bg-transparent border-b transition-colors last:border-0">
+    <TableRow
+      key={i}
+      className="border-b transition-colors last:border-0 hover:bg-transparent"
+    >
       <TableCell className="py-3">
         <Skeleton className="h-4 w-24 animate-pulse" />
       </TableCell>
@@ -88,7 +94,7 @@ const LeaveSkeletonRows = ({ count = 5 }) =>
         <Skeleton className="h-4 w-40 animate-pulse" />
       </TableCell>
       <TableCell className="py-3">
-        <Skeleton className="h-5 w-16 rounded-full animate-pulse" />
+        <Skeleton className="h-5 w-16 animate-pulse rounded-full" />
       </TableCell>
       <TableCell className="py-3">
         <Skeleton className="h-4 w-28 animate-pulse" />
@@ -176,12 +182,15 @@ export const AttendanceLeavePage = () => {
                   <h3 className="text-foreground text-sm font-bold tracking-tight">
                     Time Logs
                   </h3>
-                  <p className="text-muted-foreground text-xs font-medium mt-0.5">
+                  <p className="text-muted-foreground mt-0.5 text-xs font-medium">
                     Historical overview of your clock-ins and clock-outs
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+                  <Select
+                    value={selectedMonth}
+                    onValueChange={setSelectedMonth}
+                  >
                     <SelectTrigger className="w-35 text-xs">
                       <SelectValue placeholder="Select Month" />
                     </SelectTrigger>
@@ -214,7 +223,7 @@ export const AttendanceLeavePage = () => {
                 </div>
               </div>
             </div>
-            
+
             {isAttendanceLoading ? (
               <Table>
                 <TableHeader className="bg-muted/30">
@@ -261,9 +270,7 @@ export const AttendanceLeavePage = () => {
                           {row.clock_in ? row.clock_in.substring(0, 5) : '-'}
                         </TableCell>
                         <TableCell className="text-muted-foreground py-3.5 font-mono text-xs font-medium">
-                          {row.clock_out
-                            ? row.clock_out.substring(0, 5)
-                            : '-'}
+                          {row.clock_out ? row.clock_out.substring(0, 5) : '-'}
                         </TableCell>
                         <TableCell className="text-muted-foreground py-3.5 text-xs font-medium">
                           {formatDuration(row.work_duration)}
@@ -291,13 +298,13 @@ export const AttendanceLeavePage = () => {
         {/* Tab 2: Leaves Management */}
         <TabsContent value="leaves" className="space-y-6">
           <div className="border-border bg-card overflow-hidden rounded-xl border shadow-xs">
-            <div className="border-border border-b p-4.5 bg-card">
+            <div className="border-border bg-card border-b p-4.5">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <h3 className="text-foreground text-sm font-bold tracking-tight">
                     Leave History
                   </h3>
-                  <p className="text-muted-foreground text-xs font-medium mt-0.5">
+                  <p className="text-muted-foreground mt-0.5 text-xs font-medium">
                     Track the status of your submitted leave applications
                   </p>
                 </div>
@@ -305,13 +312,13 @@ export const AttendanceLeavePage = () => {
                 {/* Apply Leave Action Button */}
                 <Button
                   onClick={() => setIsOpen(true)}
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer h-9 px-4 text-xs font-semibold rounded-lg shadow-xs transition-colors"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 h-9 cursor-pointer rounded-lg px-4 text-xs font-semibold shadow-xs transition-colors"
                 >
                   <ACTIONS.CREATE className="mr-2 size-4" /> Apply for Leave
                 </Button>
               </div>
             </div>
-            
+
             {isLeavesLoading ? (
               <Table>
                 <TableHeader className="bg-muted/30">

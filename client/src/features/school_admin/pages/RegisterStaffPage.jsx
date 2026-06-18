@@ -473,7 +473,7 @@ const RegisterStaffPage = () => {
                       </div>
                     </button>
                     {/* Horizontal Connector Line */}
-                    {idx < steps.length -1 && (
+                    {idx < steps.length - 1 && (
                       <div
                         className={`mx-2 h-0.5 min-w-4 flex-1 sm:mx-3 sm:min-w-5 md:mx-6 ${
                           isCompleted ? 'bg-primary' : 'bg-border'

@@ -45,10 +45,7 @@ const StaffDashboardstatCard = ({ stats = {}, isLoading }) => {
     return (
       <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
         {[1, 2, 3, 4].map((i) => (
-          <Card
-            key={i}
-            className="border-border bg-card border"
-          >
+          <Card key={i} className="border-border bg-card border">
             <CardContent className="flex flex-row items-center gap-2.5 p-2.5 sm:gap-4 sm:p-4">
               <Skeleton className="size-8 shrink-0 rounded-xl sm:size-10" />
               <div className="flex min-w-0 flex-1 flex-col gap-1.5">

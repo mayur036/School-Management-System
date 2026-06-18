@@ -19,7 +19,10 @@ import { ACTIONS, EMPTY_STATE } from '@/lib/icons';
 // Skeleton rows (loading state)
 const SkeletonRows = ({ count = 3 }) =>
   Array.from({ length: count }).map((_, i) => (
-    <TableRow key={i} className="hover:bg-transparent border-b transition-colors last:border-0">
+    <TableRow
+      key={i}
+      className="border-b transition-colors last:border-0 hover:bg-transparent"
+    >
       <TableCell className="py-3 text-center">
         <Skeleton className="mx-auto h-4 w-8 animate-pulse" />
       </TableCell>
@@ -33,12 +36,12 @@ const SkeletonRows = ({ count = 3 }) =>
         <Skeleton className="h-4 w-16 animate-pulse" />
       </TableCell>
       <TableCell className="py-3 text-center">
-        <Skeleton className="mx-auto h-5 w-16 rounded-full animate-pulse" />
+        <Skeleton className="mx-auto h-5 w-16 animate-pulse rounded-full" />
       </TableCell>
       <TableCell className="py-3 text-right">
         <div className="flex items-center justify-end gap-1">
-          <Skeleton className="h-8 w-8 rounded-lg animate-pulse" />
-          <Skeleton className="h-8 w-8 rounded-lg animate-pulse" />
+          <Skeleton className="h-8 w-8 animate-pulse rounded-lg" />
+          <Skeleton className="h-8 w-8 animate-pulse rounded-lg" />
         </div>
       </TableCell>
     </TableRow>
@@ -46,7 +49,8 @@ const SkeletonRows = ({ count = 3 }) =>
 
 export const PeriodsTable = ({ onEdit }) => {
   const { data: periodsData, isLoading } = useGetSchoolPeriodsQuery();
-  const [deletePeriod, { isLoading: isDeleting }] = useDeleteSchoolPeriodMutation();
+  const [deletePeriod, { isLoading: isDeleting }] =
+    useDeleteSchoolPeriodMutation();
 
   const periods = periodsData?.data?.periods || [];
 
@@ -71,12 +75,12 @@ export const PeriodsTable = ({ onEdit }) => {
       <Table>
         <TableHeader className="bg-muted/30">
           <TableRow className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase hover:bg-transparent">
-            <TableHead className="h-11 py-3 text-center w-16">Order</TableHead>
+            <TableHead className="h-11 w-16 py-3 text-center">Order</TableHead>
             <TableHead className="h-11 py-3 text-left">Name</TableHead>
             <TableHead className="h-11 py-3 text-left">Start Time</TableHead>
             <TableHead className="h-11 py-3 text-left">End Time</TableHead>
-            <TableHead className="h-11 py-3 text-center w-24">Type</TableHead>
-            <TableHead className="h-11 py-3 text-right w-24">Actions</TableHead>
+            <TableHead className="h-11 w-24 py-3 text-center">Type</TableHead>
+            <TableHead className="h-11 w-24 py-3 text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -105,22 +109,12 @@ export const PeriodsTable = ({ onEdit }) => {
       <Table>
         <TableHeader className="bg-muted/30">
           <TableRow className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase hover:bg-transparent">
-            <TableHead className="h-11 py-3 text-center w-16">
-              Order
-            </TableHead>
+            <TableHead className="h-11 w-16 py-3 text-center">Order</TableHead>
             <TableHead className="h-11 py-3 text-left">Name</TableHead>
-            <TableHead className="h-11 py-3 text-left">
-              Start Time
-            </TableHead>
-            <TableHead className="h-11 py-3 text-left">
-              End Time
-            </TableHead>
-            <TableHead className="h-11 py-3 text-center w-24">
-              Type
-            </TableHead>
-            <TableHead className="h-11 py-3 text-right w-24">
-              Actions
-            </TableHead>
+            <TableHead className="h-11 py-3 text-left">Start Time</TableHead>
+            <TableHead className="h-11 py-3 text-left">End Time</TableHead>
+            <TableHead className="h-11 w-24 py-3 text-center">Type</TableHead>
+            <TableHead className="h-11 w-24 py-3 text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -129,7 +123,7 @@ export const PeriodsTable = ({ onEdit }) => {
               key={period.period_id}
               className="hover:bg-muted/10 border-b transition-colors last:border-0"
             >
-              <TableCell className="text-center font-mono py-3.5 text-xs font-medium">
+              <TableCell className="py-3.5 text-center font-mono text-xs font-medium">
                 {period.period_order}
               </TableCell>
               <TableCell className="text-foreground py-3.5 text-xs font-semibold">

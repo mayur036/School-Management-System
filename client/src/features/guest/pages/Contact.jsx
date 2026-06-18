@@ -60,8 +60,8 @@ export const Contact = () => {
           Let's talk about your school
         </h1>
         <p className="text-muted-foreground mx-auto mt-5 max-w-2xl text-base leading-relaxed text-pretty sm:text-lg">
-          Have a question about CampusCore or want help getting set up? Send us a
-          message and our team will get back to you.
+          Have a question about CampusCore or want help getting set up? Send us
+          a message and our team will get back to you.
         </p>
       </section>
 

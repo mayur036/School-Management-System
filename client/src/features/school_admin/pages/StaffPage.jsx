@@ -47,7 +47,10 @@ const StaffPage = () => {
   });
 
   const { data: deptData } = useGetDepartmentsQuery();
-  const departments = useMemo(() => deptData?.data?.departments ?? [], [deptData]);
+  const departments = useMemo(
+    () => deptData?.data?.departments ?? [],
+    [deptData]
+  );
 
   const staff = useMemo(() => staffData?.data?.staff ?? [], [staffData]);
 
@@ -94,17 +97,17 @@ const StaffPage = () => {
       {/* Search & Actions Bar (eSkooly style) */}
       <div className="bg-card border-border flex flex-col gap-4 rounded-xl border p-4.5 shadow-sm sm:flex-row sm:items-end sm:justify-between">
         {/* Left: Search Input Box & Filters */}
-        <div className="flex flex-col gap-4 flex-1 max-w-4xl sm:flex-row sm:items-end">
+        <div className="flex max-w-4xl flex-1 flex-col gap-4 sm:flex-row sm:items-end">
           {/* Search */}
-          <div className="flex flex-col gap-1.5 flex-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80">
+          <div className="flex flex-1 flex-col gap-1.5">
+            <span className="text-muted-foreground/80 text-[10px] font-bold tracking-wider uppercase">
               Search Employee
             </span>
             <div className="relative w-full">
               <BASE.SEARCH className="text-muted-foreground/60 absolute top-1/2 left-3 size-4 -translate-y-1/2" />
               <input
                 type="text"
-                className="bg-card border-border text-foreground placeholder:text-muted-foreground/60 w-full rounded-lg border py-2 pr-4 pl-9 text-xs outline-none focus:ring-1 focus:ring-primary"
+                className="bg-card border-border text-foreground placeholder:text-muted-foreground/60 focus:ring-primary w-full rounded-lg border py-2 pr-4 pl-9 text-xs outline-none focus:ring-1"
                 placeholder="Type name, ID or designation..."
                 value={searchTerm}
                 onChange={(e) => {
@@ -116,8 +119,8 @@ const StaffPage = () => {
           </div>
 
           {/* Department Filter */}
-          <div className="flex flex-col gap-1.5 w-full sm:w-48">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80">
+          <div className="flex w-full flex-col gap-1.5 sm:w-48">
+            <span className="text-muted-foreground/80 text-[10px] font-bold tracking-wider uppercase">
               Department
             </span>
             <Select
@@ -131,9 +134,15 @@ const StaffPage = () => {
                 <SelectValue placeholder="All Departments" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all" className="text-xs">All Departments</SelectItem>
+                <SelectItem value="all" className="text-xs">
+                  All Departments
+                </SelectItem>
                 {departments.map((dept) => (
-                  <SelectItem key={dept.department_id} value={String(dept.department_id)} className="text-xs">
+                  <SelectItem
+                    key={dept.department_id}
+                    value={String(dept.department_id)}
+                    className="text-xs"
+                  >
                     {dept.name}
                   </SelectItem>
                 ))}
@@ -142,8 +151,8 @@ const StaffPage = () => {
           </div>
 
           {/* Status Filter */}
-          <div className="flex flex-col gap-1.5 w-full sm:w-36">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80">
+          <div className="flex w-full flex-col gap-1.5 sm:w-36">
+            <span className="text-muted-foreground/80 text-[10px] font-bold tracking-wider uppercase">
               Status
             </span>
             <Select
@@ -157,9 +166,15 @@ const StaffPage = () => {
                 <SelectValue placeholder="All Status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all" className="text-xs">All Status</SelectItem>
-                <SelectItem value="active" className="text-xs">Active</SelectItem>
-                <SelectItem value="inactive" className="text-xs">Inactive</SelectItem>
+                <SelectItem value="all" className="text-xs">
+                  All Status
+                </SelectItem>
+                <SelectItem value="active" className="text-xs">
+                  Active
+                </SelectItem>
+                <SelectItem value="inactive" className="text-xs">
+                  Inactive
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -192,11 +207,9 @@ const StaffPage = () => {
           {/* Action Button */}
           <Button
             asChild
-            className="bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer h-9 flex-1 px-4 text-xs font-semibold rounded-lg shadow-xs transition-colors sm:flex-none"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 h-9 flex-1 cursor-pointer rounded-lg px-4 text-xs font-semibold shadow-xs transition-colors sm:flex-none"
           >
-            <Link to="/school/staff/register">
-              + Add New Employee
-            </Link>
+            <Link to="/school/staff/register">+ Add New Employee</Link>
           </Button>
         </div>
       </div>

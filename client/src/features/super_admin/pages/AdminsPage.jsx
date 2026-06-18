@@ -42,7 +42,10 @@ const AdminsPage = () => {
   const admins = useMemo(() => data?.data?.admins ?? [], [data]);
 
   const { data: schoolsData } = useGetSchoolsQuery();
-  const schools = useMemo(() => schoolsData?.data?.schools ?? [], [schoolsData]);
+  const schools = useMemo(
+    () => schoolsData?.data?.schools ?? [],
+    [schoolsData]
+  );
 
   // Dialog states
   const [statusAdmin, setStatusAdmin] = useState(null);
@@ -85,9 +88,9 @@ const AdminsPage = () => {
       {/* Search & Actions Bar (eSkooly style) */}
       <div className="bg-card border-border flex flex-col gap-4 rounded-xl border p-4.5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
         {/* Left: Search Input Box & Filters */}
-        <div className="flex flex-col gap-4 flex-1 max-w-4xl sm:flex-row sm:items-end">
+        <div className="flex max-w-4xl flex-1 flex-col gap-4 sm:flex-row sm:items-end">
           {/* Search */}
-          <div className="flex flex-col gap-1.5 flex-1">
+          <div className="flex flex-1 flex-col gap-1.5">
             <span className="text-muted-foreground/80 text-[10px] font-bold tracking-wider uppercase">
               Search Admin
             </span>
@@ -95,7 +98,7 @@ const AdminsPage = () => {
               <BASE.SEARCH className="text-muted-foreground/60 absolute top-1/2 left-3 size-4 -translate-y-1/2" />
               <input
                 type="text"
-                className="bg-card border-border text-foreground placeholder:text-muted-foreground/60 w-full rounded-lg border py-2 pr-4 pl-9 text-xs outline-none focus:ring-1 focus:ring-primary"
+                className="bg-card border-border text-foreground placeholder:text-muted-foreground/60 focus:ring-primary w-full rounded-lg border py-2 pr-4 pl-9 text-xs outline-none focus:ring-1"
                 placeholder="Type admin name, email or school..."
                 value={searchTerm}
                 onChange={(e) => {
@@ -107,7 +110,7 @@ const AdminsPage = () => {
           </div>
 
           {/* School Filter */}
-          <div className="flex flex-col gap-1.5 w-full sm:w-48">
+          <div className="flex w-full flex-col gap-1.5 sm:w-48">
             <span className="text-muted-foreground/80 text-[10px] font-bold tracking-wider uppercase">
               School
             </span>
@@ -122,9 +125,15 @@ const AdminsPage = () => {
                 <SelectValue placeholder="All Schools" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all" className="text-xs">All Schools</SelectItem>
+                <SelectItem value="all" className="text-xs">
+                  All Schools
+                </SelectItem>
                 {schools.map((school) => (
-                  <SelectItem key={school.school_id} value={String(school.school_id)} className="text-xs">
+                  <SelectItem
+                    key={school.school_id}
+                    value={String(school.school_id)}
+                    className="text-xs"
+                  >
                     {school.name}
                   </SelectItem>
                 ))}
@@ -133,7 +142,7 @@ const AdminsPage = () => {
           </div>
 
           {/* Status Filter */}
-          <div className="flex flex-col gap-1.5 w-full sm:w-36">
+          <div className="flex w-full flex-col gap-1.5 sm:w-36">
             <span className="text-muted-foreground/80 text-[10px] font-bold tracking-wider uppercase">
               Status
             </span>
@@ -148,9 +157,15 @@ const AdminsPage = () => {
                 <SelectValue placeholder="All Status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all" className="text-xs">All Status</SelectItem>
-                <SelectItem value="active" className="text-xs">Active</SelectItem>
-                <SelectItem value="inactive" className="text-xs">Inactive</SelectItem>
+                <SelectItem value="all" className="text-xs">
+                  All Status
+                </SelectItem>
+                <SelectItem value="active" className="text-xs">
+                  Active
+                </SelectItem>
+                <SelectItem value="inactive" className="text-xs">
+                  Inactive
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>

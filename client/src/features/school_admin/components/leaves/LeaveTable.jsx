@@ -17,10 +17,13 @@ import { formatDate, getInitials } from '@/lib/utils';
 // ── Skeleton Loading Rows ─────────────────────────────────────
 const SkeletonRows = ({ count = 5 }) =>
   Array.from({ length: count }).map((_, i) => (
-    <TableRow key={i} className="hover:bg-transparent border-b transition-colors last:border-0">
+    <TableRow
+      key={i}
+      className="border-b transition-colors last:border-0 hover:bg-transparent"
+    >
       <TableCell className="py-3">
         <div className="flex items-center gap-3">
-          <Skeleton className="size-9 rounded-full animate-pulse" />
+          <Skeleton className="size-9 animate-pulse rounded-full" />
           <div className="flex flex-col gap-1.5">
             <Skeleton className="h-4 w-28 animate-pulse" />
             <Skeleton className="h-3 w-20 animate-pulse" />
@@ -30,29 +33,36 @@ const SkeletonRows = ({ count = 5 }) =>
       <TableCell className="py-3">
         <Skeleton className="h-5 w-20 animate-pulse" />
       </TableCell>
-      <TableCell className="py-3 hidden md:table-cell">
+      <TableCell className="hidden py-3 md:table-cell">
         <Skeleton className="h-4 w-20 animate-pulse" />
       </TableCell>
-      <TableCell className="py-3 hidden lg:table-cell">
+      <TableCell className="hidden py-3 lg:table-cell">
         <Skeleton className="h-4 w-32 animate-pulse" />
       </TableCell>
-      <TableCell className="py-3 hidden xl:table-cell">
+      <TableCell className="hidden py-3 xl:table-cell">
         <Skeleton className="h-4 w-28 animate-pulse" />
       </TableCell>
       <TableCell className="py-3">
-        <Skeleton className="h-5 w-16 rounded-full animate-pulse" />
+        <Skeleton className="h-5 w-16 animate-pulse rounded-full" />
       </TableCell>
       <TableCell className="py-3 text-right">
-        <Skeleton className="ml-auto h-7 w-14 rounded-lg animate-pulse" />
+        <Skeleton className="ml-auto h-7 w-14 animate-pulse rounded-lg" />
       </TableCell>
     </TableRow>
   ));
 
 // ── Main Table Component ──────────────────────────────────────
-const LeaveTable = ({ leaves, isLoading, onReview, sortBy, sortOrder, onSort }) => {
+const LeaveTable = ({
+  leaves,
+  isLoading,
+  onReview,
+  sortBy,
+  sortOrder,
+  onSort,
+}) => {
   const renderSortChevron = (column) => {
     if (sortBy !== column) {
-      return <BASE.CHEVRON_SORT className="size-3 text-muted-foreground/55" />;
+      return <BASE.CHEVRON_SORT className="text-muted-foreground/55 size-3" />;
     }
     return sortOrder === 'ASC' ? (
       <BASE.CHEVRON_UP className="size-3" />
@@ -67,13 +77,23 @@ const LeaveTable = ({ leaves, isLoading, onReview, sortBy, sortOrder, onSort }) 
         <Table>
           <TableHeader className="bg-muted/30">
             <TableRow className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase hover:bg-transparent">
-              <TableHead className="h-11 py-3 text-left">Staff Member</TableHead>
+              <TableHead className="h-11 py-3 text-left">
+                Staff Member
+              </TableHead>
               <TableHead className="h-11 py-3 text-left">Leave Type</TableHead>
-              <TableHead className="h-11 py-3 text-left hidden md:table-cell">Department</TableHead>
-              <TableHead className="h-11 py-3 text-left hidden lg:table-cell">Duration</TableHead>
-              <TableHead className="h-11 py-3 text-left hidden xl:table-cell">Reason</TableHead>
+              <TableHead className="hidden h-11 py-3 text-left md:table-cell">
+                Department
+              </TableHead>
+              <TableHead className="hidden h-11 py-3 text-left lg:table-cell">
+                Duration
+              </TableHead>
+              <TableHead className="hidden h-11 py-3 text-left xl:table-cell">
+                Reason
+              </TableHead>
               <TableHead className="h-11 py-3 text-left">Status</TableHead>
-              <TableHead className="h-11 py-3 text-right w-16">Actions</TableHead>
+              <TableHead className="h-11 w-16 py-3 text-right">
+                Actions
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -101,7 +121,7 @@ const LeaveTable = ({ leaves, isLoading, onReview, sortBy, sortOrder, onSort }) 
           <TableRow className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase hover:bg-transparent">
             {/* Staff Member */}
             <TableHead
-              className="h-11 py-3 text-left cursor-pointer select-none hover:bg-muted/20"
+              className="hover:bg-muted/20 h-11 cursor-pointer py-3 text-left select-none"
               onClick={() => onSort?.('staff_name')}
             >
               <div className="flex items-center gap-1">
@@ -112,7 +132,7 @@ const LeaveTable = ({ leaves, isLoading, onReview, sortBy, sortOrder, onSort }) 
 
             {/* Leave Type */}
             <TableHead
-              className="h-11 py-3 text-left cursor-pointer select-none hover:bg-muted/20"
+              className="hover:bg-muted/20 h-11 cursor-pointer py-3 text-left select-none"
               onClick={() => onSort?.('leave_type')}
             >
               <div className="flex items-center gap-1">
@@ -121,11 +141,13 @@ const LeaveTable = ({ leaves, isLoading, onReview, sortBy, sortOrder, onSort }) 
               </div>
             </TableHead>
 
-            <TableHead className="h-11 py-3 text-left hidden md:table-cell">Department</TableHead>
+            <TableHead className="hidden h-11 py-3 text-left md:table-cell">
+              Department
+            </TableHead>
 
             {/* Duration */}
             <TableHead
-              className="h-11 py-3 text-left hidden lg:table-cell cursor-pointer select-none hover:bg-muted/20"
+              className="hover:bg-muted/20 hidden h-11 cursor-pointer py-3 text-left select-none lg:table-cell"
               onClick={() => onSort?.('total_days')}
             >
               <div className="flex items-center gap-1">
@@ -134,11 +156,13 @@ const LeaveTable = ({ leaves, isLoading, onReview, sortBy, sortOrder, onSort }) 
               </div>
             </TableHead>
 
-            <TableHead className="h-11 py-3 text-left hidden xl:table-cell">Reason</TableHead>
+            <TableHead className="hidden h-11 py-3 text-left xl:table-cell">
+              Reason
+            </TableHead>
 
             {/* Status */}
             <TableHead
-              className="h-11 py-3 text-left cursor-pointer select-none hover:bg-muted/20"
+              className="hover:bg-muted/20 h-11 cursor-pointer py-3 text-left select-none"
               onClick={() => onSort?.('status')}
             >
               <div className="flex items-center gap-1">
@@ -147,7 +171,7 @@ const LeaveTable = ({ leaves, isLoading, onReview, sortBy, sortOrder, onSort }) 
               </div>
             </TableHead>
 
-            <TableHead className="h-11 py-3 text-right w-16">Actions</TableHead>
+            <TableHead className="h-11 w-16 py-3 text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
