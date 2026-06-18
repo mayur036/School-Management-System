@@ -40,6 +40,10 @@ export const env = {
     apiSecret: required('CLOUDINARY_API_SECRET'),
   },
 
+  google: {
+    clientId: required('GOOGLE_CLIENT_ID'),
+  },
+
   client: {
     url: process.env.CLIENT_URL,
   },

@@ -70,3 +70,5 @@ design-system/
 *.dump
 *.bak
 
+# JSON SECRETS
+google.json

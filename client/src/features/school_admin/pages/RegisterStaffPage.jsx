@@ -427,7 +427,7 @@ const RegisterStaffPage = () => {
         <div className="flex flex-col gap-6">
           {/* Horizontal Stepper (Desktop & Mobile) */}
           <div className="bg-card border-border rounded-xl border p-4 shadow-sm">
-            <div className="flex flex-row items-center justify-between gap-2 sm:gap-6">
+            <div className="flex flex-row items-center justify-center gap-2 sm:gap-6">
               {steps.map((step, idx) => {
                 const isActive = step.id === activeStep;
                 const isCompleted = step.id < activeStep;
@@ -473,7 +473,7 @@ const RegisterStaffPage = () => {
                       </div>
                     </button>
                     {/* Horizontal Connector Line */}
-                    {idx < steps.length - 1 && (
+                    {idx < steps.length -1 && (
                       <div
                         className={`mx-2 h-0.5 min-w-4 flex-1 sm:mx-3 sm:min-w-5 md:mx-6 ${
                           isCompleted ? 'bg-primary' : 'bg-border'

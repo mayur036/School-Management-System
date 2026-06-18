@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 
 import { env, isProduction } from '../config/env.js';
+import { googleClient } from '../config/googleClient.js';
 import { sendEmail } from '../config/mailer.js';
 import { ApiError } from '../middleware/error.js';
 import authModel from '../models/auth.model.js';
@@ -79,6 +80,77 @@ const login = asyncHandler(async (req, res) => {
 });
 
 /**
+ * @desc    Authenticate user via a Google ID token and login
+ * @route   POST /api/auth/google-login
+ * @access  Public
+ */
+const googleLogin = asyncHandler(async (req, res) => {
+  const { credential } = req.body;
+
+  // 1. Verify the Google ID token (signature + audience). Never trust the email
+  //    until the token is verified against our client id.
+  let payload;
+  try {
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: env.google.clientId,
+    });
+    payload = ticket.getPayload();
+  } catch {
+    throw new ApiError(401, 'Invalid Google credential');
+  }
+
+  if (!payload?.email || payload.email_verified !== true) {
+    throw new ApiError(401, 'Google account email is not verified');
+  }
+
+  // 2. Look up an existing staff member by the verified email. Google login does
+  //    not provision accounts — staff are created by admins.
+  const user = await authModel.findUserByEmail(payload.email);
+  if (!user) {
+    throw new ApiError(
+      404,
+      'No CampusCore account found for this Google email'
+    );
+  }
+
+  // 3. Check active status
+  if (user.status !== 'active') {
+    throw new ApiError(
+      403,
+      'Account is inactive. Please contact your administrator.'
+    );
+  }
+
+  // 4. Check school active status
+  if (user.role_name !== 'super_admin' && user.school_status === 'inactive') {
+    throw new ApiError(
+      403,
+      'Your school account is currently inactive. Please contact the system administrator.'
+    );
+  }
+
+  // 5. Generate JWT token (identical claims to password login)
+  const token = signToken({
+    staff_id: user.staff_id,
+    role_name: user.role_name,
+    school_id: user.school_id,
+    department_id: user.department_id,
+    first_name: user.first_name,
+    last_name: user.last_name,
+    email: user.email,
+  });
+
+  // 6. Set the httpOnly auth cookie (same options as password login)
+  res.cookie(COOKIE_NAME, token, { ...cookieOptions, maxAge: TOKEN_TTL_MS });
+
+  // Remove password hash from response
+  delete user.password_hash;
+
+  return ok(res, { user }, 'Login successful');
+});
+
+/**
  * @desc    Logout user and clear cookie
  * @route   POST /api/auth/logout
  * @access  Public
@@ -110,7 +182,7 @@ const getMe = asyncHandler(async (req, res) => {
   return ok(res, { user }, 'User details retrieved successfully');
 });
 
-export { getMe, login, logout };
+export { getMe, googleLogin, login, logout };
 
 /**
  * @desc    Request password reset link

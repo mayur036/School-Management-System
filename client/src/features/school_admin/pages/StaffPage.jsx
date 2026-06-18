@@ -92,7 +92,7 @@ const StaffPage = () => {
       />
 
       {/* Search & Actions Bar (eSkooly style) */}
-      <div className="bg-card border-border flex flex-col gap-4 rounded-xl border p-4.5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+      <div className="bg-card border-border flex flex-col gap-4 rounded-xl border p-4.5 shadow-sm sm:flex-row sm:items-end sm:justify-between">
         {/* Left: Search Input Box & Filters */}
         <div className="flex flex-col gap-4 flex-1 max-w-4xl sm:flex-row sm:items-end">
           {/* Search */}
@@ -165,22 +165,8 @@ const StaffPage = () => {
           </div>
         </div>
 
-        {/* Right: Action Button */}
-        <Button
-          asChild
-          className="bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer h-9 px-4 text-xs font-semibold rounded-lg shadow-xs transition-colors shrink-0"
-        >
-          <Link to="/school/staff/register">
-            + Add New Employee
-          </Link>
-        </Button>
-      </div>
-
-      {/* ── Controls & Actions Bar ────────────────────────────── */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
-        {/* Action Controls */}
-        <div className="flex flex-wrap items-center gap-2">
-
+        {/* Right: View Switcher + Action Button */}
+        <div className="flex items-center gap-2 sm:shrink-0 sm:justify-end">
           {/* Grid / List Layout Switcher */}
           <div className="border-border bg-muted/40 hidden items-center rounded-lg border p-0.5 sm:flex">
             <Button
@@ -202,6 +188,16 @@ const StaffPage = () => {
               <BASE.GRID_VIEW className="size-4" />
             </Button>
           </div>
+
+          {/* Action Button */}
+          <Button
+            asChild
+            className="bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer h-9 flex-1 px-4 text-xs font-semibold rounded-lg shadow-xs transition-colors sm:flex-none"
+          >
+            <Link to="/school/staff/register">
+              + Add New Employee
+            </Link>
+          </Button>
         </div>
       </div>
 

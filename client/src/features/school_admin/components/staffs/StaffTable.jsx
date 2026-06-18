@@ -245,7 +245,7 @@ const StaffTable = ({
   // Grid / Card view rendering
   if (viewMode === 'grid') {
     return (
-      <div className="grid grid-cols-2 gap-x-3 gap-y-12 pt-10 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-16 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-x-3 gap-y-12 pt-10 sm:grid-cols-2 md:grid-cols-3 sm:gap-x-6 sm:gap-y-16 lg:grid-cols-4 xl:grid-cols-5">
         {staff.map((member) => (
           <StaffCard
             key={member.staff_id}

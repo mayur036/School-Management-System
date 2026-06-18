@@ -3,6 +3,7 @@ import { Router } from 'express';
 import {
   forgotPassword,
   getMe,
+  googleLogin,
   login,
   logout,
   resetPassword,
@@ -12,6 +13,7 @@ import { authLimiter } from '../middleware/rateLimiter.js';
 import { validate } from '../middleware/validate.js';
 import {
   forgotPasswordSchema,
+  googleLoginSchema,
   loginSchema,
   resetPasswordSchema,
 } from '../schema/auth.schema.js';
@@ -20,6 +22,12 @@ const router = Router();
 
 // Auth rate limiter: 10 attempts per 15 minutes per IP
 router.post('/login', authLimiter, validate(loginSchema), login);
+router.post(
+  '/google-login',
+  authLimiter,
+  validate(googleLoginSchema),
+  googleLogin
+);
 router.post('/logout', logout);
 router.get('/me', protect, getMe);
 router.post(

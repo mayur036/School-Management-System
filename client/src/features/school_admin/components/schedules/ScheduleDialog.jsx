@@ -354,7 +354,7 @@ export const ScheduleDialog = ({
               </Label>
               <Input
                 id="room"
-                placeholder="e.g. Room 104"
+                placeholder="e.g. 104"
                 className="h-9 text-xs"
                 {...register('room')}
               />

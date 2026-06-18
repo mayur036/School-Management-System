@@ -49,27 +49,27 @@ VALUES
   (1, 1, 'Mathematics', 'active'),
   (2, 1, 'Science', 'active');
 
--- C. Insert Test School Admin (password: Admin@123)
+-- C. Insert Test School Admin (password: Mayur@23)
 INSERT IGNORE INTO staff
   (staff_id, role_id, school_id, department_id, first_name, last_name,
    email, password_hash, phone, status)
 SELECT
-  2, r.role_id, 1, NULL, 'Sarah', 'Conner',
-  'schooladmin@greenwood.edu',
+  2, r.role_id, 1, NULL, 'Mayur', 'Kapadi',
+  'mayurkapadi23@gmail.com',
   '$2b$10$kPYRXvMaQgIUzT9vEBS/KOPKvtOkMcalw95hmbEwG.mSp1FNQ1IFu',
   '555-0233', 'active'
 FROM roles r
 WHERE r.role_name = 'school_admin';
 
--- D. Insert Test Staff Member (password: Admin@123)
+-- D. Insert Test Staff Member (password: Mayur@12)
 INSERT IGNORE INTO staff
   (staff_id, role_id, school_id, department_id, first_name, last_name,
    email, password_hash, phone, status, created_by)
 SELECT
-  3, r.role_id, 1, 1, 'John', 'Doe',
-  'staff@greenwood.edu',
+  3, r.role_id, 1, 1, 'Mayur', 'Kapadi',
+  'mayurkapadi12@gmail.com',
   '$2b$10$kPYRXvMaQgIUzT9vEBS/KOPKvtOkMcalw95hmbEwG.mSp1FNQ1IFu',
-  '555-0244', 'active', 2
+  '6274941815', 'active', 2
 FROM roles r
 WHERE r.role_name = 'staff';
 

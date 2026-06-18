@@ -53,6 +53,53 @@
 
 /**
  * @swagger
+ * /api/auth/google-login:
+ *   post:
+ *     summary: Authenticate an existing user with a Google ID token
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - credential
+ *             properties:
+ *               credential:
+ *                 type: string
+ *                 description: The Google ID token (JWT) returned by Google Sign-In
+ *     responses:
+ *       200:
+ *         description: Login successful, session cookie set
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Login successful
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     user:
+ *                       type: object
+ *       400:
+ *         description: Validation failed (missing credential)
+ *       401:
+ *         description: Invalid Google credential
+ *       403:
+ *         description: Account or school is inactive
+ *       404:
+ *         description: No CampusCore account found for this Google email
+ */
+
+/**
+ * @swagger
  * /api/auth/logout:
  *   post:
  *     summary: Logout current user and clear token cookie

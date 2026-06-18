@@ -22,6 +22,24 @@ export const authApi = baseApi.injectEndpoints({
       },
     }),
 
+    googleLogin: builder.mutation({
+      query: (credential) => ({
+        url: '/auth/google-login',
+        method: 'POST',
+        data: { credential },
+      }),
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          // API returns { success, message, data: { user } }
+          dispatch(setCredentials({ user: data.data.user }));
+          dispatch(baseApi.util.resetApiState());
+        } catch {
+          // surfaced to the caller via unwrap()
+        }
+      },
+    }),
+
     getMe: builder.query({
       query: () => ({ url: '/auth/me', method: 'GET' }),
       providesTags: ['User'],
@@ -72,6 +90,7 @@ export const authApi = baseApi.injectEndpoints({
 export const {
   useGetMeQuery,
   useLoginMutation,
+  useGoogleLoginMutation,
   useLogoutMutation,
   useForgotPasswordMutation,
   useResetPasswordMutation,
